@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Radial Gradient -->
+    <radialGradient id="appBgGrad" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="60%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#080B12" />
+    </radialGradient>
+
+    <!-- Glowing Rim -->
+    <linearGradient id="appRimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="50%" stop-color="#334155" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+
+    <!-- Emblem Fill -->
+    <linearGradient id="emblemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="60%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+
+    <!-- Glass Specular Reflection -->
+    <linearGradient id="appGlassShine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.35" />
+      <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Outer Ambient Glow Filter -->
+    <filter id="iconGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Base Rounded Container with Glass Depth -->
+  <rect x="24" y="24" width="464" height="464" rx="108" fill="url(#appBgGrad)" stroke="url(#appRimGrad)" stroke-width="6" />
+  
+  <!-- Glass Top Reflection Curve -->
+  <path d="M 28 132 C 28 74, 74 28, 132 28 L 380 28 C 438 28, 484 74, 484 132 C 340 180, 172 180, 28 132 Z" fill="url(#appGlassShine)" />
+
+  <!-- Ambient Light Center -->
+  <circle cx="256" cy="256" r="140" fill="#8B5CF6" opacity="0.18" filter="url(#iconGlow)" />
+  <circle cx="280" cy="280" r="120" fill="#22D3EE" opacity="0.14" filter="url(#iconGlow)" />
+
+  <!-- Center P / Play Symbol Group -->
+  <g transform="translate(136, 116)">
+    <!-- Outer Shadow Layer -->
+    <path d="M 40 40 
+             L 160 40 
+             C 210 40, 230 75, 230 120 
+             C 230 165, 200 195, 155 195 
+             L 90 195 
+             L 90 250 
+             L 40 250 
+             Z" 
+          fill="none" 
+          stroke="#22D3EE" 
+          stroke-width="12" 
+          opacity="0.35" 
+          filter="url(#iconGlow)" />
+
+    <!-- Solid Emblem Body -->
+    <path d="M 40 40 
+             L 160 40 
+             C 210 40, 230 75, 230 120 
+             C 230 165, 200 195, 155 195 
+             L 90 195 
+             L 90 250 
+             L 40 250 
+             Z" 
+          fill="url(#emblemGrad)" />
+
+    <!-- Outer Top Rim Glow -->
+    <path d="M 40 40 L 160 40 C 205 40, 225 70, 228 108" fill="none" stroke="#FFFFFF" stroke-width="4" opacity="0.6" stroke-linecap="round" />
+
+    <!-- Dark Inner Cutout for P Loop -->
+    <path d="M 90 82 
+             L 90 152 
+             L 155 117 
+             Z" 
+          fill="#080B12" />
+
+    <!-- Play Symbol Inset Arrow (Cyan Bright) -->
+    <path d="M 96 92 
+             L 96 142 
+             L 142 117 
+             Z" 
+          fill="#22D3EE" 
+          filter="url(#iconGlow)" />
+
+    <!-- Play Symbol Inset Highlight -->
+    <path d="M 96 92 L 142 117" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+  </g>
+</svg>

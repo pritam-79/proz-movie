@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60" width="100%" height="100%">
+  <defs>
+    <linearGradient id="prozCompactGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+    <linearGradient id="cyanCompactGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#22D3EE" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+
+  <!-- P/Play Combined Emblem Small -->
+  <g transform="translate(6, 6)">
+    <rect x="0" y="0" width="48" height="48" rx="12" fill="#111827" stroke="#334155" stroke-width="1.5" />
+    <path d="M 14 11 L 30 11 C 38 11, 41 16, 41 22 C 41 28, 37 32, 30 32 L 21 32 L 21 37 L 14 37 Z" fill="url(#prozCompactGrad)" />
+    <path d="M 22 17 L 22 26 L 31 22 Z" fill="#080B12" />
+    <path d="M 23 19 L 23 25 L 28 22 Z" fill="url(#cyanCompactGrad)" />
+  </g>
+
+  <!-- Typography -->
+  <text x="68" y="39" font-family="'Inter', sans-serif" font-weight="900" font-size="28" letter-spacing="2" fill="#F8FAFC">PROZ</text>
+  <text x="165" y="39" font-family="'Inter', sans-serif" font-weight="800" font-size="28" letter-spacing="3" fill="url(#cyanCompactGrad)">MOVIE</text>
+</svg>
