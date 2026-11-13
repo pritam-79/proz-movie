@@ -8,6 +8,14 @@
 /out/
 /build
 
+# Android build outputs and cache
+.gradle/
+**/build/
+android/.gradle/
+android/build/
+android/app/build/
+*.hprof
+
 # Environment variables
 .env*.local
 
@@ -19,3 +27,4 @@ yarn-error.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
