@@ -46,21 +46,22 @@ export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({ title, categor
         setTotalPages(data.total_pages ?? data.totalPages ?? 1);
         return;
       }
+      throw new Error(`Fetch response not ok: ${res.status}`);
     } catch (err) {
       console.warn('CategoryCatalog fetch failed, using fallback:', err);
+      // Direct fallback from MOCK_CONTENT
+      let fallbackList = MOCK_CONTENT.filter(c => !c.isRestricted18Plus && !c.is_adult);
+      if (category && category !== 'all') {
+        fallbackList = fallbackList.filter(c => c.category === category);
+      }
+      if (type && type !== 'all') {
+        fallbackList = fallbackList.filter(c => c.type === type || c.content_type === type);
+      }
+      setItems(fallbackList);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
     }
-
-    // Direct fallback from MOCK_CONTENT
-    let fallbackList = MOCK_CONTENT.filter(c => !c.isRestricted18Plus && !c.is_adult);
-    if (category && category !== 'all') {
-      fallbackList = fallbackList.filter(c => c.category === category);
-    }
-    if (type && type !== 'all') {
-      fallbackList = fallbackList.filter(c => c.type === type || c.content_type === type);
-    }
-    setItems(fallbackList);
-    setTotalPages(1);
-    setLoading(false);
   }, [category, type, filters, page]);
 
   useEffect(() => {
