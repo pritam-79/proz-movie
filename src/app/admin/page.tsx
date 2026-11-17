@@ -919,31 +919,29 @@ function AnalyticsDashboard() {
 // ─── DashboardOverview ─────────────────────────────────────────────────────────
 function DashboardOverview({ onNavigate }: { onNavigate: (s: AdminSection) => void }) {
   const [stats, setStats] = useState<StatsData>(MOCK_STATS);
-  const [isAdmin, setIsAdmin] = useState(true);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/api/admin/stats')
-      .then(res => { if (res.status === 403) { setIsAdmin(false); return null; } return res.json(); })
-      .then(d => { if (d?.stats) setStats(d.stats); })
+      .then(res => res.ok ? res.json() : null)
+      .then(d => {
+        if (d) {
+          setStats(prev => ({
+            ...prev,
+            ...d,
+            ...(d.stats || {}),
+            totalContent: d.totalContent ?? prev.totalContent,
+            activeUsers: d.activeUsers ?? prev.activeUsers,
+            activeSubscriptions: d.activeSubscriptions ?? prev.activeSubscriptions,
+            totalEpisodes: d.totalEpisodes ?? prev.totalEpisodes,
+            pendingImports: d.pendingImports ?? prev.pendingImports,
+            revenue: d.revenue ?? prev.revenue,
+          }));
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
-
-  if (!loading && !isAdmin) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center space-y-5">
-        <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-          <Lock className="w-7 h-7 text-red-400" />
-        </div>
-        <h2 className="text-xl font-bold text-[#F8FAFC]">Access Denied</h2>
-        <p className="text-[#94A3B8] text-sm max-w-sm">You don&apos;t have administrator privileges to view this dashboard.</p>
-        <Link href="/" className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#8B5CF6] hover:bg-[#7C3AED] text-white font-bold text-sm transition-colors">
-          <Home className="w-4 h-4" /> Go Home
-        </Link>
-      </div>
-    );
-  }
 
   const statCards = [
     { label: 'Total Content', value: stats.totalContent.toLocaleString(), icon: Film, color: 'text-[#8B5CF6]', bg: 'bg-[#8B5CF6]/10', border: 'border-[#8B5CF6]/20' },

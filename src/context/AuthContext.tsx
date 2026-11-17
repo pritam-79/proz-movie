@@ -37,11 +37,11 @@ const DEFAULT_USER: UserProfile = {
   is18PlusVerified: false,
   role: "admin", // Granted admin permissions by default for evaluation of Admin Dashboard
   subscription: {
-    planId: "plan_premium",
+    planId: "plan_free",
     status: "active",
     renewsAt: "2026-12-01",
-    maxScreens: 6,
-    videoQuality: "4K UHD + HDR + Dolby Atmos"
+    maxScreens: 1,
+    videoQuality: "720p Standard HD"
   }
 };
 

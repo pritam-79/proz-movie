@@ -86,7 +86,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }
 
   // Active stream URL
-  const activeStream = currentEpisode?.fallbackMp4 || currentEpisode?.streamUrl || content.fallbackMp4 || content.streamUrl;
+  const activeStream = currentEpisode?.fallbackMp4 || content.fallbackMp4 || currentEpisode?.streamUrl || content.streamUrl;
 
   // 1. Initialize Shaka Player or Native Player
   useEffect(() => {
@@ -94,8 +94,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     const initShaka = async () => {
       try {
-        if (typeof window !== 'undefined' && videoRef.current) {
-          // Dynamic import of Shaka Player to prevent SSR issues
+        if (typeof window !== 'undefined' && videoRef.current && activeStream) {
+          // If it's a direct MP4, standard video element handles it instantly
+          if (activeStream.endsWith('.mp4') || (!activeStream.includes('.m3u8') && !activeStream.includes('.mpd'))) {
+            videoRef.current.src = activeStream;
+            videoRef.current.load();
+            setIsBuffering(false);
+            return;
+          }
+
+          // Dynamic import of Shaka Player for DASH / HLS streams
           const shakaModule = await import('shaka-player');
           const shaka: any = shakaModule.default || shakaModule;
           
@@ -107,47 +115,41 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             const player = new shaka.Player(videoRef.current);
             shakaPlayerInstance = player;
 
-            // Configure Adaptive Bitrate (ABR)
             player.configure({
-              abr: {
-                enabled: true,
-                defaultBandwidthEstimate: 5000000, // 5 Mbps
-              },
-              streaming: {
-                bufferingGoal: 30,
-                rebufferingGoal: 2,
+              abr: { enabled: true, defaultBandwidthEstimate: 5000000 },
+              streaming: { bufferingGoal: 30, rebufferingGoal: 2 }
+            });
+
+            player.addEventListener('error', () => {
+              // Direct fallback to MP4 on Shaka error
+              if (videoRef.current && (content.fallbackMp4 || activeStream)) {
+                videoRef.current.src = content.fallbackMp4 || activeStream;
+                videoRef.current.load();
+                setIsBuffering(false);
               }
             });
 
-            // Listen for errors
-            player.addEventListener('error', (event: any) => {
-              console.warn('Shaka error:', event.detail);
-              // Fallback to direct video src
-              if (videoRef.current && activeStream) {
-                videoRef.current.src = activeStream;
-              }
-            });
-
-            // Load stream
             try {
               await player.load(activeStream);
-            } catch (loadErr) {
-              // Direct fallback
-              if (videoRef.current) {
-                videoRef.current.src = activeStream;
+              setIsBuffering(false);
+            } catch {
+              if (videoRef.current && (content.fallbackMp4 || activeStream)) {
+                videoRef.current.src = content.fallbackMp4 || activeStream;
+                videoRef.current.load();
+                setIsBuffering(false);
               }
             }
           } else {
-            // Direct HTML5 fallback for browsers without MSE (like iOS Safari)
-            if (videoRef.current) {
-              videoRef.current.src = activeStream;
-            }
+            videoRef.current.src = activeStream;
+            videoRef.current.load();
+            setIsBuffering(false);
           }
         }
       } catch (err) {
-        console.warn('Shaka load fallback to HTML5 native:', err);
-        if (videoRef.current) {
+        if (videoRef.current && activeStream) {
           videoRef.current.src = activeStream;
+          videoRef.current.load();
+          setIsBuffering(false);
         }
       }
     };
@@ -339,6 +341,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         playsInline
         onClick={togglePlay}
         onTimeUpdate={handleTimeUpdate}
+        onCanPlay={() => setIsBuffering(false)}
+        onLoadedData={() => setIsBuffering(false)}
+        onError={() => {
+          setIsBuffering(false);
+          if (videoRef.current && content.fallbackMp4 && videoRef.current.src !== content.fallbackMp4) {
+            videoRef.current.src = content.fallbackMp4;
+            videoRef.current.load();
+          }
+        }}
         onLoadedMetadata={() => {
           if (videoRef.current) {
             setDuration(videoRef.current.duration);
@@ -346,7 +357,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           }
         }}
         onWaiting={() => setIsBuffering(true)}
-        onPlaying={() => setIsBuffering(false)}
+        onPlaying={() => {
+          setIsBuffering(false);
+          setIsPlaying(true);
+        }}
+        onPause={() => setIsPlaying(false)}
         onEnded={() => {
           setIsPlaying(false);
           if (nextEpisode) {
@@ -354,6 +369,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           }
         }}
       />
+
+      {/* Center Play Button Overlay when Paused */}
+      {!isPlaying && !isBuffering && (
+        <div 
+          onClick={togglePlay}
+          className="absolute inset-0 flex items-center justify-center cursor-pointer z-20 group/play"
+        >
+          <div className="w-20 h-20 rounded-full bg-gradient-to-r from-proz-purple to-proz-cyan flex items-center justify-center shadow-[0_0_35px_rgba(139,92,246,0.6)] group-hover/play:scale-110 transition-transform">
+            <Play className="w-9 h-9 text-white fill-white ml-1" />
+          </div>
+        </div>
+      )}
 
       {/* Loading Spinner during buffering */}
       {isBuffering && (
