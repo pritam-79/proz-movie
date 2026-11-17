@@ -24,6 +24,7 @@ interface AuthContextType {
   login: (email: string, role?: 'user' | 'admin') => Promise<void>;
   signup: (email: string, name: string) => Promise<void>;
   logout: () => void;
+  updateProfile: (updates: Partial<UserProfile>) => void;
   upgradeSubscription: (planId: string) => void;
   verify18Plus: (birthDate: string) => boolean;
   verifyParentalPin: (pin: string) => boolean;
@@ -192,6 +193,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {}
   };
 
+  const updateProfile = (updates: Partial<UserProfile>) => {
+    if (!user) return;
+    const updatedUser: UserProfile = {
+      ...user,
+      ...updates,
+    };
+    setUser(updatedUser);
+    try {
+      localStorage.setItem('proz_auth_user', JSON.stringify(updatedUser));
+    } catch (e) {}
+  };
+
   const upgradeSubscription = (planId: string) => {
     if (!user) return;
     const planConfigs: Record<string, Partial<UserSubscription>> = {
@@ -257,6 +270,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         signup,
         logout,
+        updateProfile,
         upgradeSubscription,
         verify18Plus,
         verifyParentalPin

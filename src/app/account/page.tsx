@@ -18,11 +18,18 @@ import { useAuth } from '@/context/AuthContext';
 import { brandConfig } from '@/config/brand.config';
 
 export default function AccountPage() {
-  const { user, logout } = useAuth();
-  const [name, setName] = useState(user?.name || 'Alex Vance');
-  const [email, setEmail] = useState(user?.email || 'alex.proz@example.com');
+  const { user, logout, updateProfile } = useAuth();
+  const [name, setName] = useState(user?.name || '');
+  const [email, setEmail] = useState(user?.email || '');
   const [isSaved, setIsSaved] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  React.useEffect(() => {
+    if (user) {
+      setName(user.name);
+      setEmail(user.email);
+    }
+  }, [user]);
 
   if (!user) {
     return (
@@ -38,6 +45,7 @@ export default function AccountPage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    updateProfile({ name, email });
     setIsSaved(true);
     setTimeout(() => setIsSaved(false), 3000);
   };

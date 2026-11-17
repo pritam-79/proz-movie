@@ -63,7 +63,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<'server1' | 'server2' | 'server3' | 'server4' | 'trailer' | 'direct'>('server1');
+  const [selectedServer, setSelectedServer] = useState<'server1' | 'server2' | 'server3' | 'server4' | 'server5' | 'trailer' | 'direct'>('server1');
 
   // Resolve current episode if series
   let currentEpisode: any = null;
@@ -102,11 +102,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (server === 'server1') {
       // Server 1: VidLink Pro (Full Movie Stream in 4K/HD)
       return isSeries
-        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${ep}?primaryColor=22d3ee&secondaryColor=080b12&iconColor=22d3ee`
-        : `https://vidlink.pro/movie/${tmdbId}?primaryColor=22d3ee&secondaryColor=080b12&iconColor=22d3ee`;
+        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${ep}`
+        : `https://vidlink.pro/movie/${tmdbId}`;
     }
     if (server === 'server2') {
-      // Server 2: AutoEmbed Cloud (Full Movie Stream)
+      // Server 2: AutoEmbed Cloud (High Speed Movie Stream)
       return isSeries
         ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${ep}`
         : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
@@ -118,7 +118,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         : `https://embed.su/embed/movie/${tmdbId}`;
     }
     if (server === 'server4') {
-      // Server 4: MultiEmbed VIP (Full Movie Stream)
+      // Server 4: VidSrc VIP (Reliable alternate stream)
+      return isSeries
+        ? `https://vidsrc.xyz/embed/tv?tmdb=${tmdbId}&season=${season}&episode=${ep}`
+        : `https://vidsrc.xyz/embed/movie?tmdb=${tmdbId}`;
+    }
+    if (server === 'server5') {
+      // Server 5: MultiEmbed Stream
       return isSeries
         ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${ep}`
         : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
@@ -510,7 +516,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ Server 1: VidLink (Full Movie)
+              ⚡ S1: VidLink
             </button>
             <button
               onClick={() => setSelectedServer('server2')}
@@ -520,7 +526,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ Server 2: AutoEmbed
+              ⚡ S2: AutoEmbed
             </button>
             <button
               onClick={() => setSelectedServer('server3')}
@@ -530,7 +536,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ Server 3: EmbedSu
+              ⚡ S3: EmbedSu
             </button>
             <button
               onClick={() => setSelectedServer('server4')}
@@ -540,7 +546,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ Server 4: MultiEmbed
+              ⚡ S4: VidSrc
+            </button>
+            <button
+              onClick={() => setSelectedServer('server5')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'server5'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              ⚡ S5: MultiEmbed
             </button>
             <button
               onClick={() => setSelectedServer('trailer')}
@@ -572,9 +588,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               className="px-2.5 py-1 rounded-full glass-card border border-proz-border/50 text-[11px] font-bold text-proz-white bg-[#080B12]"
             >
               <option value="server1">⚡ Server 1: VidLink (Full Movie)</option>
-              <option value="server2">⚡ Server 2: AutoEmbed</option>
-              <option value="server3">⚡ Server 3: EmbedSu</option>
-              <option value="server4">⚡ Server 4: MultiEmbed</option>
+              <option value="server2">⚡ Server 2: AutoEmbed Cloud</option>
+              <option value="server3">⚡ Server 3: EmbedSu Ultra</option>
+              <option value="server4">⚡ Server 4: VidSrc VIP</option>
+              <option value="server5">⚡ Server 5: MultiEmbed VIP</option>
               <option value="trailer">🍿 4K Official Trailer</option>
               <option value="direct">🎥 Direct MP4 Player</option>
             </select>
@@ -819,20 +836,54 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       </div>
       ) : (
         <div
-          className={`absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs z-30 pointer-events-none transition-opacity duration-300 ${
+          className={`absolute bottom-3 left-4 right-4 flex flex-wrap items-center justify-between gap-2 text-xs z-30 transition-opacity duration-300 ${
             showControls ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <div className="px-3.5 py-1.5 rounded-full glass-card border border-proz-border/50 text-[11px] text-proz-white/90 shadow-glass-md flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>
-              {selectedServer === 'server1' && '⚡ Server 1: VidLink Pro (Full Movie / Show Stream in 4K/HD)'}
-              {selectedServer === 'server2' && '⚡ Server 2: AutoEmbed Cloud (Full Movie Stream)'}
+              {selectedServer === 'server1' && '⚡ Server 1: VidLink Pro (Full Movie Stream in 4K/HD)'}
+              {selectedServer === 'server2' && '⚡ Server 2: AutoEmbed Cloud (High Speed Stream)'}
               {selectedServer === 'server3' && '⚡ Server 3: EmbedSu Ultra (Full Movie Stream)'}
-              {selectedServer === 'server4' && '⚡ Server 4: MultiEmbed VIP (Full Movie Stream)'}
-              {selectedServer === 'trailer' && '🍿 Official 4K Trailer Mode Active • Switch to Server 1-4 for Full Movie!'}
-              {' • If you experience buffering, switch servers above anytime!'}
+              {selectedServer === 'server4' && '⚡ Server 4: VidSrc VIP (Full Movie Stream)'}
+              {selectedServer === 'server5' && '⚡ Server 5: MultiEmbed VIP (Full Movie Stream)'}
+              {selectedServer === 'trailer' && '🍿 Official 4K Trailer Active'}
+              {' • If content is unavailable or buffers, click any backup server 👉'}
             </span>
+          </div>
+
+          <div className="flex items-center gap-1 pointer-events-auto">
+            <button
+              onClick={() => setSelectedServer('server2')}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all ${
+                selectedServer === 'server2'
+                  ? 'bg-proz-cyan text-black border-proz-cyan'
+                  : 'glass-card border-proz-border/40 text-proz-white hover:border-proz-cyan/50'
+              }`}
+            >
+              Try S2: AutoEmbed
+            </button>
+            <button
+              onClick={() => setSelectedServer('server3')}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all ${
+                selectedServer === 'server3'
+                  ? 'bg-proz-cyan text-black border-proz-cyan'
+                  : 'glass-card border-proz-border/40 text-proz-white hover:border-proz-cyan/50'
+              }`}
+            >
+              Try S3: EmbedSu
+            </button>
+            <button
+              onClick={() => setSelectedServer('server4')}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition-all ${
+                selectedServer === 'server4'
+                  ? 'bg-proz-cyan text-black border-proz-cyan'
+                  : 'glass-card border-proz-border/40 text-proz-white hover:border-proz-cyan/50'
+              }`}
+            >
+              Try S4: VidSrc
+            </button>
           </div>
         </div>
       )}

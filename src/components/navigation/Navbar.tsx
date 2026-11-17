@@ -201,17 +201,6 @@ export const Navbar: React.FC = () => {
                         <Sparkles className="w-4 h-4 text-proz-purple" />
                         <span>Subscription Plans</span>
                       </Link>
-
-                      {user.role === 'admin' && (
-                        <Link
-                          href="/admin"
-                          onClick={() => setIsUserDropdownOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-amber-300 hover:bg-amber-950/30 transition-colors"
-                        >
-                          <ShieldCheck className="w-4 h-4" />
-                          <span>Admin Dashboard</span>
-                        </Link>
-                      )}
                     </div>
 
                     <div className="pt-1 border-t border-proz-border/40">
@@ -290,23 +279,13 @@ export const Navbar: React.FC = () => {
               >
                 Plans & Pricing
               </Link>
-              {user?.role === 'admin' ? (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-center py-2 rounded-xl text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30"
-                >
-                  Admin Portal
-                </Link>
-              ) : (
-                <Link
-                  href="/account"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-center py-2 rounded-xl text-xs font-semibold glass-button-secondary"
-                >
-                  Account
-                </Link>
-              )}
+              <Link
+                href="/account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-center py-2 rounded-xl text-xs font-semibold glass-button-secondary"
+              >
+                Account
+              </Link>
             </div>
           </div>
         )}
