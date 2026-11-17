@@ -94,8 +94,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     if (server === 'server1') {
       return isSeries
-        ? `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${ep}`
-        : `https://vidsrc.to/embed/movie/${tmdbId}`;
+        ? `https://vidsrc.xyz/embed/tv/${tmdbId}/${season}/${ep}`
+        : `https://vidsrc.xyz/embed/movie/${tmdbId}`;
     }
     if (server === 'server2') {
       return isSeries
@@ -186,7 +186,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         shakaPlayerInstance.destroy();
       }
     };
-  }, [activeStream]);
+  }, [activeStream, selectedServer]);
 
   // 2. Resume last saved progress
   useEffect(() => {
@@ -375,6 +375,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           {/* Video Element */}
           <video
             ref={videoRef}
+            src={activeStream}
             className="w-full h-full object-contain cursor-pointer"
             playsInline
             onClick={togglePlay}
