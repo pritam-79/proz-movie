@@ -25,10 +25,11 @@ export const MOCK_CONTENT: ContentItem[] = [
       "Japanese"
     ],
     "ratingScore": 8.8,
-    "ratingCount": 38540,
+    "ratingCount": 58540,
     "posterUrl": "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=73_1biulkYk",
+    "youtubeId": "73_1biulkYk",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -83,10 +84,11 @@ export const MOCK_CONTENT: ContentItem[] = [
       "French"
     ],
     "ratingScore": 8.9,
-    "ratingCount": 52100,
+    "ratingCount": 62100,
     "posterUrl": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=Way9Dexny3w",
+    "youtubeId": "Way9Dexny3w",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -104,11 +106,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Zendaya",
         "character": "Chani",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/r3A7ev7QkjOGBFErOKC9v7bOTLG.jpg"
-      },
-      {
-        "name": "Rebecca Ferguson",
-        "character": "Lady Jessica",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
       }
     ],
     "crew": [
@@ -145,6 +142,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/fm6K9vYQ79FGzIsmvgqvNDm9xZs.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=uYPbbksJxIg",
+    "youtubeId": "uYPbbksJxIg",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     "isFeatured": true,
@@ -162,11 +160,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Emily Blunt",
         "character": "Katherine 'Kitty' Oppenheimer",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
-      },
-      {
-        "name": "Robert Downey Jr.",
-        "character": "Lewis Strauss",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
       }
     ],
     "crew": [
@@ -202,6 +195,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/rAiYTsqJJR0nhcztQw57crXs9vo.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=zSWdZVtXT7E",
+    "youtubeId": "zSWdZVtXT7E",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -235,7 +229,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "slug": "the-dark-knight",
     "type": "movie",
     "category": "hollywood",
-    "synopsis": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
+    "synopsis": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets.",
     "tagline": "Why so serious?",
     "releaseYear": 2008,
     "runtimeMinutes": 152,
@@ -255,6 +249,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=EXeTwQWrcwY",
+    "youtubeId": "EXeTwQWrcwY",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -309,6 +304,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=cqGjhVJWtEg",
+    "youtubeId": "cqGjhVJWtEg",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -342,7 +338,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "slug": "gladiator-ii",
     "type": "movie",
     "category": "hollywood",
-    "synopsis": "Years after witnessing the death of the revered hero Maximus at the hands of his uncle, Lucius must enter the Colosseum after his home is conquered by the tyrannical Emperors who now lead Rome with an iron fist. With rage in his heart and the future of the Empire at stake, Lucius must look to his past to find strength and honor to return the glory of Rome to its people.",
+    "synopsis": "Years after witnessing the death of the revered hero Maximus at the hands of his uncle, Lucius must enter the Colosseum after his home is conquered by the tyrannical Emperors who now lead Rome with an iron fist.",
     "tagline": "What we do in life echoes in eternity.",
     "releaseYear": 2024,
     "runtimeMinutes": 148,
@@ -362,6 +358,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/euYIwmwkmz95mnXvufEmbL69ovr.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=4rgYUipGJNo",
+    "youtubeId": "4rgYUipGJNo",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -379,11 +376,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Pedro Pascal",
         "character": "Marcus Acacius",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Denzel Washington",
-        "character": "Macrinus",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
       }
     ],
     "crew": [
@@ -400,7 +392,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "slug": "john-wick-chapter-4",
     "type": "movie",
     "category": "hollywood",
-    "synopsis": "With the price on his head ever increasing, John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe and forces that turn old friends into foes.",
+    "synopsis": "With the price on his head ever increasing, John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe.",
     "tagline": "Baba Yaga returns.",
     "releaseYear": 2023,
     "runtimeMinutes": 169,
@@ -420,6 +412,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/7I6VUdPj6tQECNHdviJkUHD2389.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=qEVUtrk8_B4",
+    "youtubeId": "qEVUtrk8_B4",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -472,6 +465,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/s16H6tpK2utvwDtzZ8Qy4qm5Emw.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=d9MyW72ELq0",
+    "youtubeId": "d9MyW72ELq0",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -499,307 +493,264 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ser-010",
-    "title": "Stranger Things",
-    "originalTitle": "Stranger Things",
-    "slug": "stranger-things",
-    "type": "series",
-    "category": "series",
-    "synopsis": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
-    "tagline": "Every ending has a beginning.",
-    "releaseYear": 2024,
-    "runtimeMinutes": 55,
-    "maturityRating": "TV-14",
+    "id": "proz-mov-010",
+    "title": "Avengers: Endgame",
+    "originalTitle": "Avengers: Endgame",
+    "slug": "avengers-endgame",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "After the devastating events of Avengers: Infinity War, the universe is in ruins due to the efforts of the Mad Titan, Thanos. With the help of remaining allies, the Avengers must assemble once more in order to undo Thanos's actions and undo the chaos to the universe, no matter what consequences may be in store, and no matter who they face...",
+    "tagline": "Part of the journey is the end.",
+    "releaseYear": 2019,
+    "runtimeMinutes": 181,
+    "maturityRating": "PG-13",
     "genres": [
+      "Action",
       "Sci-Fi",
-      "Mystery",
-      "Drama",
-      "Horror"
+      "Adventure"
     ],
     "languages": [
       "English",
-      "Hindi",
-      "Spanish"
+      "Hindi"
     ],
-    "ratingScore": 9.2,
-    "ratingCount": 95400,
-    "posterUrl": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-    "backdropUrl": "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
-    "trailerUrl": "https://www.youtube.com/watch?v=b9EkMc79ZSU",
+    "ratingScore": 9.3,
+    "ratingCount": 142000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=TcMBFSGVi1c",
+    "youtubeId": "TcMBFSGVi1c",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
     "isTrending": true,
-    "isOriginal": true,
+    "isOriginal": false,
     "isRestricted18Plus": false,
-    "tmdb_id": 66732,
+    "tmdb_id": 299534,
     "cast": [
       {
-        "name": "Millie Bobby Brown",
-        "character": "Eleven",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+        "name": "Robert Downey Jr.",
+        "character": "Tony Stark / Iron Man",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
       },
       {
-        "name": "Finn Wolfhard",
-        "character": "Mike Wheeler",
+        "name": "Chris Evans",
+        "character": "Steve Rogers / Captain America",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Anthony Russo, Joe Russo",
+        "role": "Directors"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-011",
+    "title": "Inception",
+    "originalTitle": "Inception",
+    "slug": "inception",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Cobb, a skilled thief who commits corporate espionage by infiltrating the subconscious of his targets, is offered a chance to regain his old life as payment for a task considered to be impossible: 'inception', the implantation of another person's idea into a target's subconscious.",
+    "tagline": "Your mind is the scene of the crime.",
+    "releaseYear": 2010,
+    "runtimeMinutes": 148,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Sci-Fi",
+      "Adventure"
+    ],
+    "languages": [
+      "English",
+      "Japanese",
+      "French"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 112000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/s3TBrRGB1iav7gFOCNx3H31MoES.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=YoHD9XEInc0",
+    "youtubeId": "YoHD9XEInc0",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 27205,
+    "cast": [
+      {
+        "name": "Leonardo DiCaprio",
+        "character": "Dom Cobb",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/wo2hJpn04vbtmh0B9utCFdsQhxM.jpg"
       },
       {
-        "name": "Winona Ryder",
-        "character": "Joyce Byers",
+        "name": "Joseph Gordon-Levitt",
+        "character": "Arthur",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
       }
     ],
     "crew": [
       {
-        "name": "The Duffer Brothers",
-        "role": "Creators"
-      }
-    ],
-    "seasons": [
-      {
-        "id": "st-s1",
-        "seasonNumber": 1,
-        "title": "Season 1",
-        "episodeCount": 8,
-        "episodes": [
-          {
-            "id": "st-s1-e1",
-            "seasonNumber": 1,
-            "episodeNumber": 1,
-            "title": "Chapter One: The Vanishing of Will Byers",
-            "durationMinutes": 48,
-            "synopsis": "On his way home from a friend's house, young Will sees something terrifying.",
-            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
-            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
-          },
-          {
-            "id": "st-s1-e2",
-            "seasonNumber": 1,
-            "episodeNumber": 2,
-            "title": "Chapter Two: The Weirdo on Maple Street",
-            "durationMinutes": 55,
-            "synopsis": "Lucas, Mike and Dustin try to talk to the girl they found in the woods.",
-            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
-            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          }
-        ]
+        "name": "Christopher Nolan",
+        "role": "Director"
       }
     ]
   },
   {
-    "id": "proz-ser-011",
-    "title": "The Last of Us",
-    "originalTitle": "The Last of Us",
-    "slug": "the-last-of-us",
-    "type": "series",
-    "category": "series",
-    "synopsis": "Twenty years after modern civilization has been destroyed, Joel, a hardened survivor, is hired to smuggle Ellie, a 14-year-old girl, out of an oppressive quarantine zone. What starts as a small job soon becomes a brutal, heartbreaking journey.",
-    "tagline": "When you're lost in the darkness, look for the light.",
-    "releaseYear": 2023,
-    "runtimeMinutes": 60,
-    "maturityRating": "TV-MA",
+    "id": "proz-mov-012",
+    "title": "Top Gun: Maverick",
+    "originalTitle": "Top Gun: Maverick",
+    "slug": "top-gun-maverick",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "After thirty years, Maverick is still pushing the envelope as a top naval aviator, but must confront ghosts of his past when he leads TOP GUN's elite graduates on a mission that demands the ultimate sacrifice from those chosen to fly it.",
+    "tagline": "Feel the need. The need for speed.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 130,
+    "maturityRating": "PG-13",
     "genres": [
-      "Drama",
       "Action",
-      "Sci-Fi",
-      "Adventure"
-    ],
-    "languages": [
-      "English",
-      "Hindi"
-    ],
-    "ratingScore": 9.3,
-    "ratingCount": 84300,
-    "posterUrl": "https://image.tmdb.org/t/p/w500/uKvVjK1q1NVx4e6k3o9qJ8U3b98.jpg",
-    "backdropUrl": "https://image.tmdb.org/t/p/original/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg",
-    "trailerUrl": "https://www.youtube.com/watch?v=uLtkt8BonwM",
-    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "isFeatured": true,
-    "isTrending": true,
-    "isOriginal": false,
-    "isRestricted18Plus": false,
-    "tmdb_id": 100088,
-    "cast": [
-      {
-        "name": "Pedro Pascal",
-        "character": "Joel Miller",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Bella Ramsey",
-        "character": "Ellie Williams",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
-      }
-    ],
-    "crew": [
-      {
-        "name": "Craig Mazin",
-        "role": "Creator"
-      }
-    ]
-  },
-  {
-    "id": "proz-ser-012",
-    "title": "Breaking Bad",
-    "originalTitle": "Breaking Bad",
-    "slug": "breaking-bad",
-    "type": "series",
-    "category": "series",
-    "synopsis": "Walter White, a New Mexico chemistry teacher diagnosed with terminal lung cancer, teams up with former student Jesse Pinkman to secure his family's future by producing and selling crystal meth.",
-    "tagline": "Remember my name.",
-    "releaseYear": 2013,
-    "runtimeMinutes": 47,
-    "maturityRating": "TV-MA",
-    "genres": [
-      "Crime",
-      "Drama",
-      "Thriller"
-    ],
-    "languages": [
-      "English",
-      "Spanish"
-    ],
-    "ratingScore": 9.6,
-    "ratingCount": 142000,
-    "posterUrl": "https://image.tmdb.org/t/p/w500/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg",
-    "backdropUrl": "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
-    "trailerUrl": "https://www.youtube.com/watch?v=HhesaQXLuRY",
-    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    "isFeatured": true,
-    "isTrending": false,
-    "isOriginal": false,
-    "isRestricted18Plus": false,
-    "tmdb_id": 1396,
-    "cast": [
-      {
-        "name": "Bryan Cranston",
-        "character": "Walter White",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Aaron Paul",
-        "character": "Jesse Pinkman",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
-      }
-    ],
-    "crew": [
-      {
-        "name": "Vince Gilligan",
-        "role": "Creator"
-      }
-    ]
-  },
-  {
-    "id": "proz-ser-013",
-    "title": "Game of Thrones",
-    "originalTitle": "Game of Thrones",
-    "slug": "game-of-thrones",
-    "type": "series",
-    "category": "series",
-    "synopsis": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.",
-    "tagline": "Winter is coming.",
-    "releaseYear": 2019,
-    "runtimeMinutes": 57,
-    "maturityRating": "TV-MA",
-    "genres": [
-      "Sci-Fi & Fantasy",
-      "Drama",
-      "Action",
-      "Adventure"
+      "Drama"
     ],
     "languages": [
       "English"
     ],
-    "ratingScore": 9.3,
-    "ratingCount": 135000,
-    "posterUrl": "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
-    "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
-    "trailerUrl": "https://www.youtube.com/watch?v=KPLWWIOCOOQ",
-    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "isFeatured": true,
-    "isTrending": false,
+    "ratingScore": 8.8,
+    "ratingCount": 89000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/odJ4hx6g6vBt4lBWKFD1tI8WS4x.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=giXco2jaZ_4",
+    "youtubeId": "giXco2jaZ_4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": true,
     "isOriginal": false,
     "isRestricted18Plus": false,
-    "tmdb_id": 1399,
+    "tmdb_id": 361743,
     "cast": [
       {
-        "name": "Emilia Clarke",
-        "character": "Daenerys Targaryen",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
-      },
-      {
-        "name": "Kit Harington",
-        "character": "Jon Snow",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
-      },
-      {
-        "name": "Peter Dinklage",
-        "character": "Tyrion Lannister",
+        "name": "Tom Cruise",
+        "character": "Pete 'Maverick' Mitchell",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Miles Teller",
+        "character": "Bradley 'Rooster' Bradshaw",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
       }
     ],
     "crew": [
       {
-        "name": "David Benioff",
-        "role": "Creator"
+        "name": "Joseph Kosinski",
+        "role": "Director"
       }
     ]
   },
   {
-    "id": "proz-ani-014",
-    "title": "Demon Slayer: Kimetsu no Yaiba",
-    "originalTitle": "鬼滅の刃",
-    "slug": "demon-slayer-kimetsu-no-yaiba",
-    "type": "anime",
-    "category": "anime",
-    "synopsis": "It is the Taisho Period in Japan. Tanjiro, a kindhearted boy who sells charcoal for a living, finds his family slaughtered by a demon. To make matters worse, his younger sister Nezuko, the sole survivor, has been transformed into a demon herself. Tanjiro vows to become a demon slayer to turn his sister back into a human.",
-    "tagline": "Destroy demons, protect the innocent.",
-    "releaseYear": 2024,
-    "runtimeMinutes": 24,
-    "maturityRating": "TV-14",
+    "id": "proz-mov-013",
+    "title": "The Batman",
+    "originalTitle": "The Batman",
+    "slug": "the-batman",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "In his second year of fighting crime, Batman uncovers corruption in Gotham City that connects to his own family while facing a serial killer known as the Riddler.",
+    "tagline": "Unmask the truth.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 176,
+    "maturityRating": "PG-13",
     "genres": [
-      "Animation",
+      "Crime",
+      "Mystery",
       "Action",
-      "Fantasy",
-      "Adventure"
+      "Thriller"
     ],
     "languages": [
-      "Japanese",
-      "English",
-      "Hindi"
+      "English"
     ],
-    "ratingScore": 9.3,
-    "ratingCount": 74200,
-    "posterUrl": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
-    "backdropUrl": "https://image.tmdb.org/t/p/original/nTvM4mhqZlHIvUkI1gVnWumrSlq.jpg",
-    "trailerUrl": "https://www.youtube.com/watch?v=VQGCKyvzIM4",
-    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    "isFeatured": true,
-    "isTrending": true,
+    "ratingScore": 8.7,
+    "ratingCount": 82000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/5P8SmMzSNYikXpxil6BYzJ16611.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=mqqft2x_Aa4",
+    "youtubeId": "mqqft2x_Aa4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": false,
     "isOriginal": false,
     "isRestricted18Plus": false,
-    "tmdb_id": 85937,
+    "tmdb_id": 414906,
     "cast": [
       {
-        "name": "Natsuki Hanae",
-        "character": "Tanjiro Kamado (voice)",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+        "name": "Robert Pattinson",
+        "character": "Bruce Wayne / The Batman",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
       },
       {
-        "name": "Akari Kito",
-        "character": "Nezuko Kamado (voice)",
+        "name": "Zoë Kravitz",
+        "character": "Selina Kyle / Catwoman",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
       }
     ],
     "crew": [
       {
-        "name": "Haruo Sotozaki",
+        "name": "Matt Reeves",
         "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-014",
+    "title": "The Matrix",
+    "originalTitle": "The Matrix",
+    "slug": "the-matrix",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Set in the 22nd century, The Matrix tells the story of a computer hacker who joins a group of underground insurgents fighting the vast and powerful computers who now rule the earth.",
+    "tagline": "Welcome to the Real World.",
+    "releaseYear": 1999,
+    "runtimeMinutes": 136,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Sci-Fi"
+    ],
+    "languages": [
+      "English"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 119000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/l4QHerTSbflqIQtHbviE7N1v4i8.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=vKQi3bBA1y8",
+    "youtubeId": "vKQi3bBA1y8",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 603,
+    "cast": [
+      {
+        "name": "Keanu Reeves",
+        "character": "Thomas A. Anderson / Neo",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Laurence Fishburne",
+        "character": "Morpheus",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "The Wachowskis",
+        "role": "Directors"
       }
     ]
   },
@@ -832,6 +783,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/geCRueV3ElhRTr0Q2xumMi8v8YO.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=4rgYUipGJNo",
+    "youtubeId": "4rgYUipGJNo",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -860,6 +812,61 @@ export const MOCK_CONTENT: ContentItem[] = [
   },
   {
     "id": "proz-ani-016",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "originalTitle": "鬼滅の刃",
+    "slug": "demon-slayer-kimetsu-no-yaiba",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "It is the Taisho Period in Japan. Tanjiro, a kindhearted boy who sells charcoal for a living, finds his family slaughtered by a demon. To make matters worse, his younger sister Nezuko, the sole survivor, has been transformed into a demon herself. Tanjiro vows to become a demon slayer to turn his sister back into a human.",
+    "tagline": "Destroy demons, protect the innocent.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy",
+      "Adventure"
+    ],
+    "languages": [
+      "Japanese",
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 74200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/nTvM4mhqZlHIvUkI1gVnWumrSlq.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=VQGCKyvzIM4",
+    "youtubeId": "VQGCKyvzIM4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 85937,
+    "cast": [
+      {
+        "name": "Natsuki Hanae",
+        "character": "Tanjiro Kamado (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Akari Kito",
+        "character": "Nezuko Kamado (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Haruo Sotozaki",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ani-017",
     "title": "Attack on Titan",
     "originalTitle": "進撃の巨人",
     "slug": "attack-on-titan",
@@ -885,6 +892,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/7v88x0a6K9u0b8M0a6K9u0b8M.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=MGRm4IzK1SQ",
+    "youtubeId": "MGRm4IzK1SQ",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -912,7 +920,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ani-017",
+    "id": "proz-ani-018",
     "title": "Jujutsu Kaisen",
     "originalTitle": "呪術廻戦",
     "slug": "jujutsu-kaisen",
@@ -937,6 +945,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/hFWP5w2hgnFmX4fP3T3f9P0q8z.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/o8b8x0a6K9u0b8M0a6K9u0b8M.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=pkKu9hLT-t8",
+    "youtubeId": "pkKu9hLT-t8",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -964,7 +973,435 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-dra-018",
+    "id": "proz-ani-019",
+    "title": "Chainsaw Man",
+    "originalTitle": "チェンソーマン",
+    "slug": "chainsaw-man",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "Denji has a simple dream—to live a happy and peaceful life, spending time with a girl he likes. This is a far cry from reality, however, as Denji is forced by the yakuza into killing devils in order to pay off his crushing debts.",
+    "tagline": "Get sliced.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Animation",
+      "Action",
+      "Horror",
+      "Fantasy"
+    ],
+    "languages": [
+      "Japanese",
+      "English"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 56000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/yVtxvdzsBEvhhkGvlKn1ePs6wZz.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/s1xnjb42L5bF1Y1xT4vJm0a6K9u.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=q15CRdE5Bv0",
+    "youtubeId": "q15CRdE5Bv0",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 114410,
+    "cast": [
+      {
+        "name": "Kikunosuke Toya",
+        "character": "Denji (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Tomori Kusunoki",
+        "character": "Makima (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Ryu Nakayama",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ani-020",
+    "title": "Death Note",
+    "originalTitle": "デスノート",
+    "slug": "death-note",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "Light Yagami is an ace student with great prospects—and he's bored out of his mind. But all that changes when he finds the Death Note, a notebook dropped by a rogue Shinigami death god.",
+    "tagline": "Justice will prevail.",
+    "releaseYear": 2006,
+    "runtimeMinutes": 23,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Animation",
+      "Mystery",
+      "Crime",
+      "Thriller"
+    ],
+    "languages": [
+      "Japanese",
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 125000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/iigTJJskR1Pcjj4dH91iW09044z.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/t5zCBSB5xMOmcDGE9xemmGVUtWW.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=NlJZ-YgAt-c",
+    "youtubeId": "NlJZ-YgAt-c",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 13916,
+    "cast": [
+      {
+        "name": "Mamoru Miyano",
+        "character": "Light Yagami (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Kappei Yamaguchi",
+        "character": "L (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Tetsuro Araki",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-021",
+    "title": "Stranger Things",
+    "originalTitle": "Stranger Things",
+    "slug": "stranger-things",
+    "type": "series",
+    "category": "series",
+    "synopsis": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
+    "tagline": "Every ending has a beginning.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 55,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Sci-Fi",
+      "Mystery",
+      "Drama",
+      "Horror"
+    ],
+    "languages": [
+      "English",
+      "Hindi",
+      "Spanish"
+    ],
+    "ratingScore": 9.2,
+    "ratingCount": 95400,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=b9EkMc79ZSU",
+    "youtubeId": "b9EkMc79ZSU",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": true,
+    "isRestricted18Plus": false,
+    "tmdb_id": 66732,
+    "cast": [
+      {
+        "name": "Millie Bobby Brown",
+        "character": "Eleven",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Finn Wolfhard",
+        "character": "Mike Wheeler",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "The Duffer Brothers",
+        "role": "Creators"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-022",
+    "title": "The Last of Us",
+    "originalTitle": "The Last of Us",
+    "slug": "the-last-of-us",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Twenty years after modern civilization has been destroyed, Joel, a hardened survivor, is hired to smuggle Ellie, a 14-year-old girl, out of an oppressive quarantine zone.",
+    "tagline": "When you're lost in the darkness, look for the light.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 60,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Drama",
+      "Action",
+      "Sci-Fi",
+      "Adventure"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 84300,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/uKvVjK1q1NVx4e6k3o9qJ8U3b98.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=uLtkt8BonwM",
+    "youtubeId": "uLtkt8BonwM",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 100088,
+    "cast": [
+      {
+        "name": "Pedro Pascal",
+        "character": "Joel Miller",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Bella Ramsey",
+        "character": "Ellie Williams",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Craig Mazin",
+        "role": "Creator"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-023",
+    "title": "Breaking Bad",
+    "originalTitle": "Breaking Bad",
+    "slug": "breaking-bad",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Walter White, a New Mexico chemistry teacher diagnosed with terminal lung cancer, teams up with former student Jesse Pinkman to secure his family's future by producing and selling crystal meth.",
+    "tagline": "Remember my name.",
+    "releaseYear": 2013,
+    "runtimeMinutes": 47,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "languages": [
+      "English",
+      "Spanish"
+    ],
+    "ratingScore": 9.6,
+    "ratingCount": 142000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=HhesaQXLuRY",
+    "youtubeId": "HhesaQXLuRY",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1396,
+    "cast": [
+      {
+        "name": "Bryan Cranston",
+        "character": "Walter White",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Aaron Paul",
+        "character": "Jesse Pinkman",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Vince Gilligan",
+        "role": "Creator"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-024",
+    "title": "Game of Thrones",
+    "originalTitle": "Game of Thrones",
+    "slug": "game-of-thrones",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.",
+    "tagline": "Winter is coming.",
+    "releaseYear": 2019,
+    "runtimeMinutes": 57,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Drama",
+      "Action",
+      "Adventure"
+    ],
+    "languages": [
+      "English"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 135000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=KPLWWIOCOOQ",
+    "youtubeId": "KPLWWIOCOOQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1399,
+    "cast": [
+      {
+        "name": "Emilia Clarke",
+        "character": "Daenerys Targaryen",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Kit Harington",
+        "character": "Jon Snow",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "David Benioff",
+        "role": "Creator"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-025",
+    "title": "House of the Dragon",
+    "originalTitle": "House of the Dragon",
+    "slug": "house-of-the-dragon",
+    "type": "series",
+    "category": "series",
+    "synopsis": "The Targaryen dynasty is at the absolute apex of its power, with more than 15 dragons under their yoke. Most empires crumble from such heights. In the case of the Targaryens, their slow fall begins when King Viserys breaks with a century of tradition by naming his daughter Rhaenyra heir to the Iron Throne.",
+    "tagline": "Fire and blood.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 62,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Drama",
+      "Action"
+    ],
+    "languages": [
+      "English"
+    ],
+    "ratingScore": 8.9,
+    "ratingCount": 78000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1X4h40fcB4WWUmIBK0auT4zRBAV.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/etjA69oh0ivvi2mMmm941RIcqCw.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=DotnJ7tTA34",
+    "youtubeId": "DotnJ7tTA34",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 94997,
+    "cast": [
+      {
+        "name": "Emma D'Arcy",
+        "character": "Rhaenyra Targaryen",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Matt Smith",
+        "character": "Daemon Targaryen",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Ryan J. Condal",
+        "role": "Creator"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-026",
+    "title": "The Boys",
+    "originalTitle": "The Boys",
+    "slug": "the-boys",
+    "type": "series",
+    "category": "series",
+    "synopsis": "A fun and irreverent take on what happens when superheroes—who are as popular as celebrities, as influential as politicians, and as revered as gods—abuse their superpowers rather than use them for good.",
+    "tagline": "Never meet your heroes.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 60,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Action & Adventure",
+      "Comedy"
+    ],
+    "languages": [
+      "English"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 88000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/7Ns6tO3aYjppI5LO2yzRIHWPvUq.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/nGsYaURnyw098uhgUbguPzfnXxU.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=M1keXH_nKVs",
+    "youtubeId": "M1keXH_nKVs",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "tmdb_id": 76479,
+    "cast": [
+      {
+        "name": "Karl Urban",
+        "character": "Billy Butcher",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Antony Starr",
+        "character": "Homelander",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Eric Kripke",
+        "role": "Creator"
+      }
+    ]
+  },
+  {
+    "id": "proz-dra-031",
     "title": "Squid Game: Season 2",
     "originalTitle": "오징어 게임",
     "slug": "squid-game",
@@ -990,6 +1427,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/dDlG1v7o8zW6iP1H99aB0a4g96f.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/oaGMAa9nmSTOo19OIxhyufIlENn.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=oqxAJKy0ii4",
+    "youtubeId": "oqxAJKy0ii4",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -1002,22 +1440,17 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Lee Jung-jae",
         "character": "Seong Gi-hun",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Park Hae-soo",
-        "character": "Cho Sang-woo",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
       }
     ],
     "crew": [
       {
         "name": "Hwang Dong-hyuk",
-        "role": "Creator & Director"
+        "role": "Director"
       }
     ]
   },
   {
-    "id": "proz-dra-019",
+    "id": "proz-dra-032",
     "title": "Queen of Tears",
     "originalTitle": "눈물의 여왕",
     "slug": "queen-of-tears",
@@ -1042,6 +1475,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/6i88i91hP5jQ4t5B0Y8Z6u6kL8f.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/l3K6bT9z7J7e4y6N0a6K9u0b8M.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=sO7CkhN_mY8",
+    "youtubeId": "sO7CkhN_mY8",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -1069,7 +1503,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-dra-020",
+    "id": "proz-dra-033",
     "title": "Crash Landing on You",
     "originalTitle": "사랑의 불시착",
     "slug": "crash-landing-on-you",
@@ -1094,6 +1528,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/bv9pXU7XQn9i6s1y3p1x8u6d8o.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/3i9p6nK8x3k4j1y3p1x8u6d8o.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=eXMjTXL2Vks",
+    "youtubeId": "eXMjTXL2Vks",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": false,
@@ -1121,7 +1556,109 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-021",
+    "id": "proz-dra-034",
+    "title": "All of Us Are Dead",
+    "originalTitle": "지금 우리 학교는",
+    "slug": "all-of-us-are-dead",
+    "type": "drama",
+    "category": "drama",
+    "synopsis": "A high school becomes ground zero for a zombie virus outbreak. Trapped students must fight their way out or turn into one of the rabid infected.",
+    "tagline": "School is out. Survival is in.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 60,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Horror",
+      "Drama",
+      "Action & Adventure"
+    ],
+    "languages": [
+      "Korean",
+      "English"
+    ],
+    "ratingScore": 8.8,
+    "ratingCount": 52000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/pTEFqAjLzy5YTsMD6NSPhVhP9D5.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/7kex7v0a6K9u0b8M0a6K9u0b8M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=IN5TD4VRcSM",
+    "youtubeId": "IN5TD4VRcSM",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "tmdb_id": 99966,
+    "cast": [
+      {
+        "name": "Park Ji-hu",
+        "character": "Nam On-jo",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Lee JQ",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-dra-035",
+    "title": "Vincenzo",
+    "originalTitle": "빈센조",
+    "slug": "vincenzo",
+    "type": "drama",
+    "category": "drama",
+    "synopsis": "During a visit to his motherland, a Korean-Italian mafia lawyer gives an unrivaled conglomerate a taste of its own medicine with a side of justice.",
+    "tagline": "Evil is punished with evil.",
+    "releaseYear": 2021,
+    "runtimeMinutes": 80,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Drama",
+      "Crime",
+      "Comedy"
+    ],
+    "languages": [
+      "Korean",
+      "Italian",
+      "English"
+    ],
+    "ratingScore": 8.9,
+    "ratingCount": 48000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/dvXJgEDQXqLcu024669894v7O1r.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/qZq52a32P0188zW6iP1H99aB0a.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=_J8tYxSB_LQ",
+    "youtubeId": "_J8tYxSB_LQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 117376,
+    "cast": [
+      {
+        "name": "Song Joong-ki",
+        "character": "Vincenzo Cassano",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Jeon Yeo-been",
+        "character": "Hong Cha-young",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Kim Hee-won",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ind-036",
     "title": "Kalki 2898 AD",
     "originalTitle": "Kalki 2898 AD",
     "slug": "kalki-2898-ad",
@@ -1149,6 +1686,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/9Pf1sF7k8zW6iP1H99aB0a4g96f.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=kQDd1AhGIHk",
+    "youtubeId": "kQDd1AhGIHk",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -1171,11 +1709,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Deepika Padukone",
         "character": "SUM-80",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
-      },
-      {
-        "name": "Kamal Haasan",
-        "character": "Supreme Yaskin",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
       }
     ],
     "crew": [
@@ -1186,7 +1719,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-022",
+    "id": "proz-ind-037",
     "title": "Jawan",
     "originalTitle": "Jawan",
     "slug": "jawan",
@@ -1212,6 +1745,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/jJw9M7r1b7g8y8n7u6k3o9qJ8U.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/rAiYTsqJJR0nhcztQw57crXs9vo.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=MWOlnZSnXWE",
+    "youtubeId": "MWOlnZSnXWE",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -1229,11 +1763,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Nayanthara",
         "character": "Narmada Rai",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
-      },
-      {
-        "name": "Vijay Sethupathi",
-        "character": "Kalee Gaikwad",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
       }
     ],
     "crew": [
@@ -1244,7 +1773,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-023",
+    "id": "proz-ind-038",
     "title": "RRR",
     "originalTitle": "రౌద్రం రణం రుధిరం",
     "slug": "rrr",
@@ -1271,6 +1800,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/kdP1x8u6d8o6i88i91hP5jQ4t5B.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=NgBoAMWnAFM",
+    "youtubeId": "NgBoAMWnAFM",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": true,
@@ -1298,7 +1828,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-024",
+    "id": "proz-ind-039",
     "title": "Stree 2: Sarkate Ka Aatank",
     "originalTitle": "Stree 2",
     "slug": "stree-2",
@@ -1321,6 +1851,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/fm6K9vYQ79FGzIsmvgqvNDm9xZs.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=KVnhe_E0dCE",
+    "youtubeId": "KVnhe_E0dCE",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": true,
@@ -1338,11 +1869,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Rajkummar Rao",
         "character": "Vicky",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Pankaj Tripathi",
-        "character": "Rudra",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
       }
     ],
     "crew": [
@@ -1353,7 +1879,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-025",
+    "id": "proz-ind-040",
     "title": "Animal",
     "originalTitle": "Animal",
     "slug": "animal",
@@ -1379,6 +1905,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=Dydmpfo68DA",
+    "youtubeId": "Dydmpfo68DA",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     "isFeatured": false,
@@ -1396,11 +1923,6 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Anil Kapoor",
         "character": "Balbir Singh",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
-      },
-      {
-        "name": "Bobby Deol",
-        "character": "Abrar Haque",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
       }
     ],
     "crew": [
@@ -1411,7 +1933,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     ]
   },
   {
-    "id": "proz-ind-026",
+    "id": "proz-ind-041",
     "title": "K.G.F: Chapter 2",
     "originalTitle": "K.G.F: Chapter 2",
     "slug": "kgf-chapter-2",
@@ -1438,6 +1960,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     "backdropUrl": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
     "trailerUrl": "https://www.youtube.com/watch?v=JKa05nyUmuQ",
+    "youtubeId": "JKa05nyUmuQ",
     "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     "isFeatured": false,
@@ -1450,21 +1973,232 @@ export const MOCK_CONTENT: ContentItem[] = [
         "name": "Yash",
         "character": "Raja Krishnappa Bairya / Rocky",
         "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
-      },
-      {
-        "name": "Sanjay Dutt",
-        "character": "Adheera",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
-      },
-      {
-        "name": "Raveena Tandon",
-        "character": "Ramika Sen",
-        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
       }
     ],
     "crew": [
       {
         "name": "Prashanth Neel",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ind-042",
+    "title": "Pushpa 2: The Rule",
+    "originalTitle": "పుష్ప 2: ది రూల్",
+    "slug": "pushpa-2-the-rule",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "The clash between Pushpa Raj and Bhanwar Singh Shekhawat continues in this epic conclusion to the two-part action drama following Pushpa's reign over the red sandalwood smuggling syndicate.",
+    "tagline": "Wildfire begins.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 190,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "languages": [
+      "Telugu",
+      "Hindi",
+      "Tamil"
+    ],
+    "ratingScore": 9,
+    "ratingCount": 64000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1X4h40fcB4WWUmIBK0auT4zRBAV.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=1kVK0MZlbI4",
+    "youtubeId": "1kVK0MZlbI4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 822119,
+    "cast": [
+      {
+        "name": "Allu Arjun",
+        "character": "Pushpa Raj",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Rashmika Mandanna",
+        "character": "Srivalli",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Sukumar",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ind-043",
+    "title": "Pathaan",
+    "originalTitle": "Pathaan",
+    "slug": "pathaan",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "An Indian intelligence agent leads a high-stakes mission across continents to stop a ruthless former operative from launching a deadly biological attack against the nation.",
+    "tagline": "Party pathaan ke ghar rakhoge, toh mehmaan-nawaazi ke liye pathaan toh aayega!",
+    "releaseYear": 2023,
+    "runtimeMinutes": 146,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Adventure"
+    ],
+    "languages": [
+      "Hindi",
+      "Telugu",
+      "Tamil"
+    ],
+    "ratingScore": 8.5,
+    "ratingCount": 52000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/m1b9toYY4zbZ8r9hT8tYwV5Z775.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/rAiYTsqJJR0nhcztQw57crXs9vo.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=vqu4zBiH46g",
+    "youtubeId": "vqu4zBiH46g",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 864692,
+    "cast": [
+      {
+        "name": "Shah Rukh Khan",
+        "character": "Pathaan",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Deepika Padukone",
+        "character": "Rubina Mohsin",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "John Abraham",
+        "character": "Jim",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Siddharth Anand",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ind-044",
+    "title": "Baahubali 2: The Conclusion",
+    "originalTitle": "బాహుబలి 2: ది కన్ క్లూజన్",
+    "slug": "baahubali-2-the-conclusion",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "When Shiva, the son of Bahubali, learns about his heritage, he begins to look for answers. His story is juxtaposed with past events that unfolded in the Mahishmati Kingdom.",
+    "tagline": "The boy who became king.",
+    "releaseYear": 2017,
+    "runtimeMinutes": 167,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Drama"
+    ],
+    "languages": [
+      "Telugu",
+      "Hindi",
+      "Tamil"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 104000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/91hP5jQ4t5B0Y8Z6u6kL8f2cxhv.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=qD-6d8Wo3do",
+    "youtubeId": "qD-6d8Wo3do",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 350312,
+    "cast": [
+      {
+        "name": "Prabhas",
+        "character": "Amarendra Baahubali / Mahendra Baahubali",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Rana Daggubati",
+        "character": "Bhallaladeva",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "S.S. Rajamouli",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ind-045",
+    "title": "Leo",
+    "originalTitle": "Leo: Bloody Sweet",
+    "slug": "leo",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "Parthiban is a mild-mannered café owner in Kashmir, whose life is upended when a ruthless cartel tracks him down, suspecting him of being their estranged lethal enforcer, Leo Das.",
+    "tagline": "Bloody Sweet.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 164,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Crime",
+      "Thriller"
+    ],
+    "languages": [
+      "Tamil",
+      "Hindi",
+      "Telugu"
+    ],
+    "ratingScore": 8.7,
+    "ratingCount": 68000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1X4h40fcB4WWUmIBK0auT4zRBAV.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/fm6K9vYQ79FGzIsmvgqvNDm9xZs.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=Po3jStA673E",
+    "youtubeId": "Po3jStA673E",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "tmdb_id": 976573,
+    "cast": [
+      {
+        "name": "Thalapathy Vijay",
+        "character": "Parthiban / Leo Das",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Sanjay Dutt",
+        "character": "Antony Das",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Lokesh Kanagaraj",
         "role": "Director"
       }
     ]

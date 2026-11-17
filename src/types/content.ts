@@ -14,6 +14,7 @@ export interface ContentItem {
   original_title?: string;
   subcategory?: string;
   description?: string;
+  overview?: string;
   age_rating?: string;
   is_adult?: boolean;
   is_featured?: boolean;
@@ -28,6 +29,8 @@ export interface ContentItem {
   backdrop_url?: string;
   thumbnail_url?: string;
   trailer_url?: string;
+  youtube_id?: string;
+  youtubeId?: string;
   available_qualities?: string[];
   tmdb_id?: number;
   genres?: Array<{ id: string; name: string; slug: string }> | string[];
