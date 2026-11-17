@@ -63,7 +63,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [selectedServer, setSelectedServer] = useState<'server1' | 'server2' | 'server3' | 'server4' | 'direct'>('server1');
+  const [selectedServer, setSelectedServer] = useState<'server1' | 'server2' | 'server3' | 'server4' | 'trailer' | 'direct'>('server1');
 
   // Resolve current episode if series
   let currentEpisode: any = null;
@@ -100,26 +100,32 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!ytId) ytId = "73_1biulkYk";
 
     if (server === 'server1') {
-      // 4K Cinema Player (YouTube Official - 100% Reliable Playback)
-      return `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&controls=1&modestbranding=1&rel=0`;
+      // Server 1: VidLink Pro (Full Movie Stream in 4K/HD)
+      return isSeries
+        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${ep}?primaryColor=22d3ee&secondaryColor=080b12&iconColor=22d3ee`
+        : `https://vidlink.pro/movie/${tmdbId}?primaryColor=22d3ee&secondaryColor=080b12&iconColor=22d3ee`;
     }
     if (server === 'server2') {
-      // VidLink Pro (Full Movie Stream)
-      return isSeries
-        ? `https://vidlink.pro/tv/${tmdbId}/${season}/${ep}`
-        : `https://vidlink.pro/movie/${tmdbId}`;
-    }
-    if (server === 'server3') {
-      // AutoEmbed Cloud (Full Movie Stream)
+      // Server 2: AutoEmbed Cloud (Full Movie Stream)
       return isSeries
         ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${ep}`
         : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
     }
-    if (server === 'server4') {
-      // EmbedSu Ultra (Backup Cinema Stream)
+    if (server === 'server3') {
+      // Server 3: EmbedSu Ultra (Full Movie Stream)
       return isSeries
         ? `https://embed.su/embed/tv/${tmdbId}/${season}/${ep}`
         : `https://embed.su/embed/movie/${tmdbId}`;
+    }
+    if (server === 'server4') {
+      // Server 4: MultiEmbed VIP (Full Movie Stream)
+      return isSeries
+        ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${ep}`
+        : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1`;
+    }
+    if (server === 'trailer') {
+      // Official 4K Trailer Preview
+      return `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&controls=1&modestbranding=1&rel=0`;
     }
     return '';
   };
@@ -504,7 +510,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              🍿 4K Cinema Player
+              ⚡ Server 1: VidLink (Full Movie)
             </button>
             <button
               onClick={() => setSelectedServer('server2')}
@@ -514,7 +520,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ VidLink Pro
+              ⚡ Server 2: AutoEmbed
             </button>
             <button
               onClick={() => setSelectedServer('server3')}
@@ -524,7 +530,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ AutoEmbed
+              ⚡ Server 3: EmbedSu
             </button>
             <button
               onClick={() => setSelectedServer('server4')}
@@ -534,7 +540,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   : 'text-proz-grey hover:text-white'
               }`}
             >
-              ⚡ EmbedSu
+              ⚡ Server 4: MultiEmbed
+            </button>
+            <button
+              onClick={() => setSelectedServer('trailer')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'trailer'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              🍿 4K Trailer
             </button>
             <button
               onClick={() => setSelectedServer('direct')}
@@ -555,11 +571,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onChange={(e) => setSelectedServer(e.target.value as any)}
               className="px-2.5 py-1 rounded-full glass-card border border-proz-border/50 text-[11px] font-bold text-proz-white bg-[#080B12]"
             >
-              <option value="server1">🍿 4K Cinema Player (YouTube)</option>
-              <option value="server2">⚡ VidLink Pro (Full Movie)</option>
-              <option value="server3">⚡ AutoEmbed Cloud</option>
-              <option value="server4">⚡ EmbedSu Ultra</option>
-              <option value="direct">🎥 Direct MP4</option>
+              <option value="server1">⚡ Server 1: VidLink (Full Movie)</option>
+              <option value="server2">⚡ Server 2: AutoEmbed</option>
+              <option value="server3">⚡ Server 3: EmbedSu</option>
+              <option value="server4">⚡ Server 4: MultiEmbed</option>
+              <option value="trailer">🍿 4K Official Trailer</option>
+              <option value="direct">🎥 Direct MP4 Player</option>
             </select>
           </div>
 
@@ -809,10 +826,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           <div className="px-3.5 py-1.5 rounded-full glass-card border border-proz-border/50 text-[11px] text-proz-white/90 shadow-glass-md flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>
-              {selectedServer === 'server1' && '🍿 4K Cinema Player Active (Ultra HD 60fps)'}
-              {selectedServer === 'server2' && '⚡ Streaming via VidLink Pro (Full Movie Stream)'}
-              {selectedServer === 'server3' && '⚡ Streaming via AutoEmbed Cloud'}
-              {selectedServer === 'server4' && '⚡ Streaming via EmbedSu Ultra'}
+              {selectedServer === 'server1' && '⚡ Server 1: VidLink Pro (Full Movie / Show Stream in 4K/HD)'}
+              {selectedServer === 'server2' && '⚡ Server 2: AutoEmbed Cloud (Full Movie Stream)'}
+              {selectedServer === 'server3' && '⚡ Server 3: EmbedSu Ultra (Full Movie Stream)'}
+              {selectedServer === 'server4' && '⚡ Server 4: MultiEmbed VIP (Full Movie Stream)'}
+              {selectedServer === 'trailer' && '🍿 Official 4K Trailer Mode Active • Switch to Server 1-4 for Full Movie!'}
               {' • If you experience buffering, switch servers above anytime!'}
             </span>
           </div>

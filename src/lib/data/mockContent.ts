@@ -2182,7 +2182,7 @@ export const MOCK_CONTENT: ContentItem[] = [
     "isFeatured": false,
     "isTrending": true,
     "isOriginal": false,
-    "isRestricted18Plus": true,
+    "isRestricted18Plus": false,
     "tmdb_id": 976573,
     "cast": [
       {
@@ -2200,6 +2200,616 @@ export const MOCK_CONTENT: ContentItem[] = [
       {
         "name": "Lokesh Kanagaraj",
         "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-001",
+    "title": "Fifty Shades of Grey",
+    "slug": "fifty-shades-of-grey",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2015,
+    "release_year": 2015,
+    "runtimeMinutes": 125,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama",
+      "Romance",
+      "Thriller"
+    ],
+    "ratingScore": 7.4,
+    "rating_avg": 7.4,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/630RmsWq9ytc4y6sS0V0kYgP4oO.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/630RmsWq9ytc4y6sS0V0kYgP4oO.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/9rZcz389zk8Cq0iH3Ym6lR55N0s.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/9rZcz389zk8Cq0iH3Ym6lR55N0s.jpg",
+    "synopsis": "When literature student Anastasia Steele steps in for her sick roommate to interview prominent businessman Christian Grey for their campus paper, little does she realize the path her life will take.",
+    "description": "When literature student Anastasia Steele steps in for her sick roommate to interview prominent businessman Christian Grey for their campus paper, little does she realize the path her life will take.",
+    "trailerUrl": "https://www.youtube.com/watch?v=SfZWFDs0LxA",
+    "youtubeId": "SfZWFDs0LxA",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 216015,
+    "cast": [
+      {
+        "name": "Dakota Johnson",
+        "character": "Anastasia Steele"
+      },
+      {
+        "name": "Jamie Dornan",
+        "character": "Christian Grey"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-002",
+    "title": "365 Days",
+    "slug": "365-days",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2020,
+    "release_year": 2020,
+    "runtimeMinutes": 114,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "ratingScore": 6.8,
+    "rating_avg": 6.8,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/6Kym9ZvfJvTeqWk9BqjZ2U9qX4p.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/6Kym9ZvfJvTeqWk9BqjZ2U9qX4p.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/4uGk1Z3l6o7oQ6PZ0pZ1U1X5x5E.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/4uGk1Z3l6o7oQ6PZ0pZ1U1X5x5E.jpg",
+    "synopsis": "Massimo is a member of the Sicilian Mafia family and Laura is a sales director. She does not expect that on a trip to Sicily trying to save her relationship, Massimo will kidnap her and give her 365 days to fall in love with him.",
+    "description": "Massimo is a member of the Sicilian Mafia family and Laura is a sales director. She does not expect that on a trip to Sicily trying to save her relationship, Massimo will kidnap her and give her 365 days to fall in love with him.",
+    "trailerUrl": "https://www.youtube.com/watch?v=pyM3z73oMAk",
+    "youtubeId": "pyM3z73oMAk",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 664413,
+    "cast": [
+      {
+        "name": "Michele Morrone",
+        "character": "Massimo Torricelli"
+      },
+      {
+        "name": "Anna-Maria Sieklucka",
+        "character": "Laura Biel"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-003",
+    "title": "Eyes Wide Shut",
+    "slug": "eyes-wide-shut",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 1999,
+    "release_year": 1999,
+    "runtimeMinutes": 159,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Mystery",
+      "Drama",
+      "Thriller"
+    ],
+    "ratingScore": 8.2,
+    "rating_avg": 8.2,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/knEIPikq7Y44k58aD8j7dGzXQz6.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/knEIPikq7Y44k58aD8j7dGzXQz6.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/bMckg7x22Uu6l3cMvL6F6S5pY8z.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/bMckg7x22Uu6l3cMvL6F6S5pY8z.jpg",
+    "synopsis": "A Manhattan doctor embarks on a bizarre, night-long odyssey of sexual and moral discovery after his wife reveals that she once almost cheated on him.",
+    "description": "A Manhattan doctor embarks on a bizarre, night-long odyssey of sexual and moral discovery after his wife reveals that she once almost cheated on him.",
+    "trailerUrl": "https://www.youtube.com/watch?v=s3GZ6iM9d98",
+    "youtubeId": "s3GZ6iM9d98",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 345,
+    "cast": [
+      {
+        "name": "Tom Cruise",
+        "character": "Dr. William Harford"
+      },
+      {
+        "name": "Nicole Kidman",
+        "character": "Alice Harford"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-004",
+    "title": "Basic Instinct",
+    "slug": "basic-instinct",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 1992,
+    "release_year": 1992,
+    "runtimeMinutes": 127,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Mystery",
+      "Thriller"
+    ],
+    "ratingScore": 7.9,
+    "rating_avg": 7.9,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/r5sH6O0e1H8xZqQ6nC7q6S1sX3d.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/r5sH6O0e1H8xZqQ6nC7q6S1sX3d.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/uDssR9p4k4Y5xZpQ6nC7q6S1sX3d.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/uDssR9p4k4Y5xZpQ6nC7q6S1sX3d.jpg",
+    "synopsis": "A violent, sex-obsessed police detective investigates a brutal murder in which the prime suspect is an alluring and manipulative novelist.",
+    "description": "A violent, sex-obsessed police detective investigates a brutal murder in which the prime suspect is an alluring and manipulative novelist.",
+    "trailerUrl": "https://www.youtube.com/watch?v=c_l7j3v6f78",
+    "youtubeId": "c_l7j3v6f78",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 402,
+    "cast": [
+      {
+        "name": "Michael Douglas",
+        "character": "Det. Nick Curran"
+      },
+      {
+        "name": "Sharon Stone",
+        "character": "Catherine Tramell"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-005",
+    "title": "The Wolf of Wall Street",
+    "slug": "the-wolf-of-wall-street",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2013,
+    "release_year": 2013,
+    "runtimeMinutes": 180,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Comedy"
+    ],
+    "ratingScore": 8.8,
+    "rating_avg": 8.8,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/pWHf4khOloNVfPOSftBsLVAcv98.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/pWHf4khOloNVfPOSftBsLVAcv98.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/cWUOv3H7YFwvKevevTX992LGQbf.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/cWUOv3H7YFwvKevevTX992LGQbf.jpg",
+    "synopsis": "A New York stockbroker refuses to cooperate in a large securities fraud case involving corruption on Wall Street, corporate banking world and mob infiltration.",
+    "description": "A New York stockbroker refuses to cooperate in a large securities fraud case involving corruption on Wall Street, corporate banking world and mob infiltration.",
+    "trailerUrl": "https://www.youtube.com/watch?v=iszwuX1AK6A",
+    "youtubeId": "iszwuX1AK6A",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 106646,
+    "cast": [
+      {
+        "name": "Leonardo DiCaprio",
+        "character": "Jordan Belfort"
+      },
+      {
+        "name": "Jonah Hill",
+        "character": "Donnie Azoff"
+      },
+      {
+        "name": "Margot Robbie",
+        "character": "Naomi Lapaglia"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-006",
+    "title": "Wild Things",
+    "slug": "wild-things",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 1998,
+    "release_year": 1998,
+    "runtimeMinutes": 108,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Mystery",
+      "Thriller",
+      "Crime"
+    ],
+    "ratingScore": 7.2,
+    "rating_avg": 7.2,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/vGfL4Kq9uV1H4Z8K3F9J1X2V4pL.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/vGfL4Kq9uV1H4Z8K3F9J1X2V4pL.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/9fL4Kq9uV1H4Z8K3F9J1X2V4pL.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/9fL4Kq9uV1H4Z8K3F9J1X2V4pL.jpg",
+    "synopsis": "A police detective uncovers a conspiracy behind a high school guidance counselor accused of rape by two female students in wealthy South Florida.",
+    "description": "A police detective uncovers a conspiracy behind a high school guidance counselor accused of rape by two female students in wealthy South Florida.",
+    "trailerUrl": "https://www.youtube.com/watch?v=r8s7D9Z1k88",
+    "youtubeId": "r8s7D9Z1k88",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 11449,
+    "cast": [
+      {
+        "name": "Kevin Bacon",
+        "character": "Ray Duquette"
+      },
+      {
+        "name": "Matt Dillon",
+        "character": "Sam Lombardo"
+      },
+      {
+        "name": "Neve Campbell",
+        "character": "Suzie Toller"
+      },
+      {
+        "name": "Denise Richards",
+        "character": "Kelly Van Ryan"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-007",
+    "title": "Nymphomaniac: Vol. I",
+    "slug": "nymphomaniac-vol-1",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2013,
+    "release_year": 2013,
+    "runtimeMinutes": 117,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama"
+    ],
+    "ratingScore": 7.1,
+    "rating_avg": 7.1,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/lF7n0K1v6o9e7K4V5yZ6N2p9Q4k.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/lF7n0K1v6o9e7K4V5yZ6N2p9Q4k.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/uF7n0K1v6o9e7K4V5yZ6N2p9Q4k.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/uF7n0K1v6o9e7K4V5yZ6N2p9Q4k.jpg",
+    "synopsis": "A self-diagnosed nymphomaniac recounts her erotic experiences to the man who saved her after a beatdown in an alleyway.",
+    "description": "A self-diagnosed nymphomaniac recounts her erotic experiences to the man who saved her after a beatdown in an alleyway.",
+    "trailerUrl": "https://www.youtube.com/watch?v=V_y6yQZ0Z0A",
+    "youtubeId": "V_y6yQZ0Z0A",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 97365,
+    "cast": [
+      {
+        "name": "Charlotte Gainsbourg",
+        "character": "Joe"
+      },
+      {
+        "name": "Stellan Skarsgård",
+        "character": "Seligman"
+      },
+      {
+        "name": "Stacy Martin",
+        "character": "Young Joe"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-008",
+    "title": "Blue Is the Warmest Color",
+    "slug": "blue-is-the-warmest-color",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2013,
+    "release_year": 2013,
+    "runtimeMinutes": 180,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "ratingScore": 8,
+    "rating_avg": 8,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8X5n3H9oK1V8lP2v5Z3qN4p9Q4x.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/8X5n3H9oK1V8lP2v5Z3qN4p9Q4x.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/cX5n3H9oK1V8lP2v5Z3qN4p9Q4x.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/cX5n3H9oK1V8lP2v5Z3qN4p9Q4x.jpg",
+    "synopsis": "Adèle's life is changed when she meets Emma, a young woman with blue hair, who will allow her to discover desire and to assert herself as a woman and as an adult.",
+    "description": "Adèle's life is changed when she meets Emma, a young woman with blue hair, who will allow her to discover desire and to assert herself as a woman and as an adult.",
+    "trailerUrl": "https://www.youtube.com/watch?v=Y2OLgMxtr34",
+    "youtubeId": "Y2OLgMxtr34",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 152584,
+    "cast": [
+      {
+        "name": "Léa Seydoux",
+        "character": "Emma"
+      },
+      {
+        "name": "Adèle Exarchopoulos",
+        "character": "Adèle"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-009",
+    "title": "Euphoria (Uncut)",
+    "slug": "euphoria-uncut",
+    "type": "series",
+    "content_type": "series",
+    "category": "mature",
+    "releaseYear": 2019,
+    "release_year": 2019,
+    "runtimeMinutes": 55,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama"
+    ],
+    "ratingScore": 8.7,
+    "rating_avg": 8.7,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/3Q0hd3heurWj3AcAh0x7Z1FkL6j.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/3Q0hd3heurWj3AcAh0x7Z1FkL6j.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/93xA4fK66rYlGZ9F3l1U3F5o8z8.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/93xA4fK66rYlGZ9F3l1U3F5o8z8.jpg",
+    "synopsis": "A look at life for a group of high school students as they grapple with issues of drugs, sex, identity, trauma, social media, love and friendship.",
+    "description": "A look at life for a group of high school students as they grapple with issues of drugs, sex, identity, trauma, social media, love and friendship.",
+    "trailerUrl": "https://www.youtube.com/watch?v=vuAzkZIiGxQ",
+    "youtubeId": "vuAzkZIiGxQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 85552,
+    "cast": [
+      {
+        "name": "Zendaya",
+        "character": "Rue Bennett"
+      },
+      {
+        "name": "Hunter Schafer",
+        "character": "Jules Vaughn"
+      },
+      {
+        "name": "Sydney Sweeney",
+        "character": "Cassie Howard"
+      }
+    ],
+    "seasons": [
+      {
+        "id": "eup-s01",
+        "title": "Season 1",
+        "seasonNumber": 1,
+        "season_number": 1,
+        "episodeCount": 8,
+        "episodes": [
+          {
+            "id": "eup-s01-e01",
+            "title": "Pilot",
+            "episodeNumber": 1,
+            "episode_number": 1,
+            "seasonNumber": 1,
+            "durationMinutes": 55,
+            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/3Q0hd3heurWj3AcAh0x7Z1FkL6j.jpg",
+            "synopsis": "Rue returns home from rehab with no plans to stay clean.",
+            "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-010",
+    "title": "Spartacus: Blood and Sand",
+    "slug": "spartacus-blood-and-sand",
+    "type": "series",
+    "content_type": "series",
+    "category": "mature",
+    "releaseYear": 2010,
+    "release_year": 2010,
+    "runtimeMinutes": 55,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Action",
+      "Drama",
+      "Adventure"
+    ],
+    "ratingScore": 8.5,
+    "rating_avg": 8.5,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1X6k8V6fQ4N3oV7H9pZ5Q8L2X3y.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/1X6k8V6fQ4N3oV7H9pZ5Q8L2X3y.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/kX6k8V6fQ4N3oV7H9pZ5Q8L2X3y.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/kX6k8V6fQ4N3oV7H9pZ5Q8L2X3y.jpg",
+    "synopsis": "Torn from his homeland and the woman he loves, Spartacus is condemned to the brutal world of the arena where blood and death are primetime entertainment.",
+    "description": "Torn from his homeland and the woman he loves, Spartacus is condemned to the brutal world of the arena where blood and death are primetime entertainment.",
+    "trailerUrl": "https://www.youtube.com/watch?v=yHxn8W4s_78",
+    "youtubeId": "yHxn8W4s_78",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 46896,
+    "cast": [
+      {
+        "name": "Andy Whitfield",
+        "character": "Spartacus"
+      },
+      {
+        "name": "Lucy Lawless",
+        "character": "Lucretia"
+      }
+    ],
+    "seasons": [
+      {
+        "id": "spart-s01",
+        "title": "Season 1",
+        "seasonNumber": 1,
+        "season_number": 1,
+        "episodeCount": 13,
+        "episodes": [
+          {
+            "id": "spart-s01-e01",
+            "title": "The Red Serpent",
+            "episodeNumber": 1,
+            "episode_number": 1,
+            "seasonNumber": 1,
+            "durationMinutes": 55,
+            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/1X6k8V6fQ4N3oV7H9pZ5Q8L2X3y.jpg",
+            "synopsis": "A Thracian warrior is captured by Roman commander Glaber and sent to the arena.",
+            "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-011",
+    "title": "Fifty Shades Darker",
+    "slug": "fifty-shades-darker",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2017,
+    "release_year": 2017,
+    "runtimeMinutes": 118,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Drama",
+      "Romance"
+    ],
+    "ratingScore": 7.2,
+    "rating_avg": 7.2,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/3vA8FmY1H6a9G9sZ3l5qX8p2V4k.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/3vA8FmY1H6a9G9sZ3l5qX8p2V4k.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/8vA8FmY1H6a9G9sZ3l5qX8p2V4k.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/8vA8FmY1H6a9G9sZ3l5qX8p2V4k.jpg",
+    "synopsis": "While Christian wrestles with his inner demons, Anastasia must confront the anger and envy of the women who came before her.",
+    "description": "While Christian wrestles with his inner demons, Anastasia must confront the anger and envy of the women who came before her.",
+    "trailerUrl": "https://www.youtube.com/watch?v=OItKvc13gws",
+    "youtubeId": "OItKvc13gws",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 341174,
+    "cast": [
+      {
+        "name": "Dakota Johnson",
+        "character": "Anastasia Steele"
+      },
+      {
+        "name": "Jamie Dornan",
+        "character": "Christian Grey"
+      }
+    ]
+  },
+  {
+    "id": "proz-adult-012",
+    "title": "Secretary",
+    "slug": "secretary",
+    "type": "movie",
+    "content_type": "movie",
+    "category": "mature",
+    "releaseYear": 2002,
+    "release_year": 2002,
+    "runtimeMinutes": 107,
+    "maturityRating": "18+",
+    "age_rating": "18+",
+    "genres": [
+      "Comedy",
+      "Drama",
+      "Romance"
+    ],
+    "ratingScore": 7.6,
+    "rating_avg": 7.6,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8wY3b3wM8z7q2H7n8V6qY5s4x9v.jpg",
+    "poster_url": "https://image.tmdb.org/t/p/w500/8wY3b3wM8z7q2H7n8V6qY5s4x9v.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/6wY3b3wM8z7q2H7n8V6qY5s4x9v.jpg",
+    "backdrop_url": "https://image.tmdb.org/t/p/original/6wY3b3wM8z7q2H7n8V6qY5s4x9v.jpg",
+    "synopsis": "A young woman, recently released from a mental hospital, gets a job as a secretary to a demanding lawyer, where their employer-employee relationship turns into a sexual, sadomasochistic one.",
+    "description": "A young woman, recently released from a mental hospital, gets a job as a secretary to a demanding lawyer, where their employer-employee relationship turns into a sexual, sadomasochistic one.",
+    "trailerUrl": "https://www.youtube.com/watch?v=j6fH8fV3v88",
+    "youtubeId": "j6fH8fV3v88",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "is_adult": true,
+    "tmdb_id": 10741,
+    "cast": [
+      {
+        "name": "James Spader",
+        "character": "E. Edward Grey"
+      },
+      {
+        "name": "Maggie Gyllenhaal",
+        "character": "Lee Holloway"
       }
     ]
   }
