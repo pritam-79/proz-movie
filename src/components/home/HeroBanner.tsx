@@ -77,17 +77,17 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
 
             <span className="flex items-center gap-1 text-amber-400 font-bold px-2 py-0.5 rounded-md glass-card border border-proz-border/50">
               <Star className="w-3.5 h-3.5 fill-amber-400" />
-              {currentItem.ratingScore}
+              {currentItem.ratingScore || currentItem.rating_avg || '9.0'}
             </span>
 
-            <span className="text-proz-grey">{currentItem.releaseYear}</span>
+            <span className="text-proz-grey">{currentItem.releaseYear || currentItem.release_year || ''}</span>
             <span className="text-proz-grey">•</span>
             <span className="text-proz-grey">
-              {currentItem.runtimeMinutes ? `${currentItem.runtimeMinutes} min` : 'Series'}
+              {currentItem.runtimeMinutes || currentItem.runtime_minutes ? `${currentItem.runtimeMinutes || currentItem.runtime_minutes} min` : 'Series'}
             </span>
             <span className="text-proz-grey">•</span>
             <span className="text-proz-cyan capitalize font-medium">
-              {currentItem.category.replace('_', ' ')}
+              {(currentItem.category || currentItem.content_type || 'Movie').replace('_', ' ')}
             </span>
           </div>
 
@@ -104,14 +104,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
           )}
 
           <p className="text-xs sm:text-sm text-proz-white/80 line-clamp-3 leading-relaxed max-w-xl">
-            {currentItem.synopsis}
+            {currentItem.synopsis || currentItem.description || ''}
           </p>
 
           {/* Genre Badges */}
           <div className="flex flex-wrap gap-1.5 pt-1">
-            {currentItem.genres.map((g) => (
-              <span key={g} className="px-2.5 py-1 rounded-full text-[11px] glass-pill text-proz-white/90">
-                {g}
+            {currentItem.genres?.map((g: any) => (
+              <span key={typeof g === 'string' ? g : g.name} className="px-2.5 py-1 rounded-full text-[11px] glass-pill text-proz-white/90">
+                {typeof g === 'string' ? g : g.name}
               </span>
             ))}
           </div>

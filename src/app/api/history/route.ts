@@ -1,0 +1,110 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+
+export async function GET(_req: NextRequest) {
+  try {
+    const supabase = createSupabaseServerClient();
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const uid = session.user.id;
+
+    const { data, error } = await supabase
+      .from('watch_history')
+      .select('*, content(*)')
+      .eq('user_id', uid)
+      .order('last_watched_at', { ascending: false })
+      .limit(50);
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (err) {
+    console.error('History GET error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const supabase = createSupabaseServerClient();
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const uid = session.user.id;
+    const body = await req.json();
+    const { contentId, episodeId, progressSeconds, durationSeconds } = body;
+
+    if (!contentId) {
+      return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
+    }
+
+    const completed = durationSeconds > 0 ? (progressSeconds / durationSeconds > 0.9) : false;
+
+    const { error } = await supabase
+      .from('watch_history')
+      .upsert(
+        {
+          user_id: uid,
+          content_id: contentId,
+          episode_id: episodeId || null,
+          progress_seconds: progressSeconds,
+          duration_seconds: durationSeconds,
+          last_watched_at: new Date().toISOString(),
+          completed,
+        },
+        { onConflict: 'user_id,content_id,episode_id' }
+      );
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to save history' }, { status: 500 });
+    }
+
+    return NextResponse.json({ saved: true });
+  } catch (err) {
+    console.error('History POST error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const supabase = createSupabaseServerClient();
+
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const uid = session.user.id;
+    const { searchParams } = new URL(req.url);
+    const contentId = searchParams.get('contentId');
+
+    if (!contentId) {
+      return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('watch_history')
+      .delete()
+      .eq('user_id', uid)
+      .eq('content_id', contentId);
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to delete history' }, { status: 500 });
+    }
+
+    return NextResponse.json({ removed: true });
+  } catch (err) {
+    console.error('History DELETE error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

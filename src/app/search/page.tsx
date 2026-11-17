@@ -21,13 +21,14 @@ function SearchContent() {
 
     if (query.trim()) {
       const q = query.toLowerCase().trim();
-      list = list.filter(item => 
-        item.title.toLowerCase().includes(q) ||
-        item.synopsis.toLowerCase().includes(q) ||
-        item.genres.some(g => g.toLowerCase().includes(q)) ||
-        item.cast.some(c => c.name.toLowerCase().includes(q) || c.character.toLowerCase().includes(q)) ||
-        item.crew.some(cr => cr.name.toLowerCase().includes(q))
-      );
+      list = list.filter(item => {
+        const titleMatch = item.title?.toLowerCase().includes(q);
+        const synopsisMatch = (item.synopsis || item.description || '')?.toLowerCase().includes(q);
+        const genresMatch = Array.isArray(item.genres) && item.genres.some(g => (typeof g === 'string' ? g : g.name)?.toLowerCase().includes(q));
+        const castMatch = Array.isArray(item.cast) && item.cast.some(c => c.name?.toLowerCase().includes(q) || (c.character && c.character.toLowerCase().includes(q)));
+        const crewMatch = Array.isArray(item.crew) && item.crew.some(cr => cr.name?.toLowerCase().includes(q));
+        return Boolean(titleMatch || synopsisMatch || genresMatch || castMatch || crewMatch);
+      });
     }
 
     if (selectedType !== 'all') {

@@ -1,142 +1,184 @@
-export type ContentType = 'movie' | 'series';
-
-export type CategoryType = 
-  | 'hollywood' 
-  | 'bollywood' 
-  | 'south_indian' 
-  | 'bengali' 
-  | 'international' 
-  | 'anime' 
-  | 'k_drama' 
-  | 'c_drama' 
-  | 'j_drama' 
-  | 'documentary' 
-  | 'original';
-
-export type MaturityRating = 'G' | 'PG' | 'PG-13' | 'TV-14' | 'TV-MA' | '18+';
-
-export interface CastMember {
-  name: string;
-  character: string;
-  avatarUrl?: string;
-}
-
-export interface CrewMember {
-  name: string;
-  role: string;
-}
-
-export interface VideoQualityOption {
-  label: string;
-  resolution: string;
-  bitrateKbps: number;
-}
-
-export interface SubtitleTrack {
-  id: string;
-  label: string;
-  lang: string;
-  url: string;
-  isDefault?: boolean;
-}
-
-export interface AudioTrackOption {
-  id: string;
-  label: string;
-  lang: string;
-  codec: string;
-  isDefault?: boolean;
-}
-
-export interface Episode {
-  id: string;
-  seasonNumber: number;
-  episodeNumber: number;
-  title: string;
-  synopsis: string;
-  durationMinutes: number;
-  thumbnailUrl: string;
-  streamUrl: string;
-  dashUrl?: string;
-  fallbackMp4?: string;
-  introStartSec?: number;
-  introEndSec?: number;
-  subtitles?: SubtitleTrack[];
-  audioTracks?: AudioTrackOption[];
-}
-
-export interface Season {
-  id: string;
-  seasonNumber: number;
-  title: string;
-  synopsis?: string;
-  posterUrl?: string;
-  episodes: Episode[];
-}
+// ============================================================================
+// PROZ MOVIE — Content Type Definitions
+// Supports both Supabase DB records (snake_case) and legacy mock data
+// ============================================================================
 
 export interface ContentItem {
+  // Core identifiers
   id: string;
   title: string;
-  originalTitle?: string;
   slug: string;
-  type: ContentType;
-  category: CategoryType;
-  synopsis: string;
+
+  // DB fields (snake_case from Supabase)
+  content_type?: 'movie' | 'series' | 'anime' | 'drama';
+  original_title?: string;
+  subcategory?: string;
+  description?: string;
+  age_rating?: string;
+  is_adult?: boolean;
+  is_featured?: boolean;
+  is_trending?: boolean;
+  view_count?: number;
+  rating_avg?: number;
+  runtime_minutes?: number;
+  release_year?: number;
+  language?: string;
+  country?: string;
+  poster_url?: string;
+  backdrop_url?: string;
+  thumbnail_url?: string;
+  trailer_url?: string;
+  available_qualities?: string[];
+  tmdb_id?: number;
+  genres?: Array<{ id: string; name: string; slug: string }> | string[];
+  tags?: string[];
+  cast?: Array<{ name: string; character?: string; profile_url?: string; avatarUrl?: string }>;
+  crew?: Array<{ name: string; job?: string; role?: string }>;
+  seasons?: Season[];
+  video_assets?: VideoAsset[];
+  subtitles?: Subtitle[];
+  audio_tracks?: AudioTrack[];
+  licenses?: License[];
+  created_at?: string;
+  updated_at?: string;
+
+  // Legacy mock data fields (camelCase)
+  type?: 'movie' | 'series' | 'anime' | 'drama';
+  category?: string;
+  originalTitle?: string;
+  synopsis?: string;
   tagline?: string;
-  releaseYear: number;
+  releaseYear?: number;
   runtimeMinutes?: number;
-  maturityRating: MaturityRating;
-  genres: string[];
-  languages: string[];
-  ratingScore: number;
-  ratingCount: number;
-  posterUrl: string;
-  backdropUrl: string;
+  maturityRating?: string;
+  languages?: string[];
+  ratingScore?: number;
+  ratingCount?: number;
+  posterUrl?: string;
+  backdropUrl?: string;
   trailerUrl?: string;
-  streamUrl: string; // Master HLS manifest URL
-  dashUrl?: string;   // Master DASH manifest URL
-  fallbackMp4?: string; // High compatibility MP4 URL
+  streamUrl?: string;
+  dashUrl?: string;
+  fallbackMp4?: string;
   isFeatured?: boolean;
   isTrending?: boolean;
   isOriginal?: boolean;
   isRestricted18Plus?: boolean;
-  seasons?: Season[];
-  cast: CastMember[];
-  crew: CrewMember[];
-  subtitles: SubtitleTrack[];
-  audioTracks: AudioTrackOption[];
-  license: {
-    licensor: string;
-    expiryDate: string;
-    territories: string[];
-  };
+  audioTracks?: Array<{ id: string; label: string; lang: string; codec?: string; isDefault?: boolean }>;
+  license?: { licensor: string; expiryDate: string; territories: string[] };
+  skipIntroSeconds?: number;
+  skipCreditsSeconds?: number;
 }
 
-export interface PlaybackSessionToken {
-  sessionId: string;
-  userId?: string;
-  contentId: string;
-  episodeId?: string;
-  expiresAt: number;
-  maxQuality: string;
-  allowedDrm: string;
-  signature: string;
+export interface Season {
+  id: string;
+  content_id?: string;
+  season_number?: number;
+  seasonNumber?: number;
+  title?: string;
+  description?: string;
+  episode_count?: number;
+  poster_url?: string;
+  air_date?: string;
+  episodes?: Episode[];
 }
 
-export interface UserSubscription {
-  planId: string;
-  status: 'active' | 'past_due' | 'canceled' | 'none';
-  renewsAt?: string;
-  maxScreens: number;
-  videoQuality: string;
+export interface Episode {
+  id: string;
+  season_id?: string;
+  content_id?: string;
+  episode_number?: number;
+  episodeNumber?: number;
+  season_number?: number;
+  seasonNumber?: number;
+  title: string;
+  description?: string;
+  synopsis?: string;
+  thumbnail_url?: string;
+  thumbnailUrl?: string;
+  duration_seconds?: number;
+  runtimeMinutes?: number;
+  durationMinutes?: number;
+  air_date?: string;
+  airDate?: string;
+  is_filler?: boolean;
+  skip_intro_start?: number;
+  skip_intro_end?: number;
+  introStartSec?: number;
+  introEndSec?: number;
+  streamUrl?: string;
+  fallbackMp4?: string;
+  video_assets?: VideoAsset[];
+  subtitles?: Subtitle[];
 }
 
+export interface VideoAsset {
+  id: string;
+  content_id?: string;
+  episode_id?: string;
+  provider: string;
+  provider_asset_id?: string;
+  hls_url?: string;
+  dash_url?: string;
+  drm_config?: Record<string, unknown>;
+  available_qualities?: string[];
+  duration_seconds?: number;
+  is_active: boolean;
+}
+
+export interface Subtitle {
+  id: string;
+  language_code?: string;
+  lang?: string;
+  label: string;
+  format?: 'srt' | 'vtt' | 'ass';
+  url: string;
+  is_default?: boolean;
+  isDefault?: boolean;
+}
+
+export type SubtitleTrack = Subtitle;
+
+export interface AudioTrack {
+  id: string;
+  language_code?: string;
+  lang?: string;
+  label: string;
+  is_default?: boolean;
+  isDefault?: boolean;
+  is_dubbed?: boolean;
+  codec?: string;
+}
+
+export type AudioTrackOption = AudioTrack;
+
+export interface License {
+  id?: string;
+  content_id?: string;
+  rights_holder?: string;
+  licensor?: string;
+  expiry_date?: string;
+  expiryDate?: string;
+  territories?: string[];
+  is_active?: boolean;
+  streaming_permitted?: boolean;
+}
+
+// User profile type (for mock auth)
 export interface UserProfile {
   id: string;
   email: string;
   name: string;
-  avatarUrl: string;
-  subscription: UserSubscription;
+  avatarUrl?: string;
   is18PlusVerified: boolean;
-  role: 'user' | 'admin' | 'editor';
+  role: 'user' | 'admin';
+  subscription?: UserSubscription;
+}
+
+export interface UserSubscription {
+  planId: string;
+  status: 'active' | 'expired' | 'canceled' | 'past_due';
+  renewsAt?: string;
+  maxScreens: number;
+  videoQuality: string;
 }

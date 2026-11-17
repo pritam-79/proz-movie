@@ -1,112 +1,109 @@
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { MOCK_CONTENT } from '@/lib/data/mockContent';
-
-const JWT_SECRET = process.env.JWT_PLAYBACK_SECRET || 'proz-movie-playback-session-signature-secret-key-32chars';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createSupabaseServerClient();
+
+    // 1. Get session user
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    if (sessionError || !session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const uid = session.user.id;
     const body = await req.json();
-    const { contentId, episodeId, userRole = 'user', is18PlusVerified = false, planId = 'plan_premium' } = body;
+    const { contentId, episodeId } = body;
 
     if (!contentId) {
-      return NextResponse.json({ error: 'Content ID is required' }, { status: 400 });
+      return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
     }
 
-    // 1. Locate Content
-    const content = MOCK_CONTENT.find(c => c.id === contentId);
-    if (!content) {
-      return NextResponse.json({ error: 'Content not found in catalog' }, { status: 404 });
+    // 2. Fetch content
+    const { data: content, error: contentError } = await supabase
+      .from('content')
+      .select('*')
+      .eq('id', contentId)
+      .single();
+
+    if (contentError || !content) {
+      return NextResponse.json({ error: 'Content not found' }, { status: 404 });
     }
 
-    // 2. Check Age Restriction (18+)
-    if (content.isRestricted18Plus && !is18PlusVerified) {
-      return NextResponse.json({ 
-        error: 'Age Verification Required', 
-        code: 'AGE_VERIFICATION_REQUIRED',
-        message: 'This content is restricted to verified users 18 years of age or older.'
-      }, { status: 403 });
+    // 3. Check license
+    const { data: license, error: licenseError } = await supabase
+      .from('licenses')
+      .select('*')
+      .eq('content_id', contentId)
+      .eq('is_active', true)
+      .or('expiry_date.is.null,expiry_date.gt.' + new Date().toISOString())
+      .maybeSingle();
+
+    if (licenseError || !license) {
+      return NextResponse.json({ error: 'no_valid_license', message: 'No valid license for this content.' }, { status: 403 });
     }
 
-    // 3. Verify Content License Validity
-    const now = new Date();
-    const licenseExpiry = new Date(content.license.expiryDate);
-    if (now > licenseExpiry) {
-      return NextResponse.json({ 
-        error: 'Content License Expired', 
-        code: 'LICENSE_EXPIRED',
-        message: 'This title is temporarily unavailable in your region due to license window renewal.'
-      }, { status: 403 });
-    }
+    // 4. If content is adult, check age verification
+    if (content.is_adult) {
+      const { data: ageVerification } = await supabase
+        .from('age_verifications')
+        .select('*')
+        .eq('user_id', uid)
+        .eq('is_verified', true)
+        .maybeSingle();
 
-    // 4. Resolve Target Stream URL
-    let streamUrl = content.streamUrl;
-    let fallbackMp4 = content.fallbackMp4;
-    let introStartSec = 0;
-    let introEndSec = 0;
-
-    if (content.type === 'series' && episodeId) {
-      let targetEp;
-      for (const season of content.seasons || []) {
-        const found = season.episodes.find(e => e.id === episodeId);
-        if (found) {
-          targetEp = found;
-          break;
-        }
-      }
-      if (targetEp) {
-        streamUrl = targetEp.streamUrl;
-        fallbackMp4 = targetEp.fallbackMp4 || fallbackMp4;
-        introStartSec = targetEp.introStartSec || 0;
-        introEndSec = targetEp.introEndSec || 0;
+      if (!ageVerification) {
+        return NextResponse.json({ error: 'age_verification_required', message: 'Age verification required to watch this content.' }, { status: 403 });
       }
     }
 
-    // 5. Determine Quality Ceiling based on Subscription Plan
-    let maxQuality = '1080p';
-    if (planId === 'plan_premium') {
-      maxQuality = '4K UHD';
-    } else if (planId === 'plan_free') {
-      maxQuality = '720p HD';
+    // 5. Fetch video_asset
+    let videoAssetQuery = supabase
+      .from('video_assets')
+      .select('*')
+      .eq('content_id', contentId);
+
+    if (episodeId) {
+      videoAssetQuery = videoAssetQuery.eq('episode_id', episodeId);
+    } else {
+      videoAssetQuery = videoAssetQuery.is('episode_id', null);
     }
 
-    // 6. Generate Cryptographic Playback Session Token
-    const sessionId = `proz_sess_${crypto.randomBytes(16).toString('hex')}`;
-    const expiresAt = Date.now() + (4 * 60 * 60 * 1000); // 4 hours validity
-    const payload = `${sessionId}:${contentId}:${episodeId || 'main'}:${expiresAt}:${maxQuality}`;
-    const signature = crypto.createHmac('sha256', JWT_SECRET).update(payload).digest('hex');
+    const { data: videoAsset } = await videoAssetQuery.maybeSingle();
 
-    const signedToken = `${payload}:${signature}`;
+    // 6. No video asset
+    if (!videoAsset) {
+      return NextResponse.json(
+        { error: 'no_video_configured', message: 'Video infrastructure not yet configured for this title. Please contact support.' },
+        { status: 404 }
+      );
+    }
 
-    return NextResponse.json({
-      success: true,
-      session: {
-        token: signedToken,
-        sessionId,
-        contentId,
-        episodeId,
-        expiresAt,
-        maxQuality,
-        streamUrl,
-        dashUrl: content.dashUrl || null,
-        fallbackMp4: fallbackMp4 || null,
-        drm: {
-          system: "Authorized Stream Engine (Widevine/FairPlay/ClearKey Ready)",
-          licenseServerUrl: "/api/drm/license",
-          isEncrypted: false // Active clear/token authorization on demo open streams
-        },
-        metadata: {
-          title: content.title,
-          maturityRating: content.maturityRating,
-          introStartSec,
-          introEndSec,
-          subtitles: content.subtitles,
-          audioTracks: content.audioTracks
-        }
-      }
+    // 7. Create playback session
+    const sessionToken = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+
+    await supabase.from('playback_sessions').insert({
+      id: sessionToken,
+      user_id: uid,
+      content_id: contentId,
+      episode_id: episodeId || null,
+      video_asset_id: videoAsset.id,
+      expires_at: expiresAt,
     });
-  } catch (error: any) {
-    console.error('Playback authorization error:', error);
-    return NextResponse.json({ error: 'Internal Server Error during playback authorization' }, { status: 500 });
+
+    // 8. Return playback info
+    return NextResponse.json({
+      sessionToken,
+      hlsUrl: videoAsset.hls_url,
+      dashUrl: videoAsset.dash_url,
+      drmConfig: videoAsset.drm_config,
+      subtitles: [],
+      audioTracks: [],
+      expiresAt,
+    });
+  } catch (err) {
+    console.error('Playback authorize error:', err);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

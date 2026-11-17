@@ -1,267 +1,97 @@
-"use client";
+'use client';
 
-import React, { useState, useMemo } from 'react';
-import { ContentItem, CategoryType } from '@/types/content';
-import ContentCard from '@/components/content/ContentCard';
-import { Search, Filter, SlidersHorizontal, X, Film, Tv, Sparkles } from 'lucide-react';
-import { GENRE_LIST } from '@/lib/data/mockContent';
-
-interface SubCategoryOption {
-  label: string;
-  value: string;
-}
+import React, { useState, useEffect, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ContentItem } from '@/types/content';
+import FilterBar, { FilterState } from '@/components/content/FilterBar';
+import ContentGrid from '@/components/content/ContentGrid';
 
 interface CategoryCatalogProps {
   title: string;
-  subtitle: string;
-  baseType?: 'movie' | 'series' | 'all';
-  defaultCategory?: string;
-  subCategories?: SubCategoryOption[];
-  allItems: ContentItem[];
+  category: string;
+  type?: string;
 }
 
-export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({
-  title,
-  subtitle,
-  baseType = 'all',
-  defaultCategory = 'all',
-  subCategories = [],
-  allItems,
-}) => {
-  const [selectedSubCat, setSelectedSubCat] = useState<string>(defaultCategory);
-  const [selectedGenre, setSelectedGenre] = useState<string>('all');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('trending');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({ title, category, type }) => {
+  const [items, setItems] = useState<ContentItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [filters, setFilters] = useState<FilterState>({ sort: 'trending' });
 
-  const filteredItems = useMemo(() => {
-    let result = allItems.filter(item => !item.isRestricted18Plus);
+  const fetchContent = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (category && category !== 'all') params.set('category', category);
+      if (type) params.set('type', type);
+      if (filters.sort) params.set('sort', filters.sort);
+      if (filters.year) params.set('year', filters.year);
+      if (filters.language) params.set('language', filters.language);
+      params.set('page', String(page));
+      params.set('limit', '24');
 
-    // Filter by Base Type (movie or series)
-    if (baseType !== 'all') {
-      result = result.filter(item => item.type === baseType);
+      const res = await fetch(`/api/content?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setItems(data.items ?? data ?? []);
+        setTotalPages(data.total_pages ?? data.totalPages ?? 1);
+      }
+    } catch {
+      // silently handle fetch errors
+    } finally {
+      setLoading(false);
     }
+  }, [category, type, filters, page]);
 
-    // Filter by SubCategory (e.g., hollywood, bollywood, etc.)
-    if (selectedSubCat !== 'all') {
-      result = result.filter(item => item.category === selectedSubCat);
-    }
+  useEffect(() => {
+    fetchContent();
+  }, [fetchContent]);
 
-    // Filter by Genre
-    if (selectedGenre !== 'all') {
-      result = result.filter(item => 
-        item.genres.some(g => g.toLowerCase().replace(/[^a-z0-9]/g, '') === selectedGenre.toLowerCase().replace(/[^a-z0-9]/g, ''))
-      );
-    }
-
-    // Filter by Language
-    if (selectedLanguage !== 'all') {
-      result = result.filter(item => 
-        item.languages.some(l => l.toLowerCase() === selectedLanguage.toLowerCase())
-      );
-    }
-
-    // Filter by Year
-    if (selectedYear !== 'all') {
-      result = result.filter(item => item.releaseYear.toString() === selectedYear);
-    }
-
-    // Search Query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter(item => 
-        item.title.toLowerCase().includes(q) ||
-        item.synopsis.toLowerCase().includes(q) ||
-        item.genres.some(g => g.toLowerCase().includes(q))
-      );
-    }
-
-    // Sorting
-    if (sortBy === 'trending') {
-      result.sort((a, b) => (b.isTrending ? 1 : 0) - (a.isTrending ? 1 : 0));
-    } else if (sortBy === 'rating') {
-      result.sort((a, b) => b.ratingScore - a.ratingScore);
-    } else if (sortBy === 'latest') {
-      result.sort((a, b) => b.releaseYear - a.releaseYear);
-    } else if (sortBy === 'title') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    }
-
-    return result;
-  }, [allItems, baseType, selectedSubCat, selectedGenre, selectedLanguage, selectedYear, sortBy, searchQuery]);
-
-  const resetFilters = () => {
-    setSelectedSubCat('all');
-    setSelectedGenre('all');
-    setSelectedLanguage('all');
-    setSelectedYear('all');
-    setSortBy('trending');
-    setSearchQuery('');
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setPage(1);
   };
 
-  const hasActiveFilters = 
-    selectedSubCat !== 'all' || 
-    selectedGenre !== 'all' || 
-    selectedLanguage !== 'all' || 
-    selectedYear !== 'all' || 
-    searchQuery !== '';
-
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      
-      {/* Page Title & Subtitle */}
-      <div className="space-y-1">
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-proz-white tracking-tight">
-          {title}
-        </h1>
-        <p className="text-xs sm:text-sm text-proz-grey max-w-2xl">
-          {subtitle}
-        </p>
-      </div>
+    <div className="space-y-6">
+      {/* Filter bar */}
+      <FilterBar activeFilters={filters} onFiltersChange={handleFiltersChange} />
 
-      {/* SubCategory Pills (e.g. Hollywood, Bollywood, Anime, etc.) */}
-      {subCategories.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          {subCategories.map((sub) => (
-            <button
-              key={sub.value}
-              onClick={() => setSelectedSubCat(sub.value)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ${
-                selectedSubCat === sub.value
-                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-proz-white shadow-cyan-glow'
-                  : 'glass-pill text-proz-grey hover:text-proz-white hover:bg-proz-navy/70'
-              }`}
-            >
-              {sub.label}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Grid */}
+      <ContentGrid
+        items={items}
+        loading={loading}
+        emptyMessage={`No ${title.toLowerCase()} found matching your filters.`}
+      />
 
-      {/* Filter and Search Bar Controls */}
-      <div className="p-4 rounded-3xl glass-card border border-proz-border/50 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
-        
-        {/* Search input */}
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-proz-cyan absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Filter titles in ${title.toLowerCase()}...`}
-            className="w-full pl-10 pr-4 py-2 rounded-xl glass-input text-xs sm:text-sm"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-proz-grey hover:text-white"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
-        </div>
-
-        {/* Filter Dropdowns */}
-        <div className="flex flex-wrap items-center gap-2">
-          
-          {/* Genre Dropdown */}
-          <select
-            value={selectedGenre}
-            onChange={(e) => setSelectedGenre(e.target.value)}
-            className="px-3 py-2 rounded-xl glass-input text-xs text-proz-white focus:outline-none"
-          >
-            <option value="all" className="bg-proz-navy text-proz-white">All Genres</option>
-            {GENRE_LIST.map((g) => (
-              <option key={g.id} value={g.id} className="bg-proz-navy text-proz-white">
-                {g.name}
-              </option>
-            ))}
-          </select>
-
-          {/* Language Dropdown */}
-          <select
-            value={selectedLanguage}
-            onChange={(e) => setSelectedLanguage(e.target.value)}
-            className="px-3 py-2 rounded-xl glass-input text-xs text-proz-white focus:outline-none"
-          >
-            <option value="all" className="bg-proz-navy text-proz-white">All Languages</option>
-            <option value="English" className="bg-proz-navy text-proz-white">English</option>
-            <option value="Hindi" className="bg-proz-navy text-proz-white">Hindi</option>
-            <option value="Korean" className="bg-proz-navy text-proz-white">Korean</option>
-            <option value="Japanese" className="bg-proz-navy text-proz-white">Japanese</option>
-            <option value="Telugu" className="bg-proz-navy text-proz-white">Telugu</option>
-            <option value="Bengali" className="bg-proz-navy text-proz-white">Bengali</option>
-            <option value="Mandarin" className="bg-proz-navy text-proz-white">Mandarin</option>
-          </select>
-
-          {/* Year Dropdown */}
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="px-3 py-2 rounded-xl glass-input text-xs text-proz-white focus:outline-none"
-          >
-            <option value="all" className="bg-proz-navy text-proz-white">All Years</option>
-            <option value="2025" className="bg-proz-navy text-proz-white">2025</option>
-            <option value="2024" className="bg-proz-navy text-proz-white">2024</option>
-            <option value="2023" className="bg-proz-navy text-proz-white">2023</option>
-          </select>
-
-          {/* Sort Dropdown */}
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-2 rounded-xl glass-input text-xs text-proz-white focus:outline-none"
-          >
-            <option value="trending" className="bg-proz-navy text-proz-white">Trending First</option>
-            <option value="rating" className="bg-proz-navy text-proz-white">Highest Rated</option>
-            <option value="latest" className="bg-proz-navy text-proz-white">Newest First</option>
-            <option value="title" className="bg-proz-navy text-proz-white">Title (A-Z)</option>
-          </select>
-
-          {/* Clear Filters Button */}
-          {hasActiveFilters && (
-            <button
-              onClick={resetFilters}
-              className="px-3 py-2 rounded-xl glass-button-secondary text-xs text-proz-cyan flex items-center gap-1.5"
-            >
-              <X className="w-3.5 h-3.5" />
-              <span>Reset</span>
-            </button>
-          )}
-
-        </div>
-
-      </div>
-
-      {/* Results Header */}
-      <div className="flex items-center justify-between text-xs text-proz-grey px-1">
-        <span>Showing {filteredItems.length} titles</span>
-        <span>Ultra HD 4K & Adaptive Streaming</span>
-      </div>
-
-      {/* Grid of Content Cards */}
-      {filteredItems.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-          {filteredItems.map((item) => (
-            <ContentCard key={item.id} item={item} aspectRatio="poster" />
-          ))}
-        </div>
-      ) : (
-        <div className="py-20 text-center glass-card rounded-3xl border border-proz-border/50 space-y-3">
-          <p className="text-base text-proz-white font-semibold">No titles found</p>
-          <p className="text-xs text-proz-grey max-w-sm mx-auto">
-            We couldn&apos;t find any content matching your active filters. Try resetting the filters or modifying your search.
-          </p>
+      {/* Pagination */}
+      {!loading && totalPages > 1 && (
+        <div className="flex items-center justify-center gap-4 pt-4">
           <button
-            onClick={resetFilters}
-            className="mt-2 px-5 py-2 rounded-full glass-button-primary text-xs font-semibold"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page <= 1}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111827]/80 backdrop-blur-md border border-[#334155]/60 text-sm text-[#94A3B8] hover:text-[#F8FAFC] hover:border-[#8B5CF6]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
           >
-            Clear All Filters
+            <ChevronLeft className="w-4 h-4" /> Prev
+          </button>
+
+          <span className="text-sm text-[#94A3B8]">
+            Page{' '}
+            <span className="text-[#F8FAFC] font-semibold">{page}</span>
+            {' '}of{' '}
+            <span className="text-[#F8FAFC] font-semibold">{totalPages}</span>
+          </span>
+
+          <button
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111827]/80 backdrop-blur-md border border-[#334155]/60 text-sm text-[#94A3B8] hover:text-[#F8FAFC] hover:border-[#8B5CF6]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
+          >
+            Next <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       )}
-
     </div>
   );
 };

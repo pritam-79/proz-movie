@@ -29,7 +29,7 @@ export default function HomePage() {
   // 4. Latest Releases
   const latestReleases = [...MOCK_CONTENT]
     .filter(c => !c.isRestricted18Plus)
-    .sort((a, b) => b.releaseYear - a.releaseYear);
+    .sort((a, b) => (b.releaseYear || b.release_year || 0) - (a.releaseYear || a.release_year || 0));
 
   // 5. Popular Web Series
   const webSeries = MOCK_CONTENT.filter(c => c.type === 'series' && !c.isRestricted18Plus);
@@ -49,7 +49,7 @@ export default function HomePage() {
   // 10. Recommended for you
   const recommended = [...MOCK_CONTENT]
     .filter(c => !c.isRestricted18Plus)
-    .sort((a, b) => b.ratingScore - a.ratingScore);
+    .sort((a, b) => (b.ratingScore || b.rating_avg || 0) - (a.ratingScore || a.rating_avg || 0));
 
   return (
     <div className="pb-16 space-y-4">

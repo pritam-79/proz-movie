@@ -105,7 +105,7 @@ export default function SubscriptionPage() {
   ];
 
   const handleSelectPlan = (plan: PlanDetail) => {
-    if (plan.id === user?.subscription.planId) return;
+    if (plan.id === user?.subscription?.planId) return;
     setSelectedPlanForCheckout(plan);
   };
 
@@ -192,7 +192,7 @@ export default function SubscriptionPage() {
       {/* Plans Pricing Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {PLANS.map((plan) => {
-          const isCurrent = user?.subscription.planId === plan.id;
+          const isCurrent = user?.subscription?.planId === plan.id;
           const price = billingCycle === 'yearly' ? plan.priceYearly : plan.priceMonthly;
 
           return (

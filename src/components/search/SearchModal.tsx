@@ -47,11 +47,13 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
     }
 
     const q = query.toLowerCase().trim();
-    const filtered = MOCK_CONTENT.filter(item => 
-      item.title.toLowerCase().includes(q) ||
-      item.genres.some(g => g.toLowerCase().includes(q)) ||
-      item.cast.some(c => c.name.toLowerCase().includes(q))
-    ).slice(0, 6);
+    const filtered = MOCK_CONTENT.filter(item => {
+      const titleMatch = item.title?.toLowerCase().includes(q);
+      const synopsisMatch = (item.synopsis || item.description || '')?.toLowerCase().includes(q);
+      const genresMatch = Array.isArray(item.genres) && item.genres.some(g => (typeof g === 'string' ? g : g.name)?.toLowerCase().includes(q));
+      const castMatch = Array.isArray(item.cast) && item.cast.some(c => c.name?.toLowerCase().includes(q));
+      return Boolean(titleMatch || synopsisMatch || genresMatch || castMatch);
+    }).slice(0, 6);
 
     setResults(filtered);
   }, [query]);
@@ -159,16 +161,16 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                           <Tv className="w-3.5 h-3.5 text-proz-purple shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-proz-grey line-clamp-1">{item.synopsis}</p>
+                      <p className="text-xs text-proz-grey line-clamp-1">{item.synopsis || item.description || ''}</p>
                       <div className="flex items-center gap-3 text-[11px] text-proz-grey mt-1">
-                        <span>{item.releaseYear}</span>
+                        <span>{item.releaseYear || item.release_year || ''}</span>
                         <span>•</span>
                         <span className="flex items-center gap-0.5 text-amber-400">
                           <Star className="w-3 h-3 fill-amber-400" />
-                          {item.ratingScore}
+                          {item.ratingScore || item.rating_avg || 'N/A'}
                         </span>
                         <span>•</span>
-                        <span className="capitalize">{item.category.replace('_', ' ')}</span>
+                        <span className="capitalize">{(item.category || item.content_type || 'Movie').replace('_', ' ')}</span>
                       </div>
                     </div>
                     <div className="p-2 rounded-full glass-button-secondary opacity-0 group-hover:opacity-100 transition-opacity">

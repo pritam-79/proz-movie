@@ -71,16 +71,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   if (content.type === 'series' && content.seasons) {
     for (const season of content.seasons) {
-      const idx = season.episodes.findIndex(e => e.id === episodeId);
+      const episodes = (season as any).episodes || [];
+      const idx = episodes.findIndex((e: any) => e.id === episodeId);
       if (idx !== -1) {
-        currentEpisode = season.episodes[idx];
-        nextEpisode = season.episodes[idx + 1] || null;
+        currentEpisode = episodes[idx];
+        nextEpisode = episodes[idx + 1] || null;
         break;
       }
     }
-    if (!currentEpisode && content.seasons[0]?.episodes[0]) {
-      currentEpisode = content.seasons[0].episodes[0];
-      nextEpisode = content.seasons[0].episodes[1] || null;
+    if (!currentEpisode && (content.seasons[0] as any)?.episodes?.[0]) {
+      currentEpisode = (content.seasons[0] as any).episodes[0];
+      nextEpisode = (content.seasons[0] as any).episodes[1] || null;
     }
   }
 
@@ -546,7 +547,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     <span>Off</span>
                     {selectedSubtitle === 'off' && <Check className="w-3 h-3" />}
                   </button>
-                  {content.subtitles.map((sub) => (
+                  {content.subtitles?.map((sub) => (
                     <button
                       key={sub.id}
                       onClick={() => { setSelectedSubtitle(sub.id); setShowSubtitleMenu(false); }}
@@ -662,7 +663,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
 
           <div className="space-y-2.5">
-            {content.seasons[0].episodes.map((ep) => (
+            {((content.seasons[0] as any)?.episodes || []).map((ep: any) => (
               <div
                 key={ep.id}
                 onClick={() => {

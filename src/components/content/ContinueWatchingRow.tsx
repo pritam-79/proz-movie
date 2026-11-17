@@ -49,7 +49,7 @@ export const ContinueWatchingRow: React.FC = () => {
             >
               <div className="relative aspect-video rounded-2xl overflow-hidden glass-card group-hover:border-proz-cyan/50 transition-all duration-300">
                 <img
-                  src={content.backdropUrl}
+                  src={content.backdropUrl || content.backdrop_url || content.posterUrl || content.poster_url}
                   alt={content.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />

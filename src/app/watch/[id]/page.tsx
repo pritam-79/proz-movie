@@ -40,7 +40,7 @@ function WatchContent() {
             episodeId,
             userRole: user?.role || 'user',
             is18PlusVerified: user?.is18PlusVerified || false,
-            planId: user?.subscription.planId || 'plan_premium',
+            planId: user?.subscription?.planId || 'plan_premium',
           }),
         });
 
@@ -73,7 +73,7 @@ function WatchContent() {
     return () => {
       isMounted = false;
     };
-  }, [content.id, episodeId, user?.is18PlusVerified, user?.subscription.planId]);
+  }, [content.id, episodeId, user?.is18PlusVerified, user?.subscription?.planId]);
 
   // Loading Authorization State
   if (isAuthorizing) {

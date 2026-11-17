@@ -146,7 +146,7 @@ export const Navbar: React.FC = () => {
                     {user.name}
                   </span>
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-proz-purple/30 text-proz-cyan uppercase">
-                    {user.subscription.planId.replace('plan_', '')}
+                    {user.subscription?.planId ? user.subscription.planId.replace('plan_', '') : 'FREE'}
                   </span>
                 </button>
 
@@ -161,7 +161,7 @@ export const Navbar: React.FC = () => {
                       <p className="text-xs text-proz-grey truncate">{user.email}</p>
                       <div className="mt-1 flex items-center gap-1.5 text-[11px] text-proz-cyan">
                         <Crown className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="capitalize">{user.subscription.videoQuality}</span>
+                        <span className="capitalize">{user.subscription?.videoQuality || '720p HD'}</span>
                       </div>
                     </div>
 

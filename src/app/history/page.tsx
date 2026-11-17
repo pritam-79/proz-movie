@@ -77,7 +77,7 @@ export default function HistoryPage() {
                   </h3>
                   <div className="flex items-center justify-between text-xs text-proz-grey">
                     <span>{percent}% Completed</span>
-                    <span className="capitalize">{content.category.replace('_', ' ')}</span>
+                    <span className="capitalize">{content.category ? content.category.replace('_', ' ') : (content.content_type || 'Movie')}</span>
                   </div>
                   <Link
                     href={`/watch/${content.id}${history.episodeId ? `?episode=${history.episodeId}` : ''}`}

@@ -80,9 +80,9 @@ export default function AccountPage() {
             <span className="text-[10px] uppercase font-bold text-proz-grey">Active Tier</span>
             <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-400">
               <Crown className="w-4 h-4 fill-amber-400" />
-              <span>{user.subscription.planId.replace('plan_', '').toUpperCase()} VIP</span>
+              <span>{user.subscription?.planId ? user.subscription.planId.replace('plan_', '').toUpperCase() + ' VIP' : 'FREE'}</span>
             </div>
-            <p className="text-[11px] text-proz-cyan">{user.subscription.videoQuality}</p>
+            <p className="text-[11px] text-proz-cyan">{user.subscription?.videoQuality || '720p HD'}</p>
           </div>
 
           <div className="pt-2">

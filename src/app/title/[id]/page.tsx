@@ -28,7 +28,7 @@ export default function TitleDetailPage() {
   const { isInWatchlist, addToWatchlist, removeFromWatchlist } = useAuth();
   
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const content = MOCK_CONTENT.find(c => c.id === contentId) || MOCK_CONTENT[0];
+  const content = (MOCK_CONTENT.find(c => c.id === contentId) || MOCK_CONTENT[0]) as any;
 
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -54,10 +54,10 @@ export default function TitleDetailPage() {
   // Similar Titles
   const similarTitles = MOCK_CONTENT.filter(c => 
     c.id !== content.id && 
-    (c.category === content.category || c.genres.some(g => content.genres.includes(g)))
+    (c.category === content.category || (Array.isArray(c.genres) && c.genres.some((g: any) => (content.genres as any[])?.includes(g))))
   ).slice(0, 8);
 
-  const currentSeason = content.seasons?.find(s => s.seasonNumber === selectedSeasonNumber) || content.seasons?.[0];
+  const currentSeason = content.seasons?.find((s: any) => s.seasonNumber === selectedSeasonNumber) || content.seasons?.[0];
 
   return (
     <div className="pb-20 space-y-12">
@@ -177,13 +177,13 @@ export default function TitleDetailPage() {
             </p>
             
             <div className="flex flex-wrap gap-2 pt-2">
-              {content.genres.map((g) => (
+              {content.genres?.map((g: any) => (
                 <Link
-                  key={g}
-                  href={`/movies?genre=${g.toLowerCase()}`}
+                  key={typeof g === 'string' ? g : g.name}
+                  href={`/movies?genre=${(typeof g === 'string' ? g : g.slug || g.name).toLowerCase()}`}
                   className="px-3 py-1 rounded-full text-xs glass-pill text-proz-grey hover:text-proz-cyan hover:border-proz-cyan/40 transition-all"
                 >
-                  {g}
+                  {typeof g === 'string' ? g : g.name}
                 </Link>
               ))}
             </div>
@@ -204,7 +204,7 @@ export default function TitleDetailPage() {
                 {/* Season Tabs */}
                 {content.seasons.length > 1 && (
                   <div className="flex items-center gap-2">
-                    {content.seasons.map((s) => (
+                    {content.seasons.map((s: any) => (
                       <button
                         key={s.id}
                         onClick={() => setSelectedSeasonNumber(s.seasonNumber)}
@@ -223,7 +223,7 @@ export default function TitleDetailPage() {
 
               {/* Episodes List */}
               <div className="space-y-3">
-                {currentSeason?.episodes.map((ep) => (
+                {currentSeason?.episodes?.map((ep: any) => (
                   <div
                     key={ep.id}
                     onClick={() => router.push(`/watch/${content.id}?episode=${ep.id}`)}
@@ -268,7 +268,7 @@ export default function TitleDetailPage() {
               Top Cast
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {content.cast.map((c) => (
+              {content.cast?.map((c: any) => (
                 <div key={c.name} className="flex items-center gap-3 p-2.5 rounded-2xl glass-card border border-proz-border/40">
                   <img
                     src={c.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100"}
@@ -301,7 +301,7 @@ export default function TitleDetailPage() {
                 Audio Languages
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {content.languages.map((l) => (
+                {content.languages?.map((l: any) => (
                   <span key={l} className="px-2 py-0.5 rounded text-[11px] glass-pill text-proz-white">
                     {l}
                   </span>
@@ -316,8 +316,8 @@ export default function TitleDetailPage() {
                 Subtitles
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {content.subtitles.map((sub) => (
-                  <span key={sub.id} className="px-2 py-0.5 rounded text-[11px] glass-pill text-proz-white">
+                {content.subtitles?.map((sub: any) => (
+                  <span key={sub.id || sub.label} className="px-2 py-0.5 rounded text-[11px] glass-pill text-proz-white">
                     {sub.label}
                   </span>
                 ))}
