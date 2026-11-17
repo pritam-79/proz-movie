@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
-const ADMIN_EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL || process.env.ADMIN_MASTER_EMAIL || 'pritamhira2017@gmail.com';
+const ADMIN_EMAIL = process.env.ADMIN_BOOTSTRAP_EMAIL || process.env.ADMIN_MASTER_EMAIL || 'admin@prozmovie.com';
 const ADMIN_PASSWORD = process.env.ADMIN_BOOTSTRAP_PASSWORD || process.env.ADMIN_ACCESS_KEY || 'proz-admin-secure-passphrase-2026';
 const SECRET = process.env.JWT_PLAYBACK_SECRET || 'proz-admin-session-signing-secret-key-32chars';
 
