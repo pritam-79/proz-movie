@@ -16,6 +16,14 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
   loading = false,
   emptyMessage = 'No content found.',
 }) => {
+  const safeItems: ContentItem[] = Array.isArray(items)
+    ? items
+    : Array.isArray((items as any)?.data)
+    ? (items as any).data
+    : Array.isArray((items as any)?.items)
+    ? (items as any).items
+    : [];
+
   if (loading) {
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
@@ -31,7 +39,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
     );
   }
 
-  if (!items || items.length === 0) {
+  if (safeItems.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
         <div className="w-16 h-16 rounded-full bg-[#111827]/80 border border-[#334155]/60 flex items-center justify-center">
@@ -44,7 +52,7 @@ export const ContentGrid: React.FC<ContentGridProps> = ({
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
-      {items.map((item) => (
+      {safeItems.map((item) => (
         <ContentCard key={item.id} item={item} />
       ))}
     </div>

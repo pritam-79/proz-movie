@@ -682,8 +682,334 @@ export const MOCK_CONTENT: ContentItem[] = [
       expiryDate: "2029-06-30",
       territories: ["GLOBAL"]
     }
+  },
+  // 14. Upcoming Sci-Fi Thriller
+  {
+    id: "proz-mov-014",
+    title: "Quantum Heist: Geneva Protocol",
+    slug: "quantum-heist-geneva-protocol",
+    type: "movie",
+    category: "hollywood",
+    synopsis: "In near-future Switzerland, an elite team of tech infiltrators plans the impossible: breaking into CERN's underground quantum vault to retrieve an artificial singularity before an rogue defense contractor weaponizes it.",
+    tagline: "Break reality before they control it.",
+    releaseYear: 2026,
+    runtimeMinutes: 118,
+    maturityRating: "PG-13",
+    genres: ["Sci-Fi", "Heist", "Action", "Thriller"],
+    languages: ["English", "French", "German"],
+    ratingScore: 9.3,
+    ratingCount: 8900,
+    posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1920&auto=format&fit=crop",
+    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    isFeatured: true,
+    isTrending: true,
+    isOriginal: true,
+    isRestricted18Plus: false,
+    cast: [
+      { name: "Cillian Murphy", character: "Dr. Ethan Cross", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
+      { name: "Rebecca Ferguson", character: "Klara Vance", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" }
+    ],
+    crew: [{ name: "Christopher Nolan Estate", role: "Executive Producer" }],
+    subtitles: [{ id: "sub-en", label: "English [CC]", lang: "en", url: "/subtitles/tos-en.vtt", isDefault: true }],
+    audioTracks: [{ id: "aud-en", label: "English [Dolby Atmos]", lang: "en", codec: "AAC", isDefault: true }]
+  },
+
+  // 15. Top Rated Epic Fantasy
+  {
+    id: "proz-mov-015",
+    title: "Chronicles of the Dark Sun",
+    slug: "chronicles-of-the-dark-sun",
+    type: "movie",
+    category: "hollywood",
+    synopsis: "An ancient celestial eclipse unleashes forgotten elemental beasts onto the kingdom of Aethelgard. A disowned guardian knight and an arcane scholar must journey across the obsidian wastes to rekindle the primal flame.",
+    tagline: "When the sky burns black, only heroes remain.",
+    releaseYear: 2024,
+    runtimeMinutes: 142,
+    maturityRating: "PG-13",
+    genres: ["Fantasy", "Action", "Adventure"],
+    languages: ["English", "Spanish"],
+    ratingScore: 9.6,
+    ratingCount: 42100,
+    posterUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: true,
+    isOriginal: false,
+    isRestricted18Plus: false,
+    cast: [
+      { name: "Henry Cavill", character: "Valen Thorne", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" }
+    ],
+    crew: [{ name: "Guillermo del Toro", role: "Director" }]
+  },
+
+  // 16. Trending Anime Dark Fantasy
+  {
+    id: "proz-ani-016",
+    title: "Demon Hunter: Crimson Moon",
+    slug: "demon-hunter-crimson-moon",
+    type: "anime",
+    category: "anime",
+    synopsis: "In a steam-powered alternate Taisho era, the Blood Moon awakens elder demon lords sealed beneath Mount Fuji. The Shadow Hashira squadron must master forbidden breath arts to protect humanity's last stronghold.",
+    tagline: "Unleash the sword of the crimson tide.",
+    releaseYear: 2025,
+    runtimeMinutes: 98,
+    maturityRating: "TV-14",
+    genres: ["Anime", "Action", "Dark Fantasy", "Supernatural"],
+    languages: ["Japanese", "English", "Hindi"],
+    ratingScore: 9.5,
+    ratingCount: 68400,
+    posterUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: true,
+    isTrending: true,
+    isOriginal: false,
+    isRestricted18Plus: false,
+    cast: [{ name: "Natsuki Hanae", character: "Ren Kamado" }]
+  },
+
+  // 17. Latest Anime Cyberpunk
+  {
+    id: "proz-ani-017",
+    title: "Cyber Samurai: 2088",
+    slug: "cyber-samurai-2088",
+    type: "anime",
+    category: "anime",
+    synopsis: "In Neo-Kanto, where synthetic humans outnumber the biological population, an unaugmented ronin assassin is hired by a rogue AI to hunt down the corporate oligarchs who destroyed his clan.",
+    tagline: "Steel meets silicon.",
+    releaseYear: 2026,
+    runtimeMinutes: 24,
+    maturityRating: "TV-MA",
+    genres: ["Anime", "Cyberpunk", "Action", "Sci-Fi"],
+    languages: ["Japanese", "English"],
+    ratingScore: 9.2,
+    ratingCount: 19800,
+    posterUrl: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: true,
+    isOriginal: true,
+    isRestricted18Plus: false
+  },
+
+  // 18. Popular K-Drama Romance & Medical
+  {
+    id: "proz-dra-018",
+    title: "Hospital Playlist: Seoul Dawn",
+    slug: "hospital-playlist-seoul-dawn",
+    type: "series",
+    category: "k_drama",
+    synopsis: "Five university medical school friends, now veteran department heads at Seoul National Hospital, navigate high-stakes emergency surgeries, enduring romances, and late-night indie band rehearsals.",
+    tagline: "Healing hearts, one melody at a time.",
+    releaseYear: 2024,
+    runtimeMinutes: 75,
+    maturityRating: "TV-14",
+    genres: ["K-Drama", "Medical", "Romance", "Comedy"],
+    languages: ["Korean", "English"],
+    ratingScore: 9.4,
+    ratingCount: 52000,
+    posterUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: true,
+    isOriginal: false,
+    isRestricted18Plus: false
+  },
+
+  // 19. Historical Asian Drama
+  {
+    id: "proz-dra-019",
+    title: "The Emperor's Phoenix: Imperial Dawn",
+    slug: "emperors-phoenix-imperial-dawn",
+    type: "series",
+    category: "c_drama",
+    synopsis: "In the opulent yet deadly courts of the Tang dynasty, an exiled warrior princess returns disguised as a royal physician to avenge her fallen clan and reclaim the Dragon Throne.",
+    tagline: "Power is not inherited. It is seized.",
+    releaseYear: 2025,
+    runtimeMinutes: 48,
+    maturityRating: "TV-14",
+    genres: ["C-Drama", "Historical", "Martial Arts", "Romance"],
+    languages: ["Mandarin", "English"],
+    ratingScore: 9.0,
+    ratingCount: 27400,
+    posterUrl: "https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: false,
+    isOriginal: false,
+    isRestricted18Plus: false
+  },
+
+  // 20. Popular TV Series London Crime
+  {
+    id: "proz-ser-020",
+    title: "The London Syndicate: Shadow State",
+    slug: "london-syndicate-shadow-state",
+    type: "series",
+    category: "international",
+    synopsis: "When the patriarch of Britain's most powerful underground logistics syndicate disappears, his estranged daughter must fight off rival European cartels and MI6 undercover agents to protect the family empire.",
+    tagline: "Blood is thicker than oil.",
+    releaseYear: 2025,
+    runtimeMinutes: 58,
+    maturityRating: "TV-MA",
+    genres: ["Crime", "Drama", "Thriller"],
+    languages: ["English"],
+    ratingScore: 8.9,
+    ratingCount: 34100,
+    posterUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: true,
+    isOriginal: true,
+    isRestricted18Plus: false
+  },
+
+  // 21. Latest Sci-Fi Movie
+  {
+    id: "proz-mov-021",
+    title: "Solaris Drift: Deep Horizon",
+    slug: "solaris-drift-deep-horizon",
+    type: "movie",
+    category: "hollywood",
+    synopsis: "During a routine terraforming survey around Saturn's moon Titan, a deep-space mining vessel discovers an ancient extraterrestrial monolith transmitting a harmonic frequency that alters human consciousness.",
+    tagline: "Some doors should never be opened.",
+    releaseYear: 2025,
+    runtimeMinutes: 126,
+    maturityRating: "PG-13",
+    genres: ["Sci-Fi", "Mystery", "Thriller"],
+    languages: ["English"],
+    ratingScore: 9.1,
+    ratingCount: 16700,
+    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    isFeatured: true,
+    isTrending: false,
+    isOriginal: false,
+    isRestricted18Plus: false
+  },
+
+  // 22. Bollywood Action Blockbuster
+  {
+    id: "proz-bol-022",
+    title: "Mumbai Express: Target Red",
+    slug: "mumbai-express-target-red",
+    type: "movie",
+    category: "bollywood",
+    synopsis: "An elite anti-terror commando is trapped aboard a hijacked high-speed bullet train racing between Mumbai and Ahmedabad. With 800 passengers hostage, he must neutralize 40 armed mercenaries carriage by carriage.",
+    tagline: "Speed is the only weapon that never jams.",
+    releaseYear: 2024,
+    runtimeMinutes: 148,
+    maturityRating: "PG-13",
+    genres: ["Bollywood", "Action", "Thriller"],
+    languages: ["Hindi", "English"],
+    ratingScore: 8.8,
+    ratingCount: 47200,
+    posterUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: false,
+    isTrending: true,
+    isOriginal: false,
+    isRestricted18Plus: false
+  },
+
+  // 23. South Indian Historical Action
+  {
+    id: "proz-sou-023",
+    title: "Deccan Warrior 2: Battle of Kings",
+    slug: "deccan-warrior-2-battle-of-kings",
+    type: "movie",
+    category: "south_indian",
+    synopsis: "The thunderous continuation of the Vijayanagara saga. When an alliance of invaders plots the annihilation of the temple kingdoms, King Narasimha unites the hill clans for an earth-shattering final war.",
+    tagline: "Legends do not die. They rise in blood.",
+    releaseYear: 2025,
+    runtimeMinutes: 165,
+    maturityRating: "PG-13",
+    genres: ["Action", "Historical", "Drama"],
+    languages: ["Telugu", "Tamil", "Hindi", "Malayalam", "Kannada"],
+    ratingScore: 9.5,
+    ratingCount: 89000,
+    posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
+    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
+    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
+    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    isFeatured: true,
+    isTrending: true,
+    isOriginal: false,
+    isRestricted18Plus: false
   }
 ];
+
+// Helper to normalize any content item to support BOTH snake_case and camelCase
+export function normalizeContentItem(item: ContentItem): ContentItem {
+  const content_type = (item.content_type || item.type || 'movie') as 'movie' | 'series' | 'anime' | 'drama';
+  const type = content_type;
+  const releaseYear = item.releaseYear || item.release_year || 2024;
+  const release_year = releaseYear;
+  const posterUrl = item.posterUrl || item.poster_url || 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop';
+  const poster_url = posterUrl;
+  const backdropUrl = item.backdropUrl || item.backdrop_url || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop';
+  const backdrop_url = backdropUrl;
+  const ratingScore = item.ratingScore || item.rating_avg || 8.5;
+  const rating_avg = ratingScore;
+  const runtimeMinutes = item.runtimeMinutes || item.runtime_minutes || 105;
+  const runtime_minutes = runtimeMinutes;
+  const synopsis = item.synopsis || item.description || '';
+  const description = synopsis;
+  const isFeatured = Boolean(item.isFeatured ?? item.is_featured);
+  const is_featured = isFeatured;
+  const isTrending = Boolean(item.isTrending ?? item.is_trending);
+  const is_trending = isTrending;
+  const isRestricted18Plus = Boolean(item.isRestricted18Plus ?? item.is_adult);
+  const is_adult = isRestricted18Plus;
+
+  return {
+    ...item,
+    content_type,
+    type,
+    category: item.category || 'hollywood',
+    releaseYear,
+    release_year,
+    posterUrl,
+    poster_url,
+    backdropUrl,
+    backdrop_url,
+    ratingScore,
+    rating_avg,
+    runtimeMinutes,
+    runtime_minutes,
+    synopsis,
+    description,
+    isFeatured,
+    is_featured,
+    isTrending,
+    is_trending,
+    isRestricted18Plus,
+    is_adult,
+  };
+}
+
+export function getNormalizedMockContent(): ContentItem[] {
+  return MOCK_CONTENT.map(normalizeContentItem);
+}
 
 export const GENRE_LIST = [
   { id: "action", name: "Action", icon: "Flame" },

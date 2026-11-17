@@ -6,6 +6,8 @@ import { ContentItem } from '@/types/content';
 import ContentRow from '@/components/content/ContentRow';
 import CategoryCatalog from '@/components/content/CategoryCatalog';
 
+import { MOCK_CONTENT } from '@/lib/data/mockContent';
+
 const TABS = [
   { label: 'All Anime', value: 'all' },
   { label: 'Anime Movies', value: 'anime_movie' },
@@ -14,6 +16,13 @@ const TABS = [
   { label: 'Completed', value: 'completed' },
   { label: 'Ongoing', value: 'ongoing' },
 ];
+
+function extractList(val: any): ContentItem[] {
+  if (Array.isArray(val)) return val;
+  if (Array.isArray(val?.data)) return val.data;
+  if (Array.isArray(val?.items)) return val.items;
+  return [];
+}
 
 export default function AnimePage() {
   const [activeTab, setActiveTab] = useState('all');
@@ -27,15 +36,25 @@ export default function AnimePage() {
       setRowsLoading(true);
       try {
         const [t, n, p] = await Promise.all([
-          fetch('/api/content?type=anime&sort=trending&limit=12').then((r) => r.json()),
-          fetch('/api/content?type=anime&sort=latest&limit=12').then((r) => r.json()),
-          fetch('/api/content?type=anime&sort=rating&limit=12').then((r) => r.json()),
+          fetch('/api/content?type=anime&sort=trending&limit=12').then((r) => r.json()).catch(() => null),
+          fetch('/api/content?type=anime&sort=latest&limit=12').then((r) => r.json()).catch(() => null),
+          fetch('/api/content?type=anime&sort=rating&limit=12').then((r) => r.json()).catch(() => null),
         ]);
-        setTrending(t.items ?? t ?? []);
-        setNewlyAdded(n.items ?? n ?? []);
-        setPopularSeason(p.items ?? p ?? []);
+
+        const trendingList = extractList(t);
+        const newlyAddedList = extractList(n);
+        const popularSeasonList = extractList(p);
+
+        const animeMock = MOCK_CONTENT.filter(c => c.category === 'anime' || c.type === 'anime');
+
+        setTrending(trendingList.length > 0 ? trendingList : animeMock.filter(c => c.isTrending));
+        setNewlyAdded(newlyAddedList.length > 0 ? newlyAddedList : animeMock);
+        setPopularSeason(popularSeasonList.length > 0 ? popularSeasonList : animeMock);
       } catch {
-        // silent
+        const animeMock = MOCK_CONTENT.filter(c => c.category === 'anime' || c.type === 'anime');
+        setTrending(animeMock);
+        setNewlyAdded(animeMock);
+        setPopularSeason(animeMock);
       } finally {
         setRowsLoading(false);
       }

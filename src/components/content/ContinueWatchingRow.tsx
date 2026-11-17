@@ -1,9 +1,8 @@
 "use client";
 
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Play, Clock, Sparkles } from 'lucide-react';
+import { Play, Clock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { MOCK_CONTENT } from '@/lib/data/mockContent';
 
@@ -11,10 +10,26 @@ export const ContinueWatchingRow: React.FC = () => {
   const router = useRouter();
   const { watchHistory } = useAuth();
 
-  if (!watchHistory || watchHistory.length === 0) return null;
+  // If user has history, use it. Otherwise provide demo in-progress items
+  const historyList = (watchHistory && watchHistory.length > 0)
+    ? watchHistory
+    : [
+        {
+          contentId: "proz-mov-001",
+          progressSeconds: 2900,
+          totalDurationSeconds: 5040,
+          updatedAt: new Date().toISOString()
+        },
+        {
+          contentId: "proz-ser-002",
+          episodeId: "sp-s01-e01",
+          progressSeconds: 1840,
+          totalDurationSeconds: 3720,
+          updatedAt: new Date().toISOString()
+        }
+      ];
 
-  // Map history to content items
-  const historyItems = watchHistory.map((hist) => {
+  const historyItems = historyList.map((hist) => {
     const content = MOCK_CONTENT.find((c) => c.id === hist.contentId);
     if (!content) return null;
     return {

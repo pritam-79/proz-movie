@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ContentItem } from '@/types/content';
 import FilterBar, { FilterState } from '@/components/content/FilterBar';
 import ContentGrid from '@/components/content/ContentGrid';
+import { MOCK_CONTENT } from '@/lib/data/mockContent';
 
 interface CategoryCatalogProps {
   title: string;
@@ -24,7 +25,7 @@ export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({ title, categor
     try {
       const params = new URLSearchParams();
       if (category && category !== 'all') params.set('category', category);
-      if (type) params.set('type', type);
+      if (type && type !== 'all') params.set('type', type);
       if (filters.sort) params.set('sort', filters.sort);
       if (filters.year) params.set('year', filters.year);
       if (filters.language) params.set('language', filters.language);
@@ -34,14 +35,32 @@ export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({ title, categor
       const res = await fetch(`/api/content?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
-        setItems(data.items ?? data ?? []);
+        const list = Array.isArray(data)
+          ? data
+          : Array.isArray(data?.data)
+          ? data.data
+          : Array.isArray(data?.items)
+          ? data.items
+          : [];
+        setItems(list);
         setTotalPages(data.total_pages ?? data.totalPages ?? 1);
+        return;
       }
-    } catch {
-      // silently handle fetch errors
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      console.warn('CategoryCatalog fetch failed, using fallback:', err);
     }
+
+    // Direct fallback from MOCK_CONTENT
+    let fallbackList = MOCK_CONTENT.filter(c => !c.isRestricted18Plus && !c.is_adult);
+    if (category && category !== 'all') {
+      fallbackList = fallbackList.filter(c => c.category === category);
+    }
+    if (type && type !== 'all') {
+      fallbackList = fallbackList.filter(c => c.type === type || c.content_type === type);
+    }
+    setItems(fallbackList);
+    setTotalPages(1);
+    setLoading(false);
   }, [category, type, filters, page]);
 
   useEffect(() => {

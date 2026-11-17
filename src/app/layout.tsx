@@ -4,6 +4,7 @@ import { brandConfig } from '@/config/brand.config';
 import { AuthProvider } from '@/context/AuthContext';
 import Navbar from '@/components/navigation/Navbar';
 import Footer from '@/components/navigation/Footer';
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -60,7 +61,9 @@ export default function RootLayout({
 
           {/* Main Content Area */}
           <main className="flex-1 w-full pt-16">
-            {children}
+            <ErrorBoundary>
+              {children}
+            </ErrorBoundary>
           </main>
 
           {/* Site Footer */}

@@ -13,7 +13,7 @@ interface ContentRowProps {
   viewAllHref?: string;
   badge?: string;
   subtitle?: string;
-  aspectRatio?: string;
+  aspectRatio?: 'poster' | 'backdrop' | string;
   icon?: React.ReactNode;
 }
 
@@ -24,11 +24,22 @@ export const ContentRow: React.FC<ContentRowProps> = ({
   viewAllHref,
   badge,
   subtitle,
+  aspectRatio = 'poster',
   icon,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  if (!loading && (!items || items.length === 0)) return null;
+  const safeItems: ContentItem[] = Array.isArray(items)
+    ? items
+    : Array.isArray((items as any)?.data)
+    ? (items as any).data
+    : Array.isArray((items as any)?.items)
+    ? (items as any).items
+    : [];
+
+  if (!loading && safeItems.length === 0) return null;
+
+  const isBackdrop = aspectRatio === 'backdrop';
 
   return (
     <section className="relative">
@@ -71,12 +82,21 @@ export const ContentRow: React.FC<ContentRowProps> = ({
           ? Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-[150px] sm:w-[180px] aspect-[2/3] animate-pulse bg-[#111827] rounded-xl border border-[#334155]/40 snap-start"
+                className={`flex-shrink-0 ${
+                  isBackdrop
+                    ? 'w-[260px] sm:w-[320px] aspect-[16/9]'
+                    : 'w-[150px] sm:w-[180px] aspect-[2/3]'
+                } animate-pulse bg-[#111827] rounded-xl border border-[#334155]/40 snap-start`}
               />
             ))
-          : items.map((item) => (
-              <div key={item.id} className="flex-shrink-0 w-[150px] sm:w-[180px] snap-start">
-                <ContentCard item={item} />
+          : safeItems.map((item) => (
+              <div
+                key={item.id}
+                className={`flex-shrink-0 ${
+                  isBackdrop ? 'w-[260px] sm:w-[320px]' : 'w-[150px] sm:w-[180px]'
+                } snap-start`}
+              >
+                <ContentCard item={item} aspectRatio={aspectRatio} />
               </div>
             ))}
       </div>

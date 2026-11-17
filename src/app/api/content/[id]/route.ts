@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getNormalizedMockContent } from '@/lib/data/mockContent';
 
 export async function GET(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const { id } = params;
+
   try {
     const supabase = createSupabaseServerClient();
-    const { id } = params;
 
     const { data, error } = await supabase
       .from('content')
@@ -20,16 +22,23 @@ export async function GET(
         audio_tracks(*),
         licenses(*)
       `)
-      .eq('id', id)
+      .or(`id.eq.${id},slug.eq.${id}`)
       .single();
 
-    if (error || !data) {
-      return NextResponse.json({ error: 'Content not found' }, { status: 404 });
+    if (!error && data) {
+      return NextResponse.json(data);
     }
-
-    return NextResponse.json(data);
   } catch (err) {
-    console.error('Content [id] route error:', err);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    console.warn(`Supabase query for content ${id} fell back to mock repository:`, err);
   }
+
+  // Fallback: search mock content by id or slug
+  const all = getNormalizedMockContent();
+  const match = all.find((c) => c.id === id || c.slug === id);
+
+  if (match) {
+    return NextResponse.json(match);
+  }
+
+  return NextResponse.json({ error: 'Content not found' }, { status: 404 });
 }

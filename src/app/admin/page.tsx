@@ -1010,6 +1010,72 @@ function DashboardOverview({ onNavigate }: { onNavigate: (s: AdminSection) => vo
 export default function AdminDashboardPage() {
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [adminUser, setAdminUser] = useState<{ email: string; role: string } | null>(null);
+
+  // Login form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/auth/me');
+      const data = await res.json();
+      if (data.authenticated && data.user) {
+        setIsAuthenticated(true);
+        setAdminUser(data.user);
+      } else {
+        setIsAuthenticated(false);
+      }
+    } catch {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginLoading(true);
+    setLoginError(null);
+
+    try {
+      const res = await fetch('/api/admin/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        setLoginError(data.error || 'Invalid administrator credentials');
+        setLoginLoading(false);
+        return;
+      }
+
+      setIsAuthenticated(true);
+      setAdminUser(data.user);
+      setLoginLoading(false);
+    } catch (err) {
+      setLoginError('Authentication network error. Please try again.');
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/auth/logout', { method: 'POST' });
+    } catch {
+      // ignore
+    }
+    setIsAuthenticated(false);
+    setAdminUser(null);
+  };
 
   const sectionTitles: Record<AdminSection, string> = {
     dashboard: 'Dashboard',
@@ -1023,6 +1089,94 @@ export default function AdminDashboardPage() {
   };
 
   const navigate = (s: AdminSection) => { setActiveSection(s); setSidebarOpen(false); };
+
+  // Checking session
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-[#080B12] flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-[#334155]/40 border-t-[#22D3EE] animate-spin" />
+        <p className="text-sm font-semibold text-[#94A3B8]">Validating administrator session...</p>
+      </div>
+    );
+  }
+
+  // Not authenticated: render Secure Admin Login Screen
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#080B12] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Ambient background glows */}
+        <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#8B5CF6]/15 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-[#22D3EE]/10 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="w-full max-w-md bg-[#111827]/90 backdrop-blur-2xl border border-[#334155]/60 rounded-3xl p-8 shadow-[0_16px_48px_rgba(0,0,0,0.6)] relative z-10 space-y-6">
+          <div className="text-center space-y-2">
+            <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-[#8B5CF6]/20 to-[#22D3EE]/20 border border-[#8B5CF6]/40 flex items-center justify-center text-[#22D3EE] shadow-[0_0_24px_rgba(34,211,238,0.2)]">
+              <Lock className="w-7 h-7 text-[#22D3EE]" />
+            </div>
+            <p className="text-xs uppercase font-extrabold tracking-widest text-[#8B5CF6] pt-2">
+              PROZ MOVIE Console
+            </p>
+            <h1 className="text-2xl font-black text-[#F8FAFC]">
+              Administrator Login
+            </h1>
+            <p className="text-xs text-[#94A3B8]">
+              Restricted management console. Sign in with your master credentials.
+            </p>
+          </div>
+
+          {loginError && (
+            <div className="flex items-center gap-2 p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs font-semibold text-red-400">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{loginError}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#94A3B8]">Administrator Email</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@prozmovie.com"
+                className={glassInput}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#94A3B8]">Admin Access Key / Password</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••••••"
+                className={glassInput}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loginLoading}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#8B5CF6] to-[#22D3EE] text-white text-sm font-bold shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:shadow-[0_0_28px_rgba(34,211,238,0.5)] transition-all disabled:opacity-50"
+            >
+              {loginLoading ? 'Authenticating...' : 'Sign In to Console'}
+            </button>
+          </form>
+
+          <div className="pt-4 border-t border-[#334155]/40 text-center">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
+            >
+              <ArrowRight className="w-3.5 h-3.5" /> Return to PROZ MOVIE public site
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080B12] flex">
@@ -1075,7 +1229,18 @@ export default function AdminDashboardPage() {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[#334155]/40">
+        <div className="p-4 border-t border-[#334155]/40 space-y-2">
+          {adminUser && (
+            <div className="flex items-center justify-between text-xs pb-1">
+              <span className="text-[#94A3B8] truncate max-w-[130px] font-mono text-[11px]">{adminUser.email}</span>
+              <button
+                onClick={handleLogout}
+                className="text-red-400 hover:text-red-300 font-semibold text-[11px] hover:underline"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
           <Link href="/" className="flex items-center gap-2 text-xs text-[#94A3B8] hover:text-[#F8FAFC] transition-colors">
             <ArrowRight className="w-3.5 h-3.5" /> Back to site
           </Link>
@@ -1092,11 +1257,17 @@ export default function AdminDashboardPage() {
           <div className="flex-1">
             <h2 className="text-base font-bold text-[#F8FAFC]">{sectionTitles[activeSection]}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Live
             </span>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-all"
+            >
+              Sign Out
+            </button>
           </div>
         </header>
 
