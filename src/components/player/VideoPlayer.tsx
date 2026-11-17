@@ -63,11 +63,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
   const [showSkipIntro, setShowSkipIntro] = useState(false);
-  const [drmVerified, setDrmVerified] = useState(true);
+  const [selectedServer, setSelectedServer] = useState<'server1' | 'server2' | 'server3' | 'direct'>('server1');
 
   // Resolve current episode if series
-  let currentEpisode = null;
-  let nextEpisode = null;
+  let currentEpisode: any = null;
+  let nextEpisode: any = null;
 
   if (content.type === 'series' && content.seasons) {
     for (const season of content.seasons) {
@@ -84,6 +84,31 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       nextEpisode = (content.seasons[0] as any).episodes[1] || null;
     }
   }
+
+  // Helper for universal cinema stream embed
+  const getEmbedUrl = (server: string) => {
+    const tmdbId = content.tmdb_id || 533535;
+    const isSeries = content.type === 'series' || content.content_type === 'series';
+    const season = currentEpisode?.seasonNumber || 1;
+    const ep = currentEpisode?.episodeNumber || 1;
+
+    if (server === 'server1') {
+      return isSeries
+        ? `https://vidsrc.to/embed/tv/${tmdbId}/${season}/${ep}`
+        : `https://vidsrc.to/embed/movie/${tmdbId}`;
+    }
+    if (server === 'server2') {
+      return isSeries
+        ? `https://player.autoembed.cc/embed/tv/${tmdbId}/${season}/${ep}`
+        : `https://player.autoembed.cc/embed/movie/${tmdbId}`;
+    }
+    if (server === 'server3') {
+      return isSeries
+        ? `https://embed.su/embed/tv/${tmdbId}/${season}/${ep}`
+        : `https://embed.su/embed/movie/${tmdbId}`;
+    }
+    return '';
+  };
 
   // Active stream URL
   const activeStream = currentEpisode?.fallbackMp4 || content.fallbackMp4 || currentEpisode?.streamUrl || content.streamUrl;
@@ -334,122 +359,199 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseMove={handleMouseMove}
       className="relative w-full h-screen bg-black overflow-hidden select-none flex items-center justify-center font-sans"
     >
-      {/* Video Element */}
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain cursor-pointer"
-        playsInline
-        onClick={togglePlay}
-        onTimeUpdate={handleTimeUpdate}
-        onCanPlay={() => setIsBuffering(false)}
-        onLoadedData={() => setIsBuffering(false)}
-        onError={() => {
-          setIsBuffering(false);
-          if (videoRef.current && content.fallbackMp4 && videoRef.current.src !== content.fallbackMp4) {
-            videoRef.current.src = content.fallbackMp4;
-            videoRef.current.load();
-          }
-        }}
-        onLoadedMetadata={() => {
-          if (videoRef.current) {
-            setDuration(videoRef.current.duration);
-            setIsBuffering(false);
-          }
-        }}
-        onWaiting={() => setIsBuffering(true)}
-        onPlaying={() => {
-          setIsBuffering(false);
-          setIsPlaying(true);
-        }}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => {
-          setIsPlaying(false);
-          if (nextEpisode) {
-            router.push(`/watch/${content.id}?episode=${nextEpisode.id}`);
-          }
-        }}
-      />
-
-      {/* Center Play Button Overlay when Paused */}
-      {!isPlaying && !isBuffering && (
-        <div 
-          onClick={togglePlay}
-          className="absolute inset-0 flex items-center justify-center cursor-pointer z-20 group/play"
-        >
-          <div className="w-20 h-20 rounded-full bg-gradient-to-r from-proz-purple to-proz-cyan flex items-center justify-center shadow-[0_0_35px_rgba(139,92,246,0.6)] group-hover/play:scale-110 transition-transform">
-            <Play className="w-9 h-9 text-white fill-white ml-1" />
-          </div>
+      {/* Video Stream or Cinema Embed Player */}
+      {selectedServer !== 'direct' ? (
+        <div className="relative w-full h-full bg-black flex items-center justify-center">
+          <iframe
+            key={`${selectedServer}-${content.id}-${currentEpisode?.id || ''}`}
+            src={getEmbedUrl(selectedServer)}
+            className="w-full h-full border-0"
+            allowFullScreen
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          />
         </div>
-      )}
+      ) : (
+        <>
+          {/* Video Element */}
+          <video
+            ref={videoRef}
+            className="w-full h-full object-contain cursor-pointer"
+            playsInline
+            onClick={togglePlay}
+            onTimeUpdate={handleTimeUpdate}
+            onCanPlay={() => setIsBuffering(false)}
+            onLoadedData={() => setIsBuffering(false)}
+            onError={() => {
+              setIsBuffering(false);
+              if (videoRef.current && content.fallbackMp4 && videoRef.current.src !== content.fallbackMp4) {
+                videoRef.current.src = content.fallbackMp4;
+                videoRef.current.load();
+              }
+            }}
+            onLoadedMetadata={() => {
+              if (videoRef.current) {
+                setDuration(videoRef.current.duration);
+                setIsBuffering(false);
+              }
+            }}
+            onWaiting={() => setIsBuffering(true)}
+            onPlaying={() => {
+              setIsBuffering(false);
+              setIsPlaying(true);
+            }}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => {
+              setIsPlaying(false);
+              if (nextEpisode) {
+                router.push(`/watch/${content.id}?episode=${nextEpisode.id}`);
+              }
+            }}
+          />
 
-      {/* Loading Spinner during buffering */}
-      {isBuffering && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-          <div className="w-16 h-16 rounded-full border-4 border-proz-border/40 border-t-proz-cyan animate-spin" />
-        </div>
-      )}
+          {/* Center Play Button Overlay when Paused */}
+          {!isPlaying && !isBuffering && (
+            <div 
+              onClick={togglePlay}
+              className="absolute inset-0 flex items-center justify-center cursor-pointer z-20 group/play"
+            >
+              <div className="w-20 h-20 rounded-full bg-gradient-to-r from-proz-purple to-proz-cyan flex items-center justify-center shadow-[0_0_35px_rgba(139,92,246,0.6)] group-hover/play:scale-110 transition-transform">
+                <Play className="w-9 h-9 text-white fill-white ml-1" />
+              </div>
+            </div>
+          )}
 
-      {/* Skip Intro Floating Button */}
-      {showSkipIntro && (
-        <button
-          onClick={() => {
-            if (videoRef.current) {
-              videoRef.current.currentTime = currentEpisode?.introEndSec || 50;
-              setShowSkipIntro(false);
-            }
-          }}
-          className="absolute bottom-28 right-8 z-30 px-5 py-2.5 rounded-full glass-card border border-proz-cyan/50 text-proz-white font-bold text-xs flex items-center gap-2 hover:bg-proz-cyan hover:text-proz-midnight transition-all shadow-cyan-glow"
-        >
-          <SkipForward className="w-4 h-4" />
-          <span>Skip Intro</span>
-        </button>
+          {/* Loading Spinner during buffering */}
+          {isBuffering && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+              <div className="w-16 h-16 rounded-full border-4 border-proz-border/40 border-t-proz-cyan animate-spin" />
+            </div>
+          )}
+
+          {/* Skip Intro Floating Button */}
+          {showSkipIntro && (
+            <button
+              onClick={() => {
+                if (videoRef.current) {
+                  videoRef.current.currentTime = currentEpisode?.introEndSec || 50;
+                  setShowSkipIntro(false);
+                }
+              }}
+              className="absolute bottom-28 right-8 z-30 px-5 py-2.5 rounded-full glass-card border border-proz-cyan/50 text-proz-white font-bold text-xs flex items-center gap-2 hover:bg-proz-cyan hover:text-proz-midnight transition-all shadow-cyan-glow"
+            >
+              <SkipForward className="w-4 h-4" />
+              <span>Skip Intro</span>
+            </button>
+          )}
+        </>
       )}
 
       {/* Signed Session & DRM Watermark */}
-      <div className="absolute top-6 right-6 z-20 flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[10px] text-emerald-400 border border-emerald-500/30">
+      <div className="absolute top-6 right-6 z-20 hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full glass-pill text-[10px] text-emerald-400 border border-emerald-500/30">
         <ShieldCheck className="w-3.5 h-3.5" />
         <span className="font-mono">PROZ-DRM • SECURE SESSION</span>
       </div>
 
       {/* Top Overlay Bar */}
       <div
-        className={`absolute top-0 left-0 right-0 p-6 bg-gradient-to-b from-proz-midnight/90 to-transparent flex items-center justify-between transition-opacity duration-300 z-30 ${
+        className={`absolute top-0 left-0 right-0 p-4 sm:p-6 bg-gradient-to-b from-proz-midnight/90 to-transparent flex items-center justify-between transition-opacity duration-300 z-30 ${
           showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => router.back()}
-            className="p-2.5 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all"
+            className="p-2 sm:p-2.5 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all shrink-0"
             aria-label="Back to details"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <div>
-            <h2 className="text-base sm:text-lg font-bold text-proz-white">
+            <h2 className="text-sm sm:text-lg font-bold text-proz-white line-clamp-1">
               {content.title}
             </h2>
             {currentEpisode && (
-              <p className="text-xs text-proz-cyan">
-                Season {currentEpisode.seasonNumber} • Episode {currentEpisode.episodeNumber}: {currentEpisode.title}
+              <p className="text-[11px] sm:text-xs text-proz-cyan line-clamp-1">
+                S{currentEpisode.seasonNumber} • Ep{currentEpisode.episodeNumber}: {currentEpisode.title}
               </p>
             )}
           </div>
         </div>
 
-        {/* Series Episodes Drawer Toggle */}
-        {content.type === 'series' && content.seasons && (
-          <button
-            onClick={() => setShowEpisodeDrawer(!showEpisodeDrawer)}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-card border border-proz-border/50 text-xs font-semibold text-proz-white hover:border-proz-cyan/50"
-          >
-            <List className="w-4 h-4 text-proz-cyan" />
-            <span>Episodes</span>
-          </button>
-        )}
+        {/* Stream Server Selector */}
+        <div className="flex items-center gap-2">
+          {/* Desktop server pills */}
+          <div className="hidden lg:flex items-center gap-1 p-1 rounded-full glass-card border border-proz-border/50 text-[10px]">
+            <button
+              onClick={() => setSelectedServer('server1')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'server1'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              Server 1 (VidSrc)
+            </button>
+            <button
+              onClick={() => setSelectedServer('server2')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'server2'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              Server 2 (AutoEmbed)
+            </button>
+            <button
+              onClick={() => setSelectedServer('server3')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'server3'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              Server 3 (EmbedSu)
+            </button>
+            <button
+              onClick={() => setSelectedServer('direct')}
+              className={`px-2.5 py-1 rounded-full font-bold transition-all ${
+                selectedServer === 'direct'
+                  ? 'bg-gradient-to-r from-proz-purple to-proz-cyan text-white shadow-cyan-glow'
+                  : 'text-proz-grey hover:text-white'
+              }`}
+            >
+              Server 4 (Direct MP4)
+            </button>
+          </div>
+
+          {/* Mobile/Tablet server dropdown */}
+          <div className="lg:hidden">
+            <select
+              value={selectedServer}
+              onChange={(e) => setSelectedServer(e.target.value as any)}
+              className="px-2.5 py-1 rounded-full glass-card border border-proz-border/50 text-[11px] font-bold text-proz-white bg-[#080B12]"
+            >
+              <option value="server1">Server 1 (VidSrc)</option>
+              <option value="server2">Server 2 (AutoEmbed)</option>
+              <option value="server3">Server 3 (EmbedSu)</option>
+              <option value="direct">Server 4 (Direct MP4)</option>
+            </select>
+          </div>
+
+          {/* Series Episodes Drawer Toggle */}
+          {content.type === 'series' && content.seasons && (
+            <button
+              onClick={() => setShowEpisodeDrawer(!showEpisodeDrawer)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full glass-card border border-proz-border/50 text-xs font-semibold text-proz-white hover:border-proz-cyan/50"
+            >
+              <List className="w-4 h-4 text-proz-cyan" />
+              <span className="hidden sm:inline">Episodes</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Bottom Controls Bar */}
+      {selectedServer === 'direct' ? (
       <div
         className={`absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-proz-midnight/95 via-proz-midnight/70 to-transparent flex flex-col gap-3 transition-opacity duration-300 z-30 ${
           showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -672,6 +774,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         </div>
 
       </div>
+      ) : (
+        <div
+          className={`absolute bottom-3 left-4 right-4 flex items-center justify-between text-xs z-30 pointer-events-none transition-opacity duration-300 ${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          <div className="px-3.5 py-1.5 rounded-full glass-card border border-proz-border/50 text-[11px] text-proz-white/90 shadow-glass-md flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Streaming HD Source via {selectedServer === 'server1' ? 'VidSrc Pro' : selectedServer === 'server2' ? 'AutoEmbed' : 'EmbedSu'} • Having playback issues? Switch server at the top.</span>
+          </div>
+        </div>
+      )}
 
       {/* Series Episode Drawer Panel */}
       {showEpisodeDrawer && content.type === 'series' && content.seasons && (

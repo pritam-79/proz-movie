@@ -78,6 +78,7 @@ export interface Season {
   title?: string;
   description?: string;
   episode_count?: number;
+  episodeCount?: number;
   poster_url?: string;
   air_date?: string;
   episodes?: Episode[];

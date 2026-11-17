@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { MOCK_CONTENT } from '@/lib/data/mockContent';
+import { MOCK_CONTENT, getNormalizedMockContent } from '@/lib/data/mockContent';
 import VideoPlayer from '@/components/player/VideoPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { ShieldAlert, Lock, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react';
@@ -17,7 +17,8 @@ function WatchContent() {
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const episodeId = searchParams.get('episode') || undefined;
 
-  const content = MOCK_CONTENT.find(c => c.id === contentId) || MOCK_CONTENT[0];
+  const allContent = getNormalizedMockContent();
+  const content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
 
   const [isAuthorizing, setIsAuthorizing] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);

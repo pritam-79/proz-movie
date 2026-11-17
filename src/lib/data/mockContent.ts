@@ -1,976 +1,1488 @@
 import { ContentItem } from '@/types/content';
 
 export const MOCK_CONTENT: ContentItem[] = [
-  // 1. Featured Cinematic Hero & Hollywood Original
   {
-    id: "proz-mov-001",
-    title: "Tears of Steel: Cyber Horizon",
-    originalTitle: "Tears of Steel",
-    slug: "tears-of-steel-cyber-horizon",
-    type: "movie",
-    category: "hollywood",
-    synopsis: "Set in a dystopian future where Earth has been overrun by autonomous military cyborgs, a daring team of rebel scientists and veterans assemble at the ancient Oude Kerk in Amsterdam. Their mission: activate a temporal memory beacon and alter the timeline before human civilization is extinguished.",
-    tagline: "What if the future is already here, and we lost the keys?",
-    releaseYear: 2024,
-    runtimeMinutes: 84,
-    maturityRating: "PG-13",
-    genres: ["Sci-Fi", "Action", "Cyberpunk", "Thriller"],
-    languages: ["English", "Hindi", "Spanish", "Japanese"],
-    ratingScore: 9.1,
-    ratingCount: 14820,
-    posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-    dashUrl: "https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Derek de Lint", character: "Old Thom", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Sergio Hasselbaink", character: "Barley", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" },
-      { name: "Vanja Rukavina", character: "Frank", avatarUrl: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?q=80&w=200&auto=format&fit=crop" },
-      { name: "Denise Rebergen", character: "Celia", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-mov-001",
+    "title": "Deadpool & Wolverine",
+    "originalTitle": "Deadpool & Wolverine",
+    "slug": "deadpool-and-wolverine",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "A listless Wade Wilson toils away in civilian life with his days as the morally flexible mercenary Deadpool behind him. But when his homeworld faces an existential threat, Wade must reluctantly suit-up again with an even more reluctant Wolverine.",
+    "tagline": "Everyone deserves a happy ending.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 128,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Comedy",
+      "Sci-Fi"
     ],
-    crew: [
-      { name: "Ian Hubert", role: "Director & Writer" },
-      { name: "Ton Roosendaal", role: "Producer" },
-      { name: "Joris Hermans", role: "Cinematographer" }
+    "languages": [
+      "English",
+      "Hindi",
+      "Spanish",
+      "Japanese"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English [CC]", lang: "en", url: "/subtitles/tos-en.vtt", isDefault: true },
-      { id: "sub-es", label: "Español", lang: "es", url: "/subtitles/tos-es.vtt" },
-      { id: "sub-hi", label: "हिन्दी", lang: "hi", url: "/subtitles/tos-hi.vtt" }
-    ],
-    audioTracks: [
-      { id: "aud-en", label: "English [Original - 5.1 Dolby]", lang: "en", codec: "AAC", isDefault: true },
-      { id: "aud-hi", label: "Hindi [Dubbed]", lang: "hi", codec: "AAC" }
-    ],
-    license: {
-      licensor: "Blender Foundation & PROZ Cinema Studios",
-      expiryDate: "2030-12-31",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 2. K-Drama Hit Series
-  {
-    id: "proz-ser-002",
-    title: "Seoul Protocol: Shadow Cyber",
-    originalTitle: "서울 프로토콜",
-    slug: "seoul-protocol-shadow-cyber",
-    type: "series",
-    category: "k_drama",
-    synopsis: "When a deepfake cyber extortion ring threatens the South Korean national power grid, an uncompromising NIS digital forensics officer joins forces with an underground white-hat hacker group hidden in the neon alleyways of Gangnam.",
-    tagline: "In the neon city, your identity is the currency.",
-    releaseYear: 2025,
-    runtimeMinutes: 62,
-    maturityRating: "TV-MA",
-    genres: ["K-Drama", "Crime", "Cyberpunk", "Mystery"],
-    languages: ["Korean", "English", "Hindi"],
-    ratingScore: 9.4,
-    ratingCount: 31200,
-    posterUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    seasons: [
+    "ratingScore": 8.8,
+    "ratingCount": 38540,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=73_1biulkYk",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": true,
+    "isRestricted18Plus": false,
+    "tmdb_id": 533535,
+    "cast": [
       {
-        id: "sp-s01",
-        seasonNumber: 1,
-        title: "Season 1: Zero-Day Incursion",
-        episodes: [
+        "name": "Ryan Reynolds",
+        "character": "Wade Wilson / Deadpool",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4SYTH5FRAxTkYo8umAvne7YqxR9.jpg"
+      },
+      {
+        "name": "Hugh Jackman",
+        "character": "Logan / Wolverine",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      },
+      {
+        "name": "Emma Corrin",
+        "character": "Cassandra Nova",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/kL8P3H7YxX4xL3E9wzF1v2O4c9v.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Shawn Levy",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-002",
+    "title": "Dune: Part Two",
+    "originalTitle": "Dune: Part Two",
+    "slug": "dune-part-two",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he endeavors to prevent a terrible future only he can foresee.",
+    "tagline": "Long live the fighters.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 166,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Sci-Fi",
+      "Adventure",
+      "Action"
+    ],
+    "languages": [
+      "English",
+      "Hindi",
+      "French"
+    ],
+    "ratingScore": 8.9,
+    "ratingCount": 52100,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=Way9Dexny3w",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 693134,
+    "cast": [
+      {
+        "name": "Timothée Chalamet",
+        "character": "Paul Atreides",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/BE2sdjpgsa2rNTFa66f7upkaOP.jpg"
+      },
+      {
+        "name": "Zendaya",
+        "character": "Chani",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/r3A7ev7QkjOGBFErOKC9v7bOTLG.jpg"
+      },
+      {
+        "name": "Rebecca Ferguson",
+        "character": "Lady Jessica",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Denis Villeneuve",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-003",
+    "title": "Oppenheimer",
+    "originalTitle": "Oppenheimer",
+    "slug": "oppenheimer",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "The story of J. Robert Oppenheimer’s role in the development of the atomic bomb during World War II, exploring the profound moral, scientific, and geopolitical questions that followed.",
+    "tagline": "The world forever changes.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 181,
+    "maturityRating": "R",
+    "genres": [
+      "Drama",
+      "History",
+      "Biography"
+    ],
+    "languages": [
+      "English",
+      "German",
+      "Russian"
+    ],
+    "ratingScore": 9,
+    "ratingCount": 78900,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/fm6K9vYQ79FGzIsmvgqvNDm9xZs.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=uYPbbksJxIg",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 872585,
+    "cast": [
+      {
+        "name": "Cillian Murphy",
+        "character": "J. Robert Oppenheimer",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Emily Blunt",
+        "character": "Katherine 'Kitty' Oppenheimer",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Robert Downey Jr.",
+        "character": "Lewis Strauss",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Christopher Nolan",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-004",
+    "title": "Interstellar",
+    "originalTitle": "Interstellar",
+    "slug": "interstellar",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage.",
+    "tagline": "Mankind was born on Earth. It was never meant to die here.",
+    "releaseYear": 2014,
+    "runtimeMinutes": 169,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Sci-Fi",
+      "Drama",
+      "Adventure"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.2,
+    "ratingCount": 94000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/rAiYTsqJJR0nhcztQw57crXs9vo.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=zSWdZVtXT7E",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 157336,
+    "cast": [
+      {
+        "name": "Matthew McConaughey",
+        "character": "Joseph Cooper",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/eDeWQeEaBqVwVlJtXl1wY6q7o8v.jpg"
+      },
+      {
+        "name": "Anne Hathaway",
+        "character": "Dr. Amelia Brand",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Christopher Nolan",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-005",
+    "title": "The Dark Knight",
+    "originalTitle": "The Dark Knight",
+    "slug": "the-dark-knight",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Batman raises the stakes in his war on crime. With the help of Lt. Jim Gordon and District Attorney Harvey Dent, Batman sets out to dismantle the remaining criminal organizations that plague the streets. The partnership proves to be effective, but they soon find themselves prey to a reign of chaos unleashed by a rising criminal mastermind known to the terrified citizens of Gotham as the Joker.",
+    "tagline": "Why so serious?",
+    "releaseYear": 2008,
+    "runtimeMinutes": 152,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama",
+      "Thriller"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.3,
+    "ratingCount": 120500,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=EXeTwQWrcwY",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 155,
+    "cast": [
+      {
+        "name": "Christian Bale",
+        "character": "Bruce Wayne / Batman",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Heath Ledger",
+        "character": "Joker",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Christopher Nolan",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-006",
+    "title": "Spider-Man: Across the Spider-Verse",
+    "originalTitle": "Spider-Man: Across the Spider-Verse",
+    "slug": "spider-man-across-the-spider-verse",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "After reuniting with Gwen Stacy, Brooklyn’s full-time, friendly neighborhood Spider-Man is catapulted across the Multiverse, where he encounters the Spider-Society, a team of Spider-People charged with protecting the Multiverse’s very existence.",
+    "tagline": "It's how you wear the mask that matters.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 140,
+    "maturityRating": "PG",
+    "genres": [
+      "Animation",
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "languages": [
+      "English",
+      "Hindi",
+      "Spanish"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 65400,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=cqGjhVJWtEg",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 569094,
+    "cast": [
+      {
+        "name": "Shameik Moore",
+        "character": "Miles Morales",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Hailee Steinfeld",
+        "character": "Gwen Stacy",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Joaquim Dos Santos",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-007",
+    "title": "Gladiator II",
+    "originalTitle": "Gladiator II",
+    "slug": "gladiator-ii",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Years after witnessing the death of the revered hero Maximus at the hands of his uncle, Lucius must enter the Colosseum after his home is conquered by the tyrannical Emperors who now lead Rome with an iron fist. With rage in his heart and the future of the Empire at stake, Lucius must look to his past to find strength and honor to return the glory of Rome to its people.",
+    "tagline": "What we do in life echoes in eternity.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 148,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama",
+      "History"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 8.5,
+    "ratingCount": 31200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/euYIwmwkmz95mnXvufEmbL69ovr.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=4rgYUipGJNo",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 558449,
+    "cast": [
+      {
+        "name": "Paul Mescal",
+        "character": "Lucius Verus",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Pedro Pascal",
+        "character": "Marcus Acacius",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Denzel Washington",
+        "character": "Macrinus",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Ridley Scott",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-008",
+    "title": "John Wick: Chapter 4",
+    "originalTitle": "John Wick: Chapter 4",
+    "slug": "john-wick-chapter-4",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "With the price on his head ever increasing, John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe and forces that turn old friends into foes.",
+    "tagline": "Baba Yaga returns.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 169,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Crime"
+    ],
+    "languages": [
+      "English",
+      "Japanese",
+      "French"
+    ],
+    "ratingScore": 8.7,
+    "ratingCount": 71200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/7I6VUdPj6tQECNHdviJkUHD2389.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=qEVUtrk8_B4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 603692,
+    "cast": [
+      {
+        "name": "Keanu Reeves",
+        "character": "John Wick",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Donnie Yen",
+        "character": "Caine",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Chad Stahelski",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-mov-009",
+    "title": "Avatar: The Way of Water",
+    "originalTitle": "Avatar: The Way of Water",
+    "slug": "avatar-the-way-of-water",
+    "type": "movie",
+    "category": "hollywood",
+    "synopsis": "Set more than a decade after the events of the first film, learn the story of the Sully family, the trouble that follows them, the lengths they go to keep each other safe, the battles they fight to stay alive, and the tragedies they endure.",
+    "tagline": "Return to Pandora.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 192,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Sci-Fi",
+      "Action",
+      "Adventure"
+    ],
+    "languages": [
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 8.6,
+    "ratingCount": 88400,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/s16H6tpK2utvwDtzZ8Qy4qm5Emw.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=d9MyW72ELq0",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 76600,
+    "cast": [
+      {
+        "name": "Sam Worthington",
+        "character": "Jake Sully",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Zoe Saldana",
+        "character": "Neytiri",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "James Cameron",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ser-010",
+    "title": "Stranger Things",
+    "originalTitle": "Stranger Things",
+    "slug": "stranger-things",
+    "type": "series",
+    "category": "series",
+    "synopsis": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and one strange little girl.",
+    "tagline": "Every ending has a beginning.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 55,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Sci-Fi",
+      "Mystery",
+      "Drama",
+      "Horror"
+    ],
+    "languages": [
+      "English",
+      "Hindi",
+      "Spanish"
+    ],
+    "ratingScore": 9.2,
+    "ratingCount": 95400,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=b9EkMc79ZSU",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": true,
+    "isRestricted18Plus": false,
+    "tmdb_id": 66732,
+    "cast": [
+      {
+        "name": "Millie Bobby Brown",
+        "character": "Eleven",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Finn Wolfhard",
+        "character": "Mike Wheeler",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Winona Ryder",
+        "character": "Joyce Byers",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "The Duffer Brothers",
+        "role": "Creators"
+      }
+    ],
+    "seasons": [
+      {
+        "id": "st-s1",
+        "seasonNumber": 1,
+        "title": "Season 1",
+        "episodeCount": 8,
+        "episodes": [
           {
-            id: "sp-s01-e01",
-            seasonNumber: 1,
-            episodeNumber: 1,
-            title: "Episode 1: The Blackout",
-            synopsis: "A coordinated electrical pulse shuts down half of Seoul's financial district. Lead investigator Park Jin-woo discovers code signatures traced back to a decommissioned military server.",
-            durationMinutes: 64,
-            thumbnailUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=600&auto=format&fit=crop",
-            streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            introStartSec: 45,
-            introEndSec: 110
+            "id": "st-s1-e1",
+            "seasonNumber": 1,
+            "episodeNumber": 1,
+            "title": "Chapter One: The Vanishing of Will Byers",
+            "durationMinutes": 48,
+            "synopsis": "On his way home from a friend's house, young Will sees something terrifying.",
+            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
           },
           {
-            id: "sp-s01-e02",
-            seasonNumber: 1,
-            episodeNumber: 2,
-            title: "Episode 2: The Red Ledger",
-            synopsis: "Jin-woo tracks down the rogue programmer known as Spectre, only to find him ambushed inside a subterranean server farm.",
-            durationMinutes: 58,
-            thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
-            streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            introStartSec: 30,
-            introEndSec: 95
-          },
-          {
-            id: "sp-s01-e03",
-            seasonNumber: 1,
-            episodeNumber: 3,
-            title: "Episode 3: Ghost in the Metro",
-            synopsis: "The chase goes mobile as autonomous trains across Line 2 are hijacked in real time by the consortium.",
-            durationMinutes: 61,
-            thumbnailUrl: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=600&auto=format&fit=crop",
-            streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            introStartSec: 25,
-            introEndSec: 85
+            "id": "st-s1-e2",
+            "seasonNumber": 1,
+            "episodeNumber": 2,
+            "title": "Chapter Two: The Weirdo on Maple Street",
+            "durationMinutes": 55,
+            "synopsis": "Lucas, Mike and Dustin try to talk to the girl they found in the woods.",
+            "thumbnailUrl": "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg",
+            "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
           }
         ]
       }
-    ],
-    cast: [
-      { name: "Lee Dong-wook", character: "Park Jin-woo", avatarUrl: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=200&auto=format&fit=crop" },
-      { name: "Han So-hee", character: "Kang Min-ah (Spectre)", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" },
-      { name: "Wi Ha-joon", character: "Agent Choi", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "Bong Joon-seok", role: "Showrunner & Director" },
-      { name: "Kim Eun-hee", role: "Screenwriter" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/sp-en.vtt", isDefault: true },
-      { id: "sub-ko", label: "한국어", lang: "ko", url: "/subtitles/sp-ko.vtt" }
-    ],
-    audioTracks: [
-      { id: "aud-ko", label: "Korean [Original]", lang: "ko", codec: "AAC", isDefault: true },
-      { id: "aud-en", label: "English Dub", lang: "en", codec: "AAC" }
-    ],
-    license: {
-      licensor: "CJ ENM & PROZ Media Asia",
-      expiryDate: "2031-06-30",
-      territories: ["GLOBAL"]
-    }
+    ]
   },
-
-  // 3. Anime Masterpiece
   {
-    id: "proz-ani-003",
-    title: "Sintel: Dragon Vanguard",
-    originalTitle: "シンテル 龍の守護者",
-    slug: "sintel-dragon-vanguard",
-    type: "movie",
-    category: "anime",
-    synopsis: "In a fantasy kingdom shrouded in ice and forgotten magic, the determined orphan Sintel raises a wounded baby dragon. When ruthless dragon hunters kidnap Scales, she undertakes a harrowing pilgrimage through snow storms and monster-infested ruins to take back her guardian friend.",
-    tagline: "The strongest bond cannot be severed by sword or magic.",
-    releaseYear: 2024,
-    runtimeMinutes: 56,
-    maturityRating: "PG-13",
-    genres: ["Anime", "Fantasy", "Action", "Adventure"],
-    languages: ["Japanese", "English", "Hindi"],
-    ratingScore: 9.3,
-    ratingCount: 22400,
-    posterUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Halina Reijn", character: "Sintel (Voice)", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" },
-      { name: "Thom Hoffman", character: "Shaman (Voice)", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-ser-011",
+    "title": "The Last of Us",
+    "originalTitle": "The Last of Us",
+    "slug": "the-last-of-us",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Twenty years after modern civilization has been destroyed, Joel, a hardened survivor, is hired to smuggle Ellie, a 14-year-old girl, out of an oppressive quarantine zone. What starts as a small job soon becomes a brutal, heartbreaking journey.",
+    "tagline": "When you're lost in the darkness, look for the light.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 60,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Drama",
+      "Action",
+      "Sci-Fi",
+      "Adventure"
     ],
-    crew: [
-      { name: "Colin Levy", role: "Director" },
-      { name: "Esther Pearl", role: "Producer" }
+    "languages": [
+      "English",
+      "Hindi"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English [Subbed]", lang: "en", url: "/subtitles/sintel-en.vtt", isDefault: true },
-      { id: "sub-ja", label: "日本語", lang: "ja", url: "/subtitles/sintel-ja.vtt" }
-    ],
-    audioTracks: [
-      { id: "aud-ja", label: "Japanese [Original Audio]", lang: "ja", codec: "AAC", isDefault: true },
-      { id: "aud-en", label: "English Dubbed", lang: "en", codec: "AAC" }
-    ],
-    license: {
-      licensor: "Durian Open Movie Project / PROZ Anime",
-      expiryDate: "2032-01-01",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 4. Bollywood High-Octane Action
-  {
-    id: "proz-bol-004",
-    title: "Vanguard: Mumbai Rising",
-    originalTitle: "वैनगार्ड: मुंबई राइजिंग",
-    slug: "vanguard-mumbai-rising",
-    type: "movie",
-    category: "bollywood",
-    synopsis: "An elite anti-terror operative is recalled from retirement when an international syndicate plants weaponized drone swarms atop Mumbai's iconic skyline. Racing against an 8-hour countdown, he must penetrate the underwater nexus before the city collapses.",
-    tagline: "Duty beyond life. Courage beyond fear.",
-    releaseYear: 2025,
-    runtimeMinutes: 142,
-    maturityRating: "PG-13",
-    genres: ["Bollywood", "Action", "Thriller", "Crime"],
-    languages: ["Hindi", "English", "Telugu", "Tamil"],
-    ratingScore: 8.8,
-    ratingCount: 42100,
-    posterUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1566552881560-0be862a7c445?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Kabir Roy", character: "Major Vikram Rathore", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Aria Sharma", character: "Dr. Ananya Sen", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "Rohit Verma", role: "Director" },
-      { name: "Karan Malhotra", role: "Producer" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/vm-en.vtt", isDefault: true }
-    ],
-    audioTracks: [
-      { id: "aud-hi", label: "Hindi [Original Atmos]", lang: "hi", codec: "AAC", isDefault: true },
-      { id: "aud-en", label: "English Dub", lang: "en", codec: "AAC" }
-    ],
-    license: {
-      licensor: "Dharma Productions / PROZ India",
-      expiryDate: "2029-12-31",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 5. South Indian Epic
-  {
-    id: "proz-sou-005",
-    title: "Veera Chakra: The Dynasty",
-    originalTitle: "వీర చక్ర",
-    slug: "veera-chakra-the-dynasty",
-    type: "movie",
-    category: "south_indian",
-    synopsis: "In 14th-century Southern India, a forgotten prince rises against a tyrannical warlord to reclaim the sacred celestial wheel and unite the scattered kingdoms across the Deccan plateau.",
-    tagline: "Blood defines royalty. Valor defines a King.",
-    releaseYear: 2024,
-    runtimeMinutes: 165,
-    maturityRating: "PG-13",
-    genres: ["South Indian", "Action", "Epic", "Drama"],
-    languages: ["Telugu", "Tamil", "Kannada", "Malayalam", "Hindi", "English"],
-    ratingScore: 9.2,
-    ratingCount: 58000,
-    posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1608889175123-8ee362201f81?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Prabhas Rao", character: "Prince Rudra Deva", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Samantha Krishnan", character: "Princess Mallika", avatarUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "S.S. Rajamohan", role: "Director" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/vc-en.vtt", isDefault: true }
-    ],
-    audioTracks: [
-      { id: "aud-te", label: "Telugu [Original]", lang: "te", codec: "AAC", isDefault: true },
-      { id: "aud-hi", label: "Hindi Dub", lang: "hi", codec: "AAC" },
-      { id: "aud-ta", label: "Tamil Dub", lang: "ta", codec: "AAC" }
-    ],
-    license: {
-      licensor: "Arka Media Works / PROZ South",
-      expiryDate: "2030-05-15",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 6. Bengali Mystery & Cinema
-  {
-    id: "proz-ben-006",
-    title: "Kolkata Noir: Midnight Case",
-    originalTitle: "কলকাতা নয়ার: মধ্যরাতের কেস",
-    slug: "kolkata-noir-midnight-case",
-    type: "movie",
-    category: "bengali",
-    synopsis: "A seasoned detective who lost his family to an unresolved heist gets a cryptic letter pointing to a series of high-profile art thefts along the vintage tramways of North Kolkata.",
-    tagline: "The city remembers every shadow.",
-    releaseYear: 2024,
-    runtimeMinutes: 118,
-    maturityRating: "PG-13",
-    genres: ["Bengali", "Mystery", "Crime", "Thriller"],
-    languages: ["Bengali", "English", "Hindi"],
-    ratingScore: 8.7,
-    ratingCount: 12500,
-    posterUrl: "https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: false,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Parambrata Bose", character: "Inspector Subhashish", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" },
-      { name: "Raima Sen", character: "Nandini Mukherjee", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "Srijit Roy", role: "Director" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/kn-en.vtt", isDefault: true }
-    ],
-    audioTracks: [
-      { id: "aud-bn", label: "Bengali [Original]", lang: "bn", codec: "AAC", isDefault: true }
-    ],
-    license: {
-      licensor: "SVF Entertainment / PROZ East",
-      expiryDate: "2029-08-20",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 7. International Sci-Fi Cinema
-  {
-    id: "proz-int-007",
-    title: "Cosmos Laundromat: First Cycle",
-    originalTitle: "Cosmos Laundromat",
-    slug: "cosmos-laundromat-first-cycle",
-    type: "movie",
-    category: "international",
-    synopsis: "On a desolate cliff in the middle of nowhere, a melancholy soul meets an eccentric salesman who offers a washing machine with the power to transport anyone into parallel lives and infinite surreal dimensions.",
-    tagline: "One soul. Infinite parallel realities.",
-    releaseYear: 2024,
-    runtimeMinutes: 62,
-    maturityRating: "PG-13",
-    genres: ["International", "Sci-Fi", "Surreal", "Comedy"],
-    languages: ["English", "French", "German", "Spanish"],
-    ratingScore: 9.0,
-    ratingCount: 19800,
-    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Pierre Bokma", character: "Franck", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop" },
-      { name: "Reinout Scholten van Aschat", character: "Victor", avatarUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "Mathieu Auvray", role: "Director" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/cl-en.vtt", isDefault: true }
-    ],
-    audioTracks: [
-      { id: "aud-en", label: "English [Original]", lang: "en", codec: "AAC", isDefault: true }
-    ],
-    license: {
-      licensor: "Blender Animation Studio / PROZ Europe",
-      expiryDate: "2031-11-15",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 8. Cyberpunk Anime Series
-  {
-    id: "proz-ani-008",
-    title: "Chrono Blade: Neo Tokyo",
-    originalTitle: "クロノブレード ネオ東京",
-    slug: "chrono-blade-neo-tokyo",
-    type: "series",
-    category: "anime",
-    synopsis: "In year 2099, neural augments are mandatory for citizens of Neo-Tokyo. A rogue cyber-samurai possessing an analog katana and an anti-quantum neural shield wages a solo campaign against the megacorporation controlling human thoughts.",
-    tagline: "Steel cannot be hacked.",
-    releaseYear: 2025,
-    runtimeMinutes: 24,
-    maturityRating: "TV-MA",
-    genres: ["Anime", "Cyberpunk", "Action", "Sci-Fi"],
-    languages: ["Japanese", "English"],
-    ratingScore: 9.5,
-    ratingCount: 48900,
-    posterUrl: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    seasons: [
+    "ratingScore": 9.3,
+    "ratingCount": 84300,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/uKvVjK1q1NVx4e6k3o9qJ8U3b98.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/uDgy6hyPd82kOHh6I95FLtLnj6p.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=uLtkt8BonwM",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 100088,
+    "cast": [
       {
-        id: "cb-s01",
-        seasonNumber: 1,
-        title: "Season 1: Neon Glitch",
-        episodes: [
-          {
-            id: "cb-s01-e01",
-            seasonNumber: 1,
-            episodeNumber: 1,
-            title: "Episode 1: The Analog Katana",
-            synopsis: "Ren awakens with wiped memories in the neon gutters of Shinjuku Sector 4, armed only with an heirloom katana.",
-            durationMinutes: 25,
-            thumbnailUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=600&auto=format&fit=crop",
-            streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          },
-          {
-            id: "cb-s01-e02",
-            seasonNumber: 1,
-            episodeNumber: 2,
-            title: "Episode 2: Protocol Override",
-            synopsis: "Corporate strike teams deploy mecha-drones across the skybridges, forcing Ren into an alliance with underground resistance hackers.",
-            durationMinutes: 24,
-            thumbnailUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&auto=format&fit=crop",
-            streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-            fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-          }
-        ]
+        "name": "Pedro Pascal",
+        "character": "Joel Miller",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Bella Ramsey",
+        "character": "Ellie Williams",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
       }
     ],
-    cast: [
-      { name: "Kenjiro Tsuda", character: "Ren (Voice)", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Maaya Sakamoto", character: "Aoi (Voice)", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" }
-    ],
-    crew: [
-      { name: "Shinichiro Watanabe", role: "Creative Director" }
-    ],
-    subtitles: [
-      { id: "sub-en", label: "English [Subbed]", lang: "en", url: "/subtitles/cb-en.vtt", isDefault: true }
-    ],
-    audioTracks: [
-      { id: "aud-ja", label: "Japanese [Original Audio]", lang: "ja", codec: "AAC", isDefault: true },
-      { id: "aud-en", label: "English Dub", lang: "en", codec: "AAC" }
-    ],
-    license: {
-      licensor: "Mappa / PROZ Anime Studios",
-      expiryDate: "2030-10-31",
-      territories: ["GLOBAL"]
-    }
+    "crew": [
+      {
+        "name": "Craig Mazin",
+        "role": "Creator"
+      }
+    ]
   },
-
-  // 9. Chinese Drama / Wuxia
   {
-    id: "proz-dra-009",
-    title: "Sword of the Immortal Phoenix",
-    originalTitle: "凤凰不死剑",
-    slug: "sword-of-the-immortal-phoenix",
-    type: "series",
-    category: "c_drama",
-    synopsis: "In ancient Jianghu, a disgraced disciple of Mount Kunlun discovers a celestial scroll capable of commanding lightning. Bound by a forbidden promise to a rebel princess, he walks between mortal law and mythical cultivation.",
-    tagline: "Honor is forged in the fires of Mount Kunlun.",
-    releaseYear: 2024,
-    runtimeMinutes: 48,
-    maturityRating: "PG-13",
-    genres: ["Drama", "Action", "Fantasy", "Romance"],
-    languages: ["Mandarin", "English"],
-    ratingScore: 8.9,
-    ratingCount: 29500,
-    posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Xiao Zhan", character: "Master Ye Feng", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Zhao Liying", character: "Princess Lian", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-ser-012",
+    "title": "Breaking Bad",
+    "originalTitle": "Breaking Bad",
+    "slug": "breaking-bad",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Walter White, a New Mexico chemistry teacher diagnosed with terminal lung cancer, teams up with former student Jesse Pinkman to secure his family's future by producing and selling crystal meth.",
+    "tagline": "Remember my name.",
+    "releaseYear": 2013,
+    "runtimeMinutes": 47,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Crime",
+      "Drama",
+      "Thriller"
     ],
-    crew: [
-      { name: "Zhang Yimou", role: "Executive Producer" }
+    "languages": [
+      "English",
+      "Spanish"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/sp-en.vtt", isDefault: true }
+    "ratingScore": 9.6,
+    "ratingCount": 142000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/ztkUQFLlC19CCMYHW9o1zWhJRNq.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=HhesaQXLuRY",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1396,
+    "cast": [
+      {
+        "name": "Bryan Cranston",
+        "character": "Walter White",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Aaron Paul",
+        "character": "Jesse Pinkman",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
     ],
-    audioTracks: [
-      { id: "aud-zh", label: "Mandarin [Original]", lang: "zh", codec: "AAC", isDefault: true }
-    ],
-    license: {
-      licensor: "iQIYI / PROZ Asia",
-      expiryDate: "2029-04-12",
-      territories: ["GLOBAL"]
-    }
+    "crew": [
+      {
+        "name": "Vince Gilligan",
+        "role": "Creator"
+      }
+    ]
   },
-
-  // 10. Web Series OTT Hit
   {
-    id: "proz-ser-010",
-    title: "Silicon Heist: Rogue Protocol",
-    originalTitle: "Silicon Heist",
-    slug: "silicon-heist-rogue-protocol",
-    type: "series",
-    category: "original",
-    synopsis: "Four disaffected engineers at the world's most valuation-inflated quantum computing firm plan a billion-dollar cryptocurrency extraction from inside the server core during an IPO gala.",
-    tagline: "The smartest theft requires no weapons. Just a terminal.",
-    releaseYear: 2025,
-    runtimeMinutes: 52,
-    maturityRating: "TV-MA",
-    genres: ["Crime", "Thriller", "Drama", "Tech"],
-    languages: ["English", "Spanish", "German"],
-    ratingScore: 9.1,
-    ratingCount: 34100,
-    posterUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Rami Malek", character: "Elliot Hayes", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Emma Stone", character: "Devon Vance", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-ser-013",
+    "title": "Game of Thrones",
+    "originalTitle": "Game of Thrones",
+    "slug": "game-of-thrones",
+    "type": "series",
+    "category": "series",
+    "synopsis": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.",
+    "tagline": "Winter is coming.",
+    "releaseYear": 2019,
+    "runtimeMinutes": 57,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Sci-Fi & Fantasy",
+      "Drama",
+      "Action",
+      "Adventure"
     ],
-    crew: [
-      { name: "David Fincher", role: "Creator & Showrunner" }
+    "languages": [
+      "English"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English [CC]", lang: "en", url: "/subtitles/sh-en.vtt", isDefault: true }
+    "ratingScore": 9.3,
+    "ratingCount": 135000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=KPLWWIOCOOQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1399,
+    "cast": [
+      {
+        "name": "Emilia Clarke",
+        "character": "Daenerys Targaryen",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Kit Harington",
+        "character": "Jon Snow",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Peter Dinklage",
+        "character": "Tyrion Lannister",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      }
     ],
-    audioTracks: [
-      { id: "aud-en", label: "English [Atmos]", lang: "en", codec: "AAC", isDefault: true }
-    ],
-    license: {
-      licensor: "PROZ Studios Original Distribution",
-      expiryDate: "2035-12-31",
-      territories: ["GLOBAL"]
-    }
+    "crew": [
+      {
+        "name": "David Benioff",
+        "role": "Creator"
+      }
+    ]
   },
-
-  // 11. Documentary Feature
   {
-    id: "proz-doc-011",
-    title: "Deep Abyss: Secrets of the Mariana Trench",
-    slug: "deep-abyss-mariana-trench",
-    type: "movie",
-    category: "documentary",
-    synopsis: "Join a record-breaking 11,000-meter deep submersible dive into the Challenger Deep, illuminating bioluminescent alien creatures and geothermal vents never before captured in 4K HDR.",
-    tagline: "The last unexplored frontier on planet Earth.",
-    releaseYear: 2024,
-    runtimeMinutes: 75,
-    maturityRating: "G",
-    genres: ["Documentary", "Nature", "Science"],
-    languages: ["English", "French"],
-    ratingScore: 9.4,
-    ratingCount: 16200,
-    posterUrl: "https://images.unsplash.com/photo-1682687220063-4742bd7fd538?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: false,
-    isTrending: false,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "David Attenborough", character: "Narrator", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-ani-014",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "originalTitle": "鬼滅の刃",
+    "slug": "demon-slayer-kimetsu-no-yaiba",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "It is the Taisho Period in Japan. Tanjiro, a kindhearted boy who sells charcoal for a living, finds his family slaughtered by a demon. To make matters worse, his younger sister Nezuko, the sole survivor, has been transformed into a demon herself. Tanjiro vows to become a demon slayer to turn his sister back into a human.",
+    "tagline": "Destroy demons, protect the innocent.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy",
+      "Adventure"
     ],
-    crew: [
-      { name: "James Cameron", role: "Producer & Deep Sea Explorer" }
+    "languages": [
+      "Japanese",
+      "English",
+      "Hindi"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/doc-en.vtt", isDefault: true }
+    "ratingScore": 9.3,
+    "ratingCount": 74200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/nTvM4mhqZlHIvUkI1gVnWumrSlq.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=VQGCKyvzIM4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 85937,
+    "cast": [
+      {
+        "name": "Natsuki Hanae",
+        "character": "Tanjiro Kamado (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Akari Kito",
+        "character": "Nezuko Kamado (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
     ],
-    audioTracks: [
-      { id: "aud-en", label: "English [Spatial Audio]", lang: "en", codec: "AAC", isDefault: true }
-    ],
-    license: {
-      licensor: "National Geographic & PROZ Docs",
-      expiryDate: "2032-07-04",
-      territories: ["GLOBAL"]
-    }
+    "crew": [
+      {
+        "name": "Haruo Sotozaki",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 12. 18+ Restricted Zone Title 1
   {
-    id: "proz-18p-012",
-    title: "Midnight Tokyo: Neon Desires",
-    slug: "midnight-tokyo-neon-desires",
-    type: "movie",
-    category: "international",
-    synopsis: "An uncensored, provocative exploration of the seductive nightlife and high-stakes underground clubs of Roppongi, where secrets, passion and betrayal collide under neon rain.",
-    tagline: "Desire has no curfew.",
-    releaseYear: 2024,
-    runtimeMinutes: 98,
-    maturityRating: "18+",
-    genres: ["18+ Restricted", "Drama", "Romance", "Thriller"],
-    languages: ["Japanese", "English"],
-    ratingScore: 8.5,
-    ratingCount: 18400,
-    posterUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: false,
-    isTrending: false,
-    isOriginal: true,
-    isRestricted18Plus: true,
-    cast: [
-      { name: "Asuka Kirara", character: "Reiko", avatarUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-mov-015",
+    "title": "Solo Leveling: Reawakening",
+    "originalTitle": "나 혼자만 레벨업",
+    "slug": "solo-leveling-reawakening",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "Over a decade after the sudden appearance of gates that connect humanity to an alternate dimension, hunters who possess superhuman powers awaken. Sung Jinwoo, known as the weakest hunter of all mankind, is fatally injured in a high-rank double dungeon, but suddenly receives a mysterious quest log that allows him alone to level up endlessly.",
+    "tagline": "Only the strongest survive the dungeons.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy",
+      "Adventure"
     ],
-    crew: [
-      { name: "Takashi Miike", role: "Consulting Producer" }
+    "languages": [
+      "Japanese",
+      "Korean",
+      "English",
+      "Hindi"
     ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/mt-en.vtt", isDefault: true }
+    "ratingScore": 9.4,
+    "ratingCount": 68100,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/geCRueV3ElhRTr0Q2xumMi8v8YO.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/4HodYYKEIsGOdinkGi2Ucz6X9i0.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=4rgYUipGJNo",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 127532,
+    "cast": [
+      {
+        "name": "Taito Ban",
+        "character": "Sung Jinwoo (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Genta Nakamura",
+        "character": "Yoo Jinho (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      }
     ],
-    audioTracks: [
-      { id: "aud-ja", label: "Japanese [Original]", lang: "ja", codec: "AAC", isDefault: true }
+    "crew": [
+      {
+        "name": "Shunsuke Nakashige",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ani-016",
+    "title": "Attack on Titan",
+    "originalTitle": "進撃の巨人",
+    "slug": "attack-on-titan",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "After his hometown is destroyed and his mother is killed, young Eren Jaeger vows to cleanse the earth of the giant humanoid Titans that have brought humanity to the brink of extinction.",
+    "tagline": "If you win, you live. If you lose, you die.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Animation",
+      "Action",
+      "Sci-Fi",
+      "Fantasy"
     ],
-    license: {
-      licensor: "PROZ After Dark International",
-      expiryDate: "2028-12-31",
-      territories: ["GLOBAL"]
-    }
-  },
-
-  // 13. 18+ Restricted Zone Title 2
-  {
-    id: "proz-18p-013",
-    title: "Velvet Shadows: The Uncut Chronicles",
-    slug: "velvet-shadows-uncut",
-    type: "series",
-    category: "original",
-    synopsis: "An adult psychological drama delving into the sensual entanglements and dangerous blackmail rings within high society art collectors in Zurich and Milan.",
-    tagline: "Every secret leaves a velvet scar.",
-    releaseYear: 2025,
-    runtimeMinutes: 50,
-    maturityRating: "18+",
-    genres: ["18+ Restricted", "Psychological", "Drama"],
-    languages: ["English", "French", "Italian"],
-    ratingScore: 8.6,
-    ratingCount: 14200,
-    posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: false,
-    isOriginal: true,
-    isRestricted18Plus: true,
-    cast: [
-      { name: "Chloe Moreau", character: "Elena", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop" }
+    "languages": [
+      "Japanese",
+      "English"
     ],
-    crew: [
-      { name: "Jean-Luc Godard Estate", role: "Creative Advisor" }
+    "ratingScore": 9.5,
+    "ratingCount": 110000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/7v88x0a6K9u0b8M0a6K9u0b8M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=MGRm4IzK1SQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1429,
+    "cast": [
+      {
+        "name": "Yuki Kaji",
+        "character": "Eren Jaeger (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Yui Ishikawa",
+        "character": "Mikasa Ackermann (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
     ],
-    subtitles: [
-      { id: "sub-en", label: "English", lang: "en", url: "/subtitles/vs-en.vtt", isDefault: true }
+    "crew": [
+      {
+        "name": "Tetsuro Araki",
+        "role": "Director"
+      }
+    ]
+  },
+  {
+    "id": "proz-ani-017",
+    "title": "Jujutsu Kaisen",
+    "originalTitle": "呪術廻戦",
+    "slug": "jujutsu-kaisen",
+    "type": "anime",
+    "category": "anime",
+    "synopsis": "Yuji Itadori, a boy who swallows a cursed talisman - the finger of a demon - becomes cursed himself. He enters a shaman's school to be able to locate the demon's other body parts and thus exorcise himself.",
+    "tagline": "Curse the curses.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 24,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Animation",
+      "Action",
+      "Fantasy"
     ],
-    audioTracks: [
-      { id: "aud-en", label: "English [Uncensored]", lang: "en", codec: "AAC", isDefault: true }
+    "languages": [
+      "Japanese",
+      "English"
     ],
-    license: {
-      licensor: "PROZ Mature Productions",
-      expiryDate: "2029-06-30",
-      territories: ["GLOBAL"]
-    }
-  },
-  // 14. Upcoming Sci-Fi Thriller
-  {
-    id: "proz-mov-014",
-    title: "Quantum Heist: Geneva Protocol",
-    slug: "quantum-heist-geneva-protocol",
-    type: "movie",
-    category: "hollywood",
-    synopsis: "In near-future Switzerland, an elite team of tech infiltrators plans the impossible: breaking into CERN's underground quantum vault to retrieve an artificial singularity before an rogue defense contractor weaponizes it.",
-    tagline: "Break reality before they control it.",
-    releaseYear: 2026,
-    runtimeMinutes: 118,
-    maturityRating: "PG-13",
-    genres: ["Sci-Fi", "Heist", "Action", "Thriller"],
-    languages: ["English", "French", "German"],
-    ratingScore: 9.3,
-    ratingCount: 8900,
-    posterUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Cillian Murphy", character: "Dr. Ethan Cross", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop" },
-      { name: "Rebecca Ferguson", character: "Klara Vance", avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" }
+    "ratingScore": 9.2,
+    "ratingCount": 78000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/hFWP5w2hgnFmX4fP3T3f9P0q8z.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/o8b8x0a6K9u0b8M0a6K9u0b8M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=pkKu9hLT-t8",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 95479,
+    "cast": [
+      {
+        "name": "Junya Enoki",
+        "character": "Yuji Itadori (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Yuma Uchida",
+        "character": "Megumi Fushiguro (voice)",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      }
     ],
-    crew: [{ name: "Christopher Nolan Estate", role: "Executive Producer" }],
-    subtitles: [{ id: "sub-en", label: "English [CC]", lang: "en", url: "/subtitles/tos-en.vtt", isDefault: true }],
-    audioTracks: [{ id: "aud-en", label: "English [Dolby Atmos]", lang: "en", codec: "AAC", isDefault: true }]
+    "crew": [
+      {
+        "name": "Sunghoo Park",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 15. Top Rated Epic Fantasy
   {
-    id: "proz-mov-015",
-    title: "Chronicles of the Dark Sun",
-    slug: "chronicles-of-the-dark-sun",
-    type: "movie",
-    category: "hollywood",
-    synopsis: "An ancient celestial eclipse unleashes forgotten elemental beasts onto the kingdom of Aethelgard. A disowned guardian knight and an arcane scholar must journey across the obsidian wastes to rekindle the primal flame.",
-    tagline: "When the sky burns black, only heroes remain.",
-    releaseYear: 2024,
-    runtimeMinutes: 142,
-    maturityRating: "PG-13",
-    genres: ["Fantasy", "Action", "Adventure"],
-    languages: ["English", "Spanish"],
-    ratingScore: 9.6,
-    ratingCount: 42100,
-    posterUrl: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    trailerUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [
-      { name: "Henry Cavill", character: "Valen Thorne", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop" }
+    "id": "proz-dra-018",
+    "title": "Squid Game: Season 2",
+    "originalTitle": "오징어 게임",
+    "slug": "squid-game",
+    "type": "drama",
+    "category": "drama",
+    "synopsis": "Hundreds of cash-strapped players accept a strange invitation to compete in children's games. Inside, a tempting prize awaits with deadly high stakes.",
+    "tagline": "45.6 Billion is child's play.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 60,
+    "maturityRating": "TV-MA",
+    "genres": [
+      "Drama",
+      "Mystery",
+      "Action & Adventure"
     ],
-    crew: [{ name: "Guillermo del Toro", role: "Director" }]
+    "languages": [
+      "Korean",
+      "English",
+      "Hindi"
+    ],
+    "ratingScore": 9.1,
+    "ratingCount": 114000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/dDlG1v7o8zW6iP1H99aB0a4g96f.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/oaGMAa9nmSTOo19OIxhyufIlENn.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=oqxAJKy0ii4",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 93405,
+    "cast": [
+      {
+        "name": "Lee Jung-jae",
+        "character": "Seong Gi-hun",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Park Hae-soo",
+        "character": "Cho Sang-woo",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Hwang Dong-hyuk",
+        "role": "Creator & Director"
+      }
+    ]
   },
-
-  // 16. Trending Anime Dark Fantasy
   {
-    id: "proz-ani-016",
-    title: "Demon Hunter: Crimson Moon",
-    slug: "demon-hunter-crimson-moon",
-    type: "anime",
-    category: "anime",
-    synopsis: "In a steam-powered alternate Taisho era, the Blood Moon awakens elder demon lords sealed beneath Mount Fuji. The Shadow Hashira squadron must master forbidden breath arts to protect humanity's last stronghold.",
-    tagline: "Unleash the sword of the crimson tide.",
-    releaseYear: 2025,
-    runtimeMinutes: 98,
-    maturityRating: "TV-14",
-    genres: ["Anime", "Action", "Dark Fantasy", "Supernatural"],
-    languages: ["Japanese", "English", "Hindi"],
-    ratingScore: 9.5,
-    ratingCount: 68400,
-    posterUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false,
-    cast: [{ name: "Natsuki Hanae", character: "Ren Kamado" }]
+    "id": "proz-dra-019",
+    "title": "Queen of Tears",
+    "originalTitle": "눈물의 여왕",
+    "slug": "queen-of-tears",
+    "type": "drama",
+    "category": "drama",
+    "synopsis": "The queen of department stores and her small-town husband weather a marital crisis — until love miraculously begins to bloom again amidst high-stakes corporate intrigue.",
+    "tagline": "A miraculous love story against all odds.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 75,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Drama",
+      "Romance",
+      "Comedy"
+    ],
+    "languages": [
+      "Korean",
+      "English"
+    ],
+    "ratingScore": 9,
+    "ratingCount": 46200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/6i88i91hP5jQ4t5B0Y8Z6u6kL8f.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/l3K6bT9z7J7e4y6N0a6K9u0b8M.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=sO7CkhN_mY8",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 216127,
+    "cast": [
+      {
+        "name": "Kim Soo-hyun",
+        "character": "Baek Hyun-woo",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Kim Ji-won",
+        "character": "Hong Hae-in",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Park Ji-eun",
+        "role": "Writer"
+      }
+    ]
   },
-
-  // 17. Latest Anime Cyberpunk
   {
-    id: "proz-ani-017",
-    title: "Cyber Samurai: 2088",
-    slug: "cyber-samurai-2088",
-    type: "anime",
-    category: "anime",
-    synopsis: "In Neo-Kanto, where synthetic humans outnumber the biological population, an unaugmented ronin assassin is hired by a rogue AI to hunt down the corporate oligarchs who destroyed his clan.",
-    tagline: "Steel meets silicon.",
-    releaseYear: 2026,
-    runtimeMinutes: 24,
-    maturityRating: "TV-MA",
-    genres: ["Anime", "Cyberpunk", "Action", "Sci-Fi"],
-    languages: ["Japanese", "English"],
-    ratingScore: 9.2,
-    ratingCount: 19800,
-    posterUrl: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false
+    "id": "proz-dra-020",
+    "title": "Crash Landing on You",
+    "originalTitle": "사랑의 불시착",
+    "slug": "crash-landing-on-you",
+    "type": "drama",
+    "category": "drama",
+    "synopsis": "A paragliding mishap drops a South Korean heiress into North Korea - and into the life of an army officer, who decides he will help her hide.",
+    "tagline": "Love knows no borders.",
+    "releaseYear": 2020,
+    "runtimeMinutes": 70,
+    "maturityRating": "TV-14",
+    "genres": [
+      "Drama",
+      "Romance",
+      "Comedy"
+    ],
+    "languages": [
+      "Korean",
+      "English"
+    ],
+    "ratingScore": 9.2,
+    "ratingCount": 61500,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/bv9pXU7XQn9i6s1y3p1x8u6d8o.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/3i9p6nK8x3k4j1y3p1x8u6d8o.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=eXMjTXL2Vks",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 94796,
+    "cast": [
+      {
+        "name": "Hyun Bin",
+        "character": "Ri Jeong-hyeok",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Son Ye-jin",
+        "character": "Yoon Se-ri",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Lee Jeong-hyo",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 18. Popular K-Drama Romance & Medical
   {
-    id: "proz-dra-018",
-    title: "Hospital Playlist: Seoul Dawn",
-    slug: "hospital-playlist-seoul-dawn",
-    type: "series",
-    category: "k_drama",
-    synopsis: "Five university medical school friends, now veteran department heads at Seoul National Hospital, navigate high-stakes emergency surgeries, enduring romances, and late-night indie band rehearsals.",
-    tagline: "Healing hearts, one melody at a time.",
-    releaseYear: 2024,
-    runtimeMinutes: 75,
-    maturityRating: "TV-14",
-    genres: ["K-Drama", "Medical", "Romance", "Comedy"],
-    languages: ["Korean", "English"],
-    ratingScore: 9.4,
-    ratingCount: 52000,
-    posterUrl: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false
+    "id": "proz-ind-021",
+    "title": "Kalki 2898 AD",
+    "originalTitle": "Kalki 2898 AD",
+    "slug": "kalki-2898-ad",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "Set in a post-apocalyptic world in the year 2898 AD, the movie follows a select group of heroes on a mission to save the unborn child of SUM-80, believed to be the final avatar of Lord Vishnu.",
+    "tagline": "The destiny of mankind unfolds in the holy city of Kasi.",
+    "releaseYear": 2024,
+    "runtimeMinutes": 181,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Sci-Fi",
+      "Action",
+      "Mythology",
+      "Adventure"
+    ],
+    "languages": [
+      "Telugu",
+      "Hindi",
+      "Tamil",
+      "English"
+    ],
+    "ratingScore": 8.8,
+    "ratingCount": 54100,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/9Pf1sF7k8zW6iP1H99aB0a4g96f.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/2OMB0ynKlyIenMJWI2Dy9IWT4c.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=kQDd1AhGIHk",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 868759,
+    "cast": [
+      {
+        "name": "Prabhas",
+        "character": "Bhairava",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Amitabh Bachchan",
+        "character": "Ashwatthama",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Deepika Padukone",
+        "character": "SUM-80",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Kamal Haasan",
+        "character": "Supreme Yaskin",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Nag Ashwin",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 19. Historical Asian Drama
   {
-    id: "proz-dra-019",
-    title: "The Emperor's Phoenix: Imperial Dawn",
-    slug: "emperors-phoenix-imperial-dawn",
-    type: "series",
-    category: "c_drama",
-    synopsis: "In the opulent yet deadly courts of the Tang dynasty, an exiled warrior princess returns disguised as a royal physician to avenge her fallen clan and reclaim the Dragon Throne.",
-    tagline: "Power is not inherited. It is seized.",
-    releaseYear: 2025,
-    runtimeMinutes: 48,
-    maturityRating: "TV-14",
-    genres: ["C-Drama", "Historical", "Martial Arts", "Romance"],
-    languages: ["Mandarin", "English"],
-    ratingScore: 9.0,
-    ratingCount: 27400,
-    posterUrl: "https://images.unsplash.com/photo-1514539079130-25950c84af65?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: false,
-    isOriginal: false,
-    isRestricted18Plus: false
+    "id": "proz-ind-022",
+    "title": "Jawan",
+    "originalTitle": "Jawan",
+    "slug": "jawan",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "A high-octane action thriller which outlines the emotional journey of a man who is set to rectify the wrongs in the society, with help from a team of fearless women.",
+    "tagline": "Ready chief!",
+    "releaseYear": 2023,
+    "runtimeMinutes": 169,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Thriller",
+      "Drama"
+    ],
+    "languages": [
+      "Hindi",
+      "Tamil",
+      "Telugu"
+    ],
+    "ratingScore": 8.6,
+    "ratingCount": 62000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/jJw9M7r1b7g8y8n7u6k3o9qJ8U.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/rAiYTsqJJR0nhcztQw57crXs9vo.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=MWOlnZSnXWE",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 872906,
+    "cast": [
+      {
+        "name": "Shah Rukh Khan",
+        "character": "Vikram Rathore / Azad",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Nayanthara",
+        "character": "Narmada Rai",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Vijay Sethupathi",
+        "character": "Kalee Gaikwad",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Atlee",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 20. Popular TV Series London Crime
   {
-    id: "proz-ser-020",
-    title: "The London Syndicate: Shadow State",
-    slug: "london-syndicate-shadow-state",
-    type: "series",
-    category: "international",
-    synopsis: "When the patriarch of Britain's most powerful underground logistics syndicate disappears, his estranged daughter must fight off rival European cartels and MI6 undercover agents to protect the family empire.",
-    tagline: "Blood is thicker than oil.",
-    releaseYear: 2025,
-    runtimeMinutes: 58,
-    maturityRating: "TV-MA",
-    genres: ["Crime", "Drama", "Thriller"],
-    languages: ["English"],
-    ratingScore: 8.9,
-    ratingCount: 34100,
-    posterUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: true,
-    isRestricted18Plus: false
+    "id": "proz-ind-023",
+    "title": "RRR",
+    "originalTitle": "రౌద్రం రణం రుధిరం",
+    "slug": "rrr",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "A fictional history of two legendary revolutionaries' journey away from home before they began fighting for their country in the 1920s.",
+    "tagline": "Rise, Roar, Revolt.",
+    "releaseYear": 2022,
+    "runtimeMinutes": 187,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Drama",
+      "History"
+    ],
+    "languages": [
+      "Telugu",
+      "Hindi",
+      "Tamil",
+      "English"
+    ],
+    "ratingScore": 9,
+    "ratingCount": 89000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/kdP1x8u6d8o6i88i91hP5jQ4t5B.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=NgBoAMWnAFM",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": true,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 579974,
+    "cast": [
+      {
+        "name": "N.T. Rama Rao Jr.",
+        "character": "Komaram Bheem",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Ram Charan",
+        "character": "Alluri Sitarama Raju",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "S.S. Rajamouli",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 21. Latest Sci-Fi Movie
   {
-    id: "proz-mov-021",
-    title: "Solaris Drift: Deep Horizon",
-    slug: "solaris-drift-deep-horizon",
-    type: "movie",
-    category: "hollywood",
-    synopsis: "During a routine terraforming survey around Saturn's moon Titan, a deep-space mining vessel discovers an ancient extraterrestrial monolith transmitting a harmonic frequency that alters human consciousness.",
-    tagline: "Some doors should never be opened.",
-    releaseYear: 2025,
-    runtimeMinutes: 126,
-    maturityRating: "PG-13",
-    genres: ["Sci-Fi", "Mystery", "Thriller"],
-    languages: ["English"],
-    ratingScore: 9.1,
-    ratingCount: 16700,
-    posterUrl: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-    isFeatured: true,
-    isTrending: false,
-    isOriginal: false,
-    isRestricted18Plus: false
+    "id": "proz-ind-024",
+    "title": "Stree 2: Sarkate Ka Aatank",
+    "originalTitle": "Stree 2",
+    "slug": "stree-2",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "The town of Chanderi faces a terrifying new menace: a headless entity known as 'Sarkata' that abducts modern women. Vicky and his loyal friends unite once again to save their town.",
+    "tagline": "O Stree Raksha Karna!",
+    "releaseYear": 2024,
+    "runtimeMinutes": 147,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Comedy",
+      "Horror"
+    ],
+    "languages": [
+      "Hindi"
+    ],
+    "ratingScore": 8.7,
+    "ratingCount": 41200,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/fm6K9vYQ79FGzIsmvgqvNDm9xZs.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=KVnhe_E0dCE",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": true,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 1084736,
+    "cast": [
+      {
+        "name": "Shraddha Kapoor",
+        "character": "She / Stree",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      },
+      {
+        "name": "Rajkummar Rao",
+        "character": "Vicky",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Pankaj Tripathi",
+        "character": "Rudra",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Amar Kaushik",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 22. Bollywood Action Blockbuster
   {
-    id: "proz-bol-022",
-    title: "Mumbai Express: Target Red",
-    slug: "mumbai-express-target-red",
-    type: "movie",
-    category: "bollywood",
-    synopsis: "An elite anti-terror commando is trapped aboard a hijacked high-speed bullet train racing between Mumbai and Ahmedabad. With 800 passengers hostage, he must neutralize 40 armed mercenaries carriage by carriage.",
-    tagline: "Speed is the only weapon that never jams.",
-    releaseYear: 2024,
-    runtimeMinutes: 148,
-    maturityRating: "PG-13",
-    genres: ["Bollywood", "Action", "Thriller"],
-    languages: ["Hindi", "English"],
-    ratingScore: 8.8,
-    ratingCount: 47200,
-    posterUrl: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: false,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false
+    "id": "proz-ind-025",
+    "title": "Animal",
+    "originalTitle": "Animal",
+    "slug": "animal",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "A son's obsessive love for his distant father pushes him into a dark descent of bloody violence and gang war against those who threaten his family empire.",
+    "tagline": "Papa, meri jaan.",
+    "releaseYear": 2023,
+    "runtimeMinutes": 201,
+    "maturityRating": "R",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "languages": [
+      "Hindi",
+      "Telugu",
+      "Tamil"
+    ],
+    "ratingScore": 8.4,
+    "ratingCount": 57000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/xOMo8BRK7PfcJv9JCnx7s5hj0PX.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=Dydmpfo68DA",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "isFeatured": false,
+    "isTrending": true,
+    "isOriginal": false,
+    "isRestricted18Plus": true,
+    "tmdb_id": 781732,
+    "cast": [
+      {
+        "name": "Ranbir Kapoor",
+        "character": "Ranvijay Singh",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Anil Kapoor",
+        "character": "Balbir Singh",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Bobby Deol",
+        "character": "Abrar Haque",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/4XujBEqZnPpeGFctEO999gq7i8L.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Sandeep Reddy Vanga",
+        "role": "Director"
+      }
+    ]
   },
-
-  // 23. South Indian Historical Action
   {
-    id: "proz-sou-023",
-    title: "Deccan Warrior 2: Battle of Kings",
-    slug: "deccan-warrior-2-battle-of-kings",
-    type: "movie",
-    category: "south_indian",
-    synopsis: "The thunderous continuation of the Vijayanagara saga. When an alliance of invaders plots the annihilation of the temple kingdoms, King Narasimha unites the hill clans for an earth-shattering final war.",
-    tagline: "Legends do not die. They rise in blood.",
-    releaseYear: 2025,
-    runtimeMinutes: 165,
-    maturityRating: "PG-13",
-    genres: ["Action", "Historical", "Drama"],
-    languages: ["Telugu", "Tamil", "Hindi", "Malayalam", "Kannada"],
-    ratingScore: 9.5,
-    ratingCount: 89000,
-    posterUrl: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop",
-    backdropUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop",
-    streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8",
-    fallbackMp4: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    isFeatured: true,
-    isTrending: true,
-    isOriginal: false,
-    isRestricted18Plus: false
+    "id": "proz-ind-026",
+    "title": "K.G.F: Chapter 2",
+    "originalTitle": "K.G.F: Chapter 2",
+    "slug": "kgf-chapter-2",
+    "type": "movie",
+    "category": "bollywood",
+    "synopsis": "The blood-soaked land of Kolar Gold Fields has a new overlord now: Rocky, whose name strikes fear into the heart of his foes. His allies look up to him, the government sees him as a danger to law and order, and enemies clamor for revenge.",
+    "tagline": "Violence, Violence, Violence... I don't like it. I avoid. But violence likes me!",
+    "releaseYear": 2022,
+    "runtimeMinutes": 168,
+    "maturityRating": "PG-13",
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "languages": [
+      "Kannada",
+      "Hindi",
+      "Telugu",
+      "Tamil"
+    ],
+    "ratingScore": 8.9,
+    "ratingCount": 78000,
+    "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+    "backdropUrl": "https://image.tmdb.org/t/p/original/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg",
+    "trailerUrl": "https://www.youtube.com/watch?v=JKa05nyUmuQ",
+    "streamUrl": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "fallbackMp4": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    "isFeatured": false,
+    "isTrending": false,
+    "isOriginal": false,
+    "isRestricted18Plus": false,
+    "tmdb_id": 591275,
+    "cast": [
+      {
+        "name": "Yash",
+        "character": "Raja Krishnappa Bairya / Rocky",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/5qHNjhtjMD4Ywh3ag093PRhiF0m.jpg"
+      },
+      {
+        "name": "Sanjay Dutt",
+        "character": "Adheera",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/360Rjhjh2508Q9qZ7Yj70pYlT9.jpg"
+      },
+      {
+        "name": "Raveena Tandon",
+        "character": "Ramika Sen",
+        "avatarUrl": "https://image.tmdb.org/t/p/w200/9kFm6T8vX9bA0rC7wZ5wB8pYlT9.jpg"
+      }
+    ],
+    "crew": [
+      {
+        "name": "Prashanth Neel",
+        "role": "Director"
+      }
+    ]
   }
 ];
 
-// Helper to normalize any content item to support BOTH snake_case and camelCase
 export function normalizeContentItem(item: ContentItem): ContentItem {
   const content_type = (item.content_type || item.type || 'movie') as 'movie' | 'series' | 'anime' | 'drama';
   const type = content_type;
   const releaseYear = item.releaseYear || item.release_year || 2024;
   const release_year = releaseYear;
-  const posterUrl = item.posterUrl || item.poster_url || 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop';
+  const posterUrl = item.posterUrl || item.poster_url || 'https://image.tmdb.org/t/p/w500/8cdWjvZQUExUUTzyp4t6EDMubfO.jpg';
   const poster_url = posterUrl;
-  const backdropUrl = item.backdropUrl || item.backdrop_url || 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop';
+  const backdropUrl = item.backdropUrl || item.backdrop_url || 'https://image.tmdb.org/t/p/original/yDHYTfA3R0jFYba16jBB1ef8oIt.jpg';
   const backdrop_url = backdropUrl;
   const ratingScore = item.ratingScore || item.rating_avg || 8.5;
   const rating_avg = ratingScore;
-  const runtimeMinutes = item.runtimeMinutes || item.runtime_minutes || 105;
+  const runtimeMinutes = item.runtimeMinutes || item.runtime_minutes || 120;
   const runtime_minutes = runtimeMinutes;
   const synopsis = item.synopsis || item.description || '';
   const description = synopsis;
@@ -986,7 +1498,7 @@ export function normalizeContentItem(item: ContentItem): ContentItem {
     territories: ['Worldwide', 'IN', 'US', 'EU', 'GB', 'CA', 'AU'],
     expiryDate: '2030-12-31',
   };
-  const languages = (item.languages && item.languages.length > 0) ? item.languages : ['English (Original)'];
+  const languages = (item.languages && item.languages.length > 0) ? item.languages : ['English (Original)', 'Hindi', 'Spanish'];
   const subtitles = (item.subtitles && item.subtitles.length > 0) ? item.subtitles : [
     { id: 'sub-en', label: 'English [CC]', lang: 'en', url: '/subtitles/default-en.vtt', isDefault: true }
   ];
@@ -1036,7 +1548,7 @@ export const GENRE_LIST = [
   { id: "anime", name: "Anime", icon: "Sparkles" },
   { id: "k_drama", name: "K-Drama", icon: "Tv" },
   { id: "crime", name: "Crime", icon: "ShieldAlert" },
-  { id: "documentary", name: "Documentary", icon: "Film" },
   { id: "comedy", name: "Comedy", icon: "Laugh" },
   { id: "fantasy", name: "Fantasy", icon: "Shield" },
+  { id: "adventure", name: "Adventure", icon: "Compass" }
 ];

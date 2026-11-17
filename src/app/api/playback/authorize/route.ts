@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
 
     // Fallback: mock content authorization
     const mockContent = getNormalizedMockContent();
-    const match = mockContent.find((c) => c.id === contentId || c.slug === contentId);
+    const match = mockContent.find((c) => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
 
     if (!match) {
       return NextResponse.json({

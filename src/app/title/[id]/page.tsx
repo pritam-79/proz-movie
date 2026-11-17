@@ -29,7 +29,7 @@ export default function TitleDetailPage() {
   
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const allContent = getNormalizedMockContent();
-  const rawContent = allContent.find(c => c.id === contentId || c.slug === contentId) || allContent[0];
+  const rawContent = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
   const content = normalizeContentItem(rawContent) as any;
 
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(1);
