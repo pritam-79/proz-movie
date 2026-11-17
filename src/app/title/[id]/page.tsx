@@ -18,7 +18,7 @@ import {
   Tv,
   Film
 } from 'lucide-react';
-import { MOCK_CONTENT } from '@/lib/data/mockContent';
+import { MOCK_CONTENT, getNormalizedMockContent, normalizeContentItem } from '@/lib/data/mockContent';
 import { useAuth } from '@/context/AuthContext';
 import ContentRow from '@/components/content/ContentRow';
 
@@ -28,7 +28,9 @@ export default function TitleDetailPage() {
   const { isInWatchlist, addToWatchlist, removeFromWatchlist } = useAuth();
   
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
-  const content = (MOCK_CONTENT.find(c => c.id === contentId) || MOCK_CONTENT[0]) as any;
+  const allContent = getNormalizedMockContent();
+  const rawContent = allContent.find(c => c.id === contentId || c.slug === contentId) || allContent[0];
+  const content = normalizeContentItem(rawContent) as any;
 
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -52,9 +54,9 @@ export default function TitleDetailPage() {
   };
 
   // Similar Titles
-  const similarTitles = MOCK_CONTENT.filter(c => 
+  const similarTitles = allContent.filter(c => 
     c.id !== content.id && 
-    (c.category === content.category || (Array.isArray(c.genres) && c.genres.some((g: any) => (content.genres as any[])?.includes(g))))
+    (c.category === content.category || (Array.isArray(c.genres) && Array.isArray(content.genres) && c.genres.some((g: any) => content.genres.includes(g))))
   ).slice(0, 8);
 
   const currentSeason = content.seasons?.find((s: any) => s.seasonNumber === selectedSeasonNumber) || content.seasons?.[0];
@@ -107,7 +109,7 @@ export default function TitleDetailPage() {
                 {content.runtimeMinutes ? `${content.runtimeMinutes} min` : `${content.seasons?.length || 1} Seasons`}
               </span>
               <span className="text-proz-grey">•</span>
-              <span className="text-proz-cyan capitalize">{content.category.replace('_', ' ')}</span>
+              <span className="text-proz-cyan capitalize">{(content.category || 'movie').replace('_', ' ')}</span>
             </div>
 
             <h1 className="text-3xl sm:text-5xl font-black text-proz-white tracking-tight">
@@ -338,9 +340,9 @@ export default function TitleDetailPage() {
                 <Shield className="w-3.5 h-3.5" />
                 <span>Authorized Digital Distribution Rights</span>
               </div>
-              <p>Licensor: {content.license.licensor}</p>
-              <p>Territories: {content.license.territories.join(', ')}</p>
-              <p>License Valid: Through {content.license.expiryDate}</p>
+              <p>Licensor: {content.license?.licensor || 'PROZ Global Studios & Distribution Ltd.'}</p>
+              <p>Territories: {Array.isArray(content.license?.territories) ? content.license.territories.join(', ') : 'Global Multi-Territory (Worldwide)'}</p>
+              <p>License Valid: Through {content.license?.expiryDate || '2030-12-31'}</p>
             </div>
 
           </div>

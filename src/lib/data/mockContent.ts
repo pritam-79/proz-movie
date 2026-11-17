@@ -981,6 +981,19 @@ export function normalizeContentItem(item: ContentItem): ContentItem {
   const isRestricted18Plus = Boolean(item.isRestricted18Plus ?? item.is_adult);
   const is_adult = isRestricted18Plus;
 
+  const license = item.license || {
+    licensor: 'PROZ Global Studios & Distribution Ltd.',
+    territories: ['Worldwide', 'IN', 'US', 'EU', 'GB', 'CA', 'AU'],
+    expiryDate: '2030-12-31',
+  };
+  const languages = (item.languages && item.languages.length > 0) ? item.languages : ['English (Original)'];
+  const subtitles = (item.subtitles && item.subtitles.length > 0) ? item.subtitles : [
+    { id: 'sub-en', label: 'English [CC]', lang: 'en', url: '/subtitles/default-en.vtt', isDefault: true }
+  ];
+  const audioTracks = (item.audioTracks && item.audioTracks.length > 0) ? item.audioTracks : [
+    { id: 'aud-en', label: 'English [Atmos 5.1]', lang: 'en', codec: 'AAC', isDefault: true }
+  ];
+
   return {
     ...item,
     content_type,
@@ -1004,6 +1017,10 @@ export function normalizeContentItem(item: ContentItem): ContentItem {
     is_trending,
     isRestricted18Plus,
     is_adult,
+    license,
+    languages,
+    subtitles,
+    audioTracks,
   };
 }
 
