@@ -35,14 +35,18 @@ import {
   ToggleLeft,
   ToggleRight,
   Zap,
+  Tv,
 } from 'lucide-react';
 import { brandConfig } from '@/config/brand.config';
+import { getAllChannels } from '@/lib/data/channelsData';
+import { Channel } from '@/types/channel';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type AdminSection =
   | 'dashboard'
   | 'content'
+  | 'channels'
   | 'imports'
   | 'providers'
   | 'licenses'
@@ -110,6 +114,7 @@ const glassSelect =
 const NAV_ITEMS: { id: AdminSection; label: string; Icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
   { id: 'content', label: 'Content', Icon: Film },
+  { id: 'channels', label: 'Channels', Icon: Tv },
   { id: 'imports', label: 'Import Jobs', Icon: Import },
   { id: 'providers', label: 'Providers', Icon: Server },
   { id: 'licenses', label: 'Licenses', Icon: Shield },
@@ -452,6 +457,422 @@ function ContentManager() {
       </div>
 
       {showAdd && <AddContentModal onClose={() => setShowAdd(false)} onSave={item => { setItems(p => [item, ...p]); setShowAdd(false); }} />}
+    </div>
+  );
+}
+
+// ─── ChannelManager ─────────────────────────────────────────────────────────────
+function ChannelManager() {
+  const [channels, setChannels] = useState<Channel[]>(() => getAllChannels());
+  const [search, setSearch] = useState('');
+  const [catFilter, setCatFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [showAdd, setShowAdd] = useState(false);
+  const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
+
+  const [formName, setFormName] = useState('');
+  const [formCategory, setFormCategory] = useState('Indian OTT');
+  const [formDesc, setFormDesc] = useState('');
+  const [formSubs, setFormSubs] = useState('500K');
+  const [formRating, setFormRating] = useState(4.8);
+  const [formColor, setFormColor] = useState('#E11D48');
+
+  const PER_PAGE = 12;
+
+  const filtered = channels.filter((c) =>
+    (c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.description.toLowerCase().includes(search.toLowerCase())) &&
+    (catFilter === 'all' || c.category.toLowerCase() === catFilter.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  const paged = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
+
+  const handleDelete = (id: string) => {
+    if (!confirm('Are you sure you want to remove this channel?')) return;
+    setChannels((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const handleToggleFeatured = (id: string) => {
+    setChannels((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, featured: !c.featured } : c))
+    );
+  };
+
+  const handleOpenAdd = () => {
+    setFormName('');
+    setFormCategory('Indian OTT');
+    setFormDesc('');
+    setFormSubs('250K');
+    setFormRating(4.8);
+    setFormColor('#E11D48');
+    setShowAdd(true);
+  };
+
+  const handleOpenEdit = (channel: Channel) => {
+    setEditingChannel(channel);
+    setFormName(channel.name);
+    setFormCategory(channel.category);
+    setFormDesc(channel.description);
+    setFormSubs(channel.subscribers || '250K');
+    setFormRating(channel.rating || 4.8);
+    setFormColor(channel.color || '#E11D48');
+  };
+
+  const handleSaveChannel = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim()) return;
+
+    if (editingChannel) {
+      setChannels((prev) =>
+        prev.map((c) =>
+          c.id === editingChannel.id
+            ? {
+                ...c,
+                name: formName,
+                category: formCategory,
+                description: formDesc,
+                subscribers: formSubs,
+                rating: Number(formRating),
+                color: formColor,
+              }
+            : c
+        )
+      );
+      setEditingChannel(null);
+    } else {
+      const slug = formName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      const newChan: Channel = {
+        id: slug,
+        name: formName,
+        slug: slug,
+        category: formCategory,
+        description: formDesc || `Official channel for ${formName}.`,
+        logo: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=200&auto=format&fit=crop&q=60',
+        contentCount: 25,
+        subscribers: formSubs,
+        rating: Number(formRating),
+        color: formColor,
+        featured: false,
+      };
+      setChannels((prev) => [newChan, ...prev]);
+      setShowAdd(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            placeholder="Search channels..."
+            className={`${glassInput} pl-10`}
+          />
+        </div>
+        <select
+          value={catFilter}
+          onChange={(e) => {
+            setCatFilter(e.target.value);
+            setPage(1);
+          }}
+          className="px-4 py-2.5 bg-[#080B12]/60 border border-[#334155]/60 rounded-xl text-[#F8FAFC] focus:outline-none text-sm"
+        >
+          <option value="all" className="bg-[#111827]">
+            All Categories ({channels.length})
+          </option>
+          {[
+            'Indian OTT',
+            'Web Series',
+            '18+ Exclusive',
+            'Regional',
+            'Drama',
+            'Comedy',
+            'International',
+          ].map((c) => (
+            <option key={c} value={c} className="bg-[#111827]">
+              {c}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleOpenAdd}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-sm transition-colors whitespace-nowrap shadow-md"
+        >
+          <Plus className="w-4 h-4" /> Add Channel
+        </button>
+      </div>
+
+      {/* Stats Counter */}
+      <div className="flex items-center justify-between text-xs text-[#94A3B8] px-1">
+        <span>
+          Showing {paged.length} of {filtered.length} channels
+        </span>
+        <span>Directory Total: {channels.length} studios</span>
+      </div>
+
+      {/* Channels Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {paged.map((channel) => {
+          const initials = channel.name
+            .split(' ')
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join('')
+            .toUpperCase();
+
+          return (
+            <div
+              key={channel.id}
+              className="p-4 rounded-xl bg-[#111827]/60 border border-[#334155]/40 hover:border-rose-500/40 transition-all flex flex-col justify-between space-y-3"
+            >
+              <div className="flex items-start gap-3">
+                {/* Circular Avatar Preview */}
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 border border-zinc-700 shadow-md"
+                  style={{
+                    background: `radial-gradient(circle at 30% 30%, ${
+                      channel.color || '#991B1B'
+                    }ee, #0B0E14 85%)`,
+                  }}
+                >
+                  <span className="font-extrabold text-white text-xs drop-shadow">
+                    {initials}
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <h4 className="text-sm font-bold text-[#F8FAFC] truncate">
+                      {channel.name}
+                    </h4>
+                    {channel.featured && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-bold">
+                        FEATURED
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-rose-400 font-medium">
+                    {channel.category}
+                  </span>
+                  <p className="text-xs text-[#94A3B8] line-clamp-1 mt-0.5">
+                    {channel.description}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-[#334155]/40 text-xs text-[#94A3B8]">
+                <span>{channel.subscribers || '1.2M'} subs</span>
+                <span>{channel.contentCount} titles</span>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleToggleFeatured(channel.id)}
+                    className={`p-1.5 rounded-lg border text-xs transition-colors ${
+                      channel.featured
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        : 'bg-[#334155]/30 text-zinc-400 border-transparent hover:text-white'
+                    }`}
+                    title="Toggle featured"
+                  >
+                    ★
+                  </button>
+                  <button
+                    onClick={() => handleOpenEdit(channel)}
+                    className="p-1.5 rounded-lg bg-[#334155]/30 hover:bg-[#334155]/60 text-[#94A3B8] hover:text-[#F8FAFC] transition-colors"
+                    title="Edit Channel"
+                  >
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(channel.id)}
+                    className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
+                    title="Delete Channel"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between pt-2">
+          <span className="text-xs text-[#94A3B8]">
+            Page {page} of {totalPages}
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="p-1.5 rounded-lg bg-[#334155]/30 disabled:opacity-40 hover:bg-[#334155]/60 text-[#94A3B8] transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs text-[#F8FAFC] font-medium">
+              {page} / {totalPages}
+            </span>
+            <button
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="p-1.5 rounded-lg bg-[#334155]/30 disabled:opacity-40 hover:bg-[#334155]/60 text-[#94A3B8] transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add / Edit Channel Modal */}
+      {(showAdd || editingChannel) && (
+        <div className="fixed inset-0 z-50 bg-[#080B12]/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-2xl bg-[#111827] border border-[#334155]/60 p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-[#334155]/40">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Tv className="w-4 h-4 text-rose-500" />
+                {editingChannel ? 'Edit Channel' : 'Add New Channel'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowAdd(false);
+                  setEditingChannel(null);
+                }}
+                className="p-1 rounded-lg text-zinc-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveChannel} className="space-y-3 text-xs">
+              <div>
+                <label className="text-[#94A3B8] block mb-1 font-semibold">
+                  Channel Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="e.g. Star Movies, Red Prime"
+                  className={glassInput}
+                />
+              </div>
+
+              <div>
+                <label className="text-[#94A3B8] block mb-1 font-semibold">
+                  Category *
+                </label>
+                <select
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value)}
+                  className={glassSelect}
+                >
+                  {[
+                    'Indian OTT',
+                    'Web Series',
+                    '18+ Exclusive',
+                    'Regional',
+                    'Drama',
+                    'Comedy',
+                    'International',
+                  ].map((cat) => (
+                    <option key={cat} value={cat} className="bg-[#111827]">
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[#94A3B8] block mb-1 font-semibold">
+                  Description
+                </label>
+                <textarea
+                  rows={2}
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  placeholder="Channel description..."
+                  className={glassInput}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[#94A3B8] block mb-1 font-semibold">
+                    Subscribers
+                  </label>
+                  <input
+                    type="text"
+                    value={formSubs}
+                    onChange={(e) => setFormSubs(e.target.value)}
+                    placeholder="e.g. 1.2M"
+                    className={glassInput}
+                  />
+                </div>
+                <div>
+                  <label className="text-[#94A3B8] block mb-1 font-semibold">
+                    Rating (1.0 - 5.0)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="1.0"
+                    max="5.0"
+                    value={formRating}
+                    onChange={(e) => setFormRating(Number(e.target.value))}
+                    className={glassInput}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[#94A3B8] block mb-1 font-semibold">
+                  Accent Color
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    value={formColor}
+                    onChange={(e) => setFormColor(e.target.value)}
+                    className="w-10 h-8 rounded bg-transparent cursor-pointer"
+                  />
+                  <span className="font-mono text-zinc-300">{formColor}</span>
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-[#334155]/40 flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAdd(false);
+                    setEditingChannel(null);
+                  }}
+                  className="px-4 py-2 rounded-xl text-zinc-400 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold transition-all shadow-md"
+                >
+                  {editingChannel ? 'Save Changes' : 'Create Channel'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1078,6 +1499,7 @@ export default function AdminDashboardPage() {
   const sectionTitles: Record<AdminSection, string> = {
     dashboard: 'Dashboard',
     content: 'Content Management',
+    channels: 'Channel Directory & Studio Management',
     imports: 'Import Jobs',
     providers: 'Metadata Providers',
     licenses: 'Licenses & Rights',
@@ -1273,6 +1695,7 @@ export default function AdminDashboardPage() {
         <main className="flex-1 p-5 md:p-6">
           {activeSection === 'dashboard' && <DashboardOverview onNavigate={navigate} />}
           {activeSection === 'content' && <ContentManager />}
+          {activeSection === 'channels' && <ChannelManager />}
           {activeSection === 'imports' && <ImportManager />}
           {activeSection === 'providers' && <ProviderManager />}
           {activeSection === 'licenses' && <LicenseManager />}

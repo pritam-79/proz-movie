@@ -5,6 +5,8 @@ import ContentRow from '@/components/content/ContentRow';
 import ContinueWatchingRow from '@/components/content/ContinueWatchingRow';
 import MyListRow from '@/components/content/MyListRow';
 import GenreGrid from '@/components/home/GenreGrid';
+import SubHeaderNav from '@/components/navigation/SubHeaderNav';
+import PopularChannelsRow from '@/components/content/PopularChannelsRow';
 import { 
   Flame, 
   TrendingUp, 
@@ -138,10 +140,16 @@ export default function HomePage() {
 
   return (
     <div className="pb-16 space-y-8">
+      {/* 0. Sub-Header Horizontal Navigation (Recommend, Movies, TV Shows, 18+, Anime, Channels) */}
+      <SubHeaderNav />
+
       {/* 1. Cinematic Hero Banner & Featured Slider */}
       <HeroBanner featuredItems={featuredItems} />
 
-      {/* 2. Continue Watching (Interactive Client Row) */}
+      {/* 2. Popular Channels & Networks Grid Row */}
+      <PopularChannelsRow />
+
+      {/* 3. Continue Watching (Interactive Client Row) */}
       <ContinueWatchingRow />
 
       {/* 3. Trending Today */}

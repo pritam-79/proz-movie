@@ -3,6 +3,7 @@ import './globals.css';
 import { brandConfig } from '@/config/brand.config';
 import { AuthProvider } from '@/context/AuthContext';
 import Navbar from '@/components/navigation/Navbar';
+import MobileBottomNav from '@/components/navigation/MobileBottomNav';
 import Footer from '@/components/navigation/Footer';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
 
@@ -60,7 +61,7 @@ export default function RootLayout({
           <Navbar />
 
           {/* Main Content Area */}
-          <main className="flex-1 w-full pt-16">
+          <main className="flex-1 w-full pt-16 pb-20 md:pb-8">
             <ErrorBoundary>
               {children}
             </ErrorBoundary>
@@ -68,6 +69,9 @@ export default function RootLayout({
 
           {/* Site Footer */}
           <Footer />
+
+          {/* Mobile Bottom Navigation */}
+          <MobileBottomNav />
         </AuthProvider>
       </body>
     </html>
