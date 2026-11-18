@@ -1,5 +1,5 @@
 /**
- * PROZ MOVIE - Central Brand Configuration
+ * PROZ Entertainment - Central Brand Configuration
  * YOUR WORLD. YOUR ENTERTAINMENT.
  * 
  * Never hardcode brand identity throughout individual components.
@@ -67,13 +67,13 @@ export interface BrandConfig {
 }
 
 export const brandConfig: BrandConfig = {
-  name: "PROZ MOVIE",
+  name: "PROZ Entertainment",
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
-  websiteTitle: "PROZ MOVIE – Stream Your World",
+  websiteTitle: "PROZ Entertainment – Stream Your World",
   description:
-    "Experience next-generation entertainment streaming with PROZ MOVIE. Dive into 4K movies, exclusive web series, anime collections, and international dramas with Liquid Glass precision.",
+    "Experience next-generation entertainment streaming with PROZ Entertainment. Dive into 4K movies, exclusive web series, anime collections, and international dramas with Liquid Glass precision.",
   establishedYear: 2026,
-  copyright: "© 2026 PROZ MOVIE. All rights reserved. Your World. Your Entertainment.",
+  copyright: "© 2026 PROZ Entertainment. All rights reserved. Your World. Your Entertainment.",
   
   company: {
     legalName: "PROZ Entertainment Technologies Inc.",

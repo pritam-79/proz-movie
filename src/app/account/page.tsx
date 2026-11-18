@@ -199,7 +199,7 @@ export default function AccountPage() {
               <span>Danger Zone</span>
             </h4>
             <p className="text-xs text-proz-grey leading-relaxed">
-              Permanently delete your PROZ MOVIE account, viewing history, and active subscriptions. This action cannot be reversed.
+              Permanently delete your PROZ Entertainment account, viewing history, and active subscriptions. This action cannot be reversed.
             </p>
             <button
               onClick={() => setShowDeleteModal(true)}
@@ -219,7 +219,7 @@ export default function AccountPage() {
           <div className="max-w-md w-full p-6 rounded-3xl glass-card border border-rose-500/50 shadow-glass-lg space-y-4">
             <h3 className="text-lg font-bold text-proz-white">Confirm Account Deletion</h3>
             <p className="text-xs text-proz-grey leading-relaxed">
-              Are you sure you want to delete your PROZ MOVIE profile? All saved items, continuous playback marks, and active subscriptions will be erased.
+              Are you sure you want to delete your PROZ Entertainment profile? All saved items, continuous playback marks, and active subscriptions will be erased.
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button

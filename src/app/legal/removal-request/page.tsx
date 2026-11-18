@@ -60,7 +60,7 @@ export default function RemovalRequestPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-proz-white">Title Name & PROZ MOVIE URL</label>
+              <label className="text-xs font-semibold text-proz-white">Title Name & PROZ Entertainment URL</label>
               <input
                 type="text"
                 required

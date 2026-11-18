@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: brandConfig.websiteTitle,
   description: brandConfig.description,
   keywords: [
-    'PROZ MOVIE',
+    'PROZ Entertainment',
     'Stream Your World',
     'Movies',
     'Web Series',

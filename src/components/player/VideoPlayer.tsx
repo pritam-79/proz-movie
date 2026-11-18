@@ -14,18 +14,17 @@ import {
   RotateCw, 
   Settings, 
   Subtitles, 
-  PictureInPicture, 
   ArrowLeft, 
   SkipForward, 
   Check, 
-  ShieldCheck, 
-  AlertCircle,
   ExternalLink,
   Smartphone,
   Globe,
   Sparkles,
   Tv,
-  RefreshCw
+  Cast,
+  FastForward,
+  Radio
 } from 'lucide-react';
 import { ContentItem } from '@/types/content';
 import { VideoSource } from '@/types/provider';
@@ -57,11 +56,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isMuted, setIsMuted] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
-  const [selectedQuality, setSelectedQuality] = useState('Auto (1080p)');
+  const [selectedQuality, setSelectedQuality] = useState('1080p (Super)');
   const [selectedSubtitle, setSelectedSubtitle] = useState<string>('off');
   const [showControls, setShowControls] = useState(true);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [showCastModal, setShowCastModal] = useState(false);
   const [showEpisodeDrawer, setShowEpisodeDrawer] = useState(false);
   const [isBuffering, setIsBuffering] = useState(true);
   const [hasPlaybackError, setHasPlaybackError] = useState(false);
@@ -205,9 +207,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       if (isPlaying) {
         setShowControls(false);
         setShowSettingsMenu(false);
+        setShowSpeedMenu(false);
         setShowSubtitleMenu(false);
+        setShowQualityMenu(false);
       }
-    }, 3500);
+    }, 4000);
   };
 
   const togglePlay = () => {
@@ -233,6 +237,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       videoRef.current.currentTime = target;
       setCurrentTime(target);
     }
+  };
+
+  const handleSpeedChange = (speed: number) => {
+    setPlaybackSpeed(speed);
+    if (videoRef.current) {
+      videoRef.current.playbackRate = speed;
+    }
+    setShowSpeedMenu(false);
   };
 
   const toggleMute = () => {
@@ -263,6 +275,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  const speedOptions = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
+  const qualityOptions = ['Auto', '1080p (Super)', '720p (High)', '480p (Standard)'];
+  const subtitleOptions = [
+    { label: 'Off', value: 'off' },
+    { label: 'English [CC]', value: 'en' },
+    { label: 'Hindi', value: 'hi' },
+    { label: 'Bengali', value: 'bn' },
+    { label: 'Spanish', value: 'es' }
+  ];
 
   return (
     <div 
@@ -301,7 +323,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onPause={() => setIsPlaying(false)}
             onError={() => {
               setHasPlaybackError(true);
-              setErrorMessage('CORS or playback format error on direct stream.');
+              setErrorMessage('Stream error on direct playback. Switching to backup provider.');
               setIsBuffering(false);
             }}
           />
@@ -327,7 +349,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         />
       )}
 
-      {/* ─── Mode 3 / Error Fallback: Official Provider Streaming Hub ─── */}
+      {/* ─── Mode 3 / Fallback: Official Provider Streaming Hub ─── */}
       {(playbackMode === 'official_hub' || hasPlaybackError) && (
         <div className="absolute inset-0 bg-gradient-to-b from-[#13070A] via-[#0C0E14] to-black flex flex-col items-center justify-center p-6 text-center z-20">
           <div className="max-w-md w-full space-y-4">
@@ -447,12 +469,20 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             {content.title} {currentEpisode ? `• E${currentEpisode.episodeNumber}` : ''}
           </h1>
           <span className="text-[10px] text-zinc-400 block truncate">
-            {content.releaseYear || 2024} • {content.category?.toUpperCase() || 'CINEMA'}
+            {content.releaseYear || 2024} • {content.category?.toUpperCase() || 'ENTERTAINMENT'}
           </span>
         </div>
 
-        {/* Source Mode Switcher */}
-        <div className="flex items-center gap-1">
+        {/* Source Mode Switcher & Screencast */}
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setShowCastModal(true)}
+            className="p-1.5 rounded-lg bg-black/40 text-zinc-300 hover:text-white border border-white/10"
+            title="Screencast / DLNA"
+          >
+            <Cast className="w-4 h-4" />
+          </button>
+
           {activeStream && (
             <button
               onClick={() => {
@@ -497,6 +527,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Skip Intro Floating Button */}
+      {playbackMode === 'direct' && isPlaying && currentTime > 5 && currentTime < 90 && (
+        <button
+          onClick={() => seekDelta(85 - currentTime)}
+          className="absolute bottom-20 left-4 z-40 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 text-white text-xs font-bold hover:bg-rose-600 transition-all flex items-center gap-1.5 shadow-xl"
+        >
+          <FastForward className="w-3.5 h-3.5" />
+          <span>Skip Intro</span>
+        </button>
+      )}
 
       {/* ─── Bottom Controls Bar (Direct Playback Mode) ─── */}
       {playbackMode === 'direct' && !hasPlaybackError && (
@@ -543,6 +584,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <RotateCw className="w-4 h-4" />
               </button>
 
+              {nextEpisode && (
+                <button
+                  onClick={() => router.push(`/watch/${content.id}?episode=${nextEpisode.id}`)}
+                  className="p-1.5 text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
+                  title="Next Episode"
+                >
+                  <SkipForward className="w-4 h-4" />
+                </button>
+              )}
+
               {/* Volume */}
               <div className="flex items-center gap-2 group/vol">
                 <button onClick={toggleMute} className="text-zinc-400 hover:text-white">
@@ -569,8 +620,113 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               </span>
             </div>
 
-            {/* Right Controls */}
+            {/* Right Controls (Speed, Subtitles, Quality, Episodes, Fullscreen) */}
             <div className="flex items-center gap-2">
+              {/* Playback Speed (Cinema HD exact speeds) */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowSpeedMenu(!showSpeedMenu);
+                    setShowSubtitleMenu(false);
+                    setShowQualityMenu(false);
+                  }}
+                  className="px-2 py-1 rounded bg-zinc-800 text-zinc-300 hover:text-white text-[11px] font-bold"
+                  title="Playback Speed"
+                >
+                  {playbackSpeed === 1 ? 'Normal' : `${playbackSpeed}x`}
+                </button>
+
+                {showSpeedMenu && (
+                  <div className="absolute bottom-8 right-0 bg-zinc-900 border border-zinc-700 rounded-xl p-1.5 w-24 space-y-1 shadow-2xl z-50">
+                    {speedOptions.map((speed) => (
+                      <button
+                        key={speed}
+                        onClick={() => handleSpeedChange(speed)}
+                        className={`w-full text-left px-2 py-1 rounded text-xs font-semibold ${
+                          playbackSpeed === speed ? 'bg-rose-600 text-white' : 'text-zinc-300 hover:bg-zinc-800'
+                        }`}
+                      >
+                        {speed === 1.0 ? 'Normal' : `${speed}x`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Subtitles Menu */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowSubtitleMenu(!showSubtitleMenu);
+                    setShowSpeedMenu(false);
+                    setShowQualityMenu(false);
+                  }}
+                  className={`p-1.5 rounded transition-colors ${
+                    selectedSubtitle !== 'off' ? 'text-rose-400 bg-rose-950/40' : 'text-zinc-400 hover:text-white'
+                  }`}
+                  title="Subtitles"
+                >
+                  <Subtitles className="w-4 h-4" />
+                </button>
+
+                {showSubtitleMenu && (
+                  <div className="absolute bottom-8 right-0 bg-zinc-900 border border-zinc-700 rounded-xl p-1.5 w-32 space-y-1 shadow-2xl z-50">
+                    <p className="text-[10px] text-zinc-500 font-bold px-2 py-0.5 uppercase">Subtitles</p>
+                    {subtitleOptions.map((sub) => (
+                      <button
+                        key={sub.value}
+                        onClick={() => {
+                          setSelectedSubtitle(sub.value);
+                          setShowSubtitleMenu(false);
+                        }}
+                        className={`w-full text-left px-2 py-1 rounded text-xs flex items-center justify-between ${
+                          selectedSubtitle === sub.value ? 'bg-rose-600 text-white' : 'text-zinc-300 hover:bg-zinc-800'
+                        }`}
+                      >
+                        <span>{sub.label}</span>
+                        {selectedSubtitle === sub.value && <Check className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Quality Menu (Cinema HD Super / High / Standard) */}
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    setShowQualityMenu(!showQualityMenu);
+                    setShowSpeedMenu(false);
+                    setShowSubtitleMenu(false);
+                  }}
+                  className="p-1.5 text-zinc-400 hover:text-white"
+                  title="Quality Settings"
+                >
+                  <Settings className="w-4 h-4" />
+                </button>
+
+                {showQualityMenu && (
+                  <div className="absolute bottom-8 right-0 bg-zinc-900 border border-zinc-700 rounded-xl p-1.5 w-36 space-y-1 shadow-2xl z-50">
+                    <p className="text-[10px] text-zinc-500 font-bold px-2 py-0.5 uppercase">Video Quality</p>
+                    {qualityOptions.map((q) => (
+                      <button
+                        key={q}
+                        onClick={() => {
+                          setSelectedQuality(q);
+                          setShowQualityMenu(false);
+                        }}
+                        className={`w-full text-left px-2 py-1 rounded text-xs flex items-center justify-between ${
+                          selectedQuality === q ? 'bg-rose-600 text-white' : 'text-zinc-300 hover:bg-zinc-800'
+                        }`}
+                      >
+                        <span>{q}</span>
+                        {selectedQuality === q && <Check className="w-3 h-3" />}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Episodes Drawer toggle if series */}
               {content.type === 'series' && content.seasons && (
                 <button
@@ -585,6 +741,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <button
                 onClick={toggleFullscreen}
                 className="p-2 text-zinc-400 hover:text-white transition-colors"
+                title="Fullscreen"
               >
                 {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
               </button>
@@ -636,6 +793,65 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Screencast / DLNA Modal Dialog (Matching Cinema HD Cast prompt) */}
+      {showCastModal && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-150">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-800">
+              <div className="flex items-center gap-2 text-white font-bold text-sm">
+                <Cast className="w-4 h-4 text-rose-500" />
+                <span>Cast to Device (DLNA)</span>
+              </div>
+              <button 
+                onClick={() => setShowCastModal(false)}
+                className="text-zinc-400 hover:text-white text-xs"
+              >
+                Cancel
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-400">
+              Please make sure your phone and TV are connected to the same Wi-Fi network.
+            </p>
+
+            <div className="space-y-2 py-2">
+              <div className="p-3 rounded-xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-between hover:border-rose-500 cursor-pointer transition-all">
+                <div className="flex items-center gap-2.5">
+                  <Radio className="w-4 h-4 text-rose-400 animate-pulse" />
+                  <div>
+                    <p className="text-xs font-bold text-white">Living Room Smart TV</p>
+                    <span className="text-[10px] text-zinc-400">Android TV / DLNA Ready</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-rose-600/20 text-rose-400 border border-rose-500/30">
+                  Connect
+                </span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-zinc-800/80 border border-zinc-700 flex items-center justify-between hover:border-rose-500 cursor-pointer transition-all">
+                <div className="flex items-center gap-2.5">
+                  <Cast className="w-4 h-4 text-cyan-400" />
+                  <div>
+                    <p className="text-xs font-bold text-white">Bedroom Chromecast Ultra</p>
+                    <span className="text-[10px] text-zinc-400">Google Cast Ready</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-cyan-600/20 text-cyan-400 border border-cyan-500/30">
+                  Connect
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowCastModal(false)}
+              className="w-full py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs font-semibold hover:bg-zinc-700 transition-colors"
+            >
+              Done
+            </button>
           </div>
         </div>
       )}

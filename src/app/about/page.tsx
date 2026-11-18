@@ -5,16 +5,16 @@ import { Film, Shield, Zap, Globe, Users, Heart } from 'lucide-react';
 
 export const metadata = {
   title: `About — ${brandConfig.websiteTitle}`,
-  description: 'Learn about PROZ MOVIE — a premium entertainment streaming platform built for the world.',
+  description: 'Learn about PROZ Entertainment — a premium entertainment streaming platform built for the world.',
 };
 
 const values = [
   { icon: Film, title: 'Premium Entertainment', desc: 'Curated cinema from Hollywood, Bollywood, Anime, K-Drama and beyond — all in one place.' },
-  { icon: Shield, title: 'Licensed & Legal', desc: 'Every title on PROZ MOVIE is properly licensed. We respect creators, rights holders and distributors.' },
+  { icon: Shield, title: 'Licensed & Legal', desc: 'Every title on PROZ Entertainment is properly licensed. We respect creators, rights holders and distributors.' },
   { icon: Zap, title: 'Cutting-Edge Streaming', desc: 'Adaptive bitrate HLS delivery, Shaka Player, DRM protection, and 4K HDR where licensed.' },
   { icon: Globe, title: 'Global Entertainment', desc: 'Content in English, Hindi, Korean, Japanese, Chinese, Tamil, Telugu, Bengali and more.' },
   { icon: Users, title: 'Multi-Profile Support', desc: 'Create up to 4 profiles per account with individual watchlists, preferences and history.' },
-  { icon: Heart, title: 'Built With Care', desc: 'PROZ MOVIE is an independent platform built to deliver a cinema-grade experience to every screen.' },
+  { icon: Heart, title: 'Built With Care', desc: 'PROZ Entertainment is an independent platform built to deliver a cinema-grade experience to every screen.' },
 ];
 
 export default function AboutPage() {
@@ -28,7 +28,7 @@ export default function AboutPage() {
         <div className="relative max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-sm font-medium mb-6">
             <Film className="w-4 h-4" />
-            About PROZ MOVIE
+            About PROZ Entertainment
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-[#F8FAFC] mb-6 leading-tight">
             YOUR WORLD.{' '}
@@ -37,7 +37,7 @@ export default function AboutPage() {
             </span>
           </h1>
           <p className="text-xl text-[#94A3B8] max-w-2xl mx-auto leading-relaxed">
-            PROZ MOVIE is a premium entertainment streaming platform delivering cinema-grade experiences 
+            PROZ Entertainment is a premium entertainment streaming platform delivering cinema-grade experiences 
             across movies, web series, anime, dramas and more — built on a foundation of authorized content 
             and cutting-edge streaming technology.
           </p>
@@ -79,7 +79,7 @@ export default function AboutPage() {
       <section className="max-w-3xl mx-auto px-6 pb-20 text-center">
         <h2 className="text-3xl font-bold text-[#F8FAFC] mb-4">Ready to Stream?</h2>
         <p className="text-[#94A3B8] mb-8">
-          Join PROZ MOVIE today and experience entertainment like never before.
+          Join PROZ Entertainment today and experience entertainment like never before.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link

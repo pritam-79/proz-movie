@@ -1,5 +1,5 @@
 /**
- * PROZ MOVIE — Universal Provider & Streaming Integration Type Definitions
+ * PROZ Entertainment — Universal Provider & Streaming Integration Type Definitions
  * Phase 1 & 2 Provider Architecture
  */
 

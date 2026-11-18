@@ -148,7 +148,7 @@ export default function DeviceManagementPage() {
         <div className="space-y-1">
           <h4 className="text-sm font-bold text-proz-white">Security & Screen Limiting</h4>
           <p className="text-xs text-proz-grey leading-relaxed">
-            PROZ MOVIE monitors concurrent playback sessions in real time via signed HMAC tokens. If your account exceeds {maxAllowedScreens} simultaneous streams, older idle playback sessions are gracefully paused.
+            PROZ Entertainment monitors concurrent playback sessions in real time via signed HMAC tokens. If your account exceeds {maxAllowedScreens} simultaneous streams, older idle playback sessions are gracefully paused.
           </p>
         </div>
       </div>

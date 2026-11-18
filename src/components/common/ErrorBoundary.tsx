@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('PROZ MOVIE Client Exception caught by ErrorBoundary:', error, errorInfo);
+    console.error('PROZ Entertainment Client Exception caught by ErrorBoundary:', error, errorInfo);
   }
 
   private handleReset = () => {

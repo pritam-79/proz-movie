@@ -120,7 +120,7 @@ export default function AdminConsolePage() {
               Security Boundary
             </span>
             <h1 className="text-xl font-black text-white mt-2">
-              PROZ MOVIE Admin Console
+              PROZ Entertainment Admin Console
             </h1>
             <p className="text-xs text-zinc-400 mt-1">
               Automated Provider & Channel Streaming Operations Portal
@@ -188,7 +188,7 @@ export default function AdminConsolePage() {
               <span className="text-[10px] font-bold text-rose-500 uppercase tracking-widest block">
                 ADMIN CONSOLE V3
               </span>
-              <h2 className="text-base font-black text-white">PROZ MOVIE</h2>
+              <h2 className="text-base font-black text-white">PROZ Entertainment</h2>
             </div>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1 text-zinc-400 hover:text-white">
               <X className="w-5 h-5" />

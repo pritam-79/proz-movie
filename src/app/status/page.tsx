@@ -4,8 +4,8 @@ import { ShieldCheck, CheckCircle2, ArrowLeft, Activity, Server, Radio, Database
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'System Status — PROZ MOVIE',
-  description: 'Real-time uptime and health monitoring for PROZ MOVIE streaming servers, DRM and CDN infrastructure.',
+  title: 'System Status — PROZ Entertainment',
+  description: 'Real-time uptime and health monitoring for PROZ Entertainment streaming servers, DRM and CDN infrastructure.',
 };
 
 export default function StatusPage() {

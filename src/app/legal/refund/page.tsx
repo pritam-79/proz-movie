@@ -3,8 +3,8 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'Subscription & Refund Policy — PROZ MOVIE',
-  description: 'Understand billing intervals, automatic renewals, trial policies, and refund eligibility on PROZ MOVIE.',
+  title: 'Subscription & Refund Policy — PROZ Entertainment',
+  description: 'Understand billing intervals, automatic renewals, trial policies, and refund eligibility on PROZ Entertainment.',
 };
 
 export default function RefundPolicyPage() {

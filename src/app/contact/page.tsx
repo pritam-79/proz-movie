@@ -31,8 +31,8 @@ export default function ContactPage() {
       a: "Navigate to Account Settings, select your sub-profiles, and assign a 4-digit master PIN to lock TV-MA and 18+ content."
     },
     {
-      q: "What devices are supported by PROZ MOVIE?",
-      a: "PROZ MOVIE is accessible on all modern web browsers (Chrome, Safari, Firefox, Edge), iOS & Android smartphones/tablets, smart TVs, Apple TV, and streaming sticks."
+      q: "What devices are supported by PROZ Entertainment?",
+      a: "PROZ Entertainment is accessible on all modern web browsers (Chrome, Safari, Firefox, Edge), iOS & Android smartphones/tablets, smart TVs, Apple TV, and streaming sticks."
     }
   ];
 

@@ -3,8 +3,8 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'Privacy Policy — PROZ MOVIE',
-  description: 'Learn how PROZ MOVIE collects, protects and handles your personal information and playback data.',
+  title: 'Privacy Policy — PROZ Entertainment',
+  description: 'Learn how PROZ Entertainment collects, protects and handles your personal information and playback data.',
 };
 
 export default function PrivacyPage() {

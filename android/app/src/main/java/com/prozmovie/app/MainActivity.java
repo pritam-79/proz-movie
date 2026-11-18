@@ -26,17 +26,17 @@ public class MainActivity extends Activity {
     private View customView;
     private ProgressBar progressBar;
 
-    // Default connection endpoints:
-    // When running in an Android Emulator, 10.0.2.2 maps to the host's localhost:3000
+    // Production & Development URLs
+    // Live hosted server on Vercel
+    private static final String PRODUCTION_URL = "https://proz-movie.vercel.app";
     private static final String EMULATOR_URL = "http://10.0.2.2:3000";
     private static final String LOCAL_URL = "http://localhost:3000";
-    private static final String PRODUCTION_URL = "https://prozmovie.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configure Immersive Status & Nav Bars
+        // Configure Immersive Status & Nav Bars matching Liquid Glass theme
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -52,8 +52,8 @@ public class MainActivity extends Activity {
 
         configureWebView();
 
-        // Determine initial load URL
-        String targetUrl = isRunningOnEmulator() ? EMULATOR_URL : LOCAL_URL;
+        // Connect to the hosted production server so the APK works on real physical devices
+        String targetUrl = PRODUCTION_URL;
         webView.loadUrl(targetUrl);
     }
 
@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 
         // Custom User Agent identifier
         String defaultUa = settings.getUserAgentString();
-        settings.setUserAgentString(defaultUa + " ProzMovieApp/1.0.0 (Android; LiquidGlass)");
+        settings.setUserAgentString(defaultUa + " ProzEntertainmentApp/0.01 (Android; LiquidGlass)");
 
         // Set WebChromeClient for Fullscreen Video Playback
         webView.setWebChromeClient(new WebChromeClient() {
@@ -133,24 +133,16 @@ public class MainActivity extends Activity {
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                // If local dev server is starting, show a graceful retry screen
+                // If network is offline, show a graceful reconnect screen
                 String offlineHtml = "<html><head><meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
                     "<style>body{background:#080B12;color:#F8FAFC;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;padding:24px;text-align:center;}" +
-                    "h1{color:#22D3EE;font-size:24px;margin-bottom:8px;}p{color:#94A3B8;font-size:13px;line-height:1.6;max-width:320px;}" +
-                    "button{background:linear-gradient(135deg,#8B5CF6,#22D3EE);color:#fff;border:none;padding:12px 28px;border-radius:99px;font-weight:bold;margin-top:20px;font-size:14px;cursor:pointer;box-shadow:0 0 20px rgba(34,211,238,0.4);}</style></head>" +
-                    "<body><h1>PROZ MOVIE</h1><p>Connecting to streaming server... Tap below to reconnect or ensure host is online.</p>" +
+                    "h1{color:#E50914;font-size:24px;margin-bottom:8px;}p{color:#94A3B8;font-size:13px;line-height:1.6;max-width:320px;}" +
+                    "button{background:linear-gradient(135deg,#E50914,#8B5CF6);color:#fff;border:none;padding:12px 28px;border-radius:99px;font-weight:bold;margin-top:20px;font-size:14px;cursor:pointer;box-shadow:0 0 20px rgba(229,9,20,0.4);}</style></head>" +
+                    "<body><h1>PROZ ENTERTAINMENT</h1><p>Connecting to streaming server... Please ensure Wi-Fi or mobile data is enabled, then tap below.</p>" +
                     "<button onclick='location.reload()'>Reconnect</button></body></html>";
                 view.loadDataWithBaseURL(null, offlineHtml, "text/html", "UTF-8", null);
             }
         });
-    }
-
-    private boolean isRunningOnEmulator() {
-        return Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.startsWith("unknown")
-                || Build.MODEL.contains("google_sdk")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86");
     }
 
     @Override

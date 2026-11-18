@@ -3,7 +3,7 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'Copyright & DMCA Policy — PROZ MOVIE',
+  title: 'Copyright & DMCA Policy — PROZ Entertainment',
   description: 'Copyright protection, intellectual property ownership, and Digital Millennium Copyright Act compliance procedures.',
 };
 

@@ -7,6 +7,7 @@ import MyListRow from '@/components/content/MyListRow';
 import GenreGrid from '@/components/home/GenreGrid';
 import SubHeaderNav from '@/components/navigation/SubHeaderNav';
 import PopularChannelsRow from '@/components/content/PopularChannelsRow';
+import ActionButtonPair from '@/components/common/ActionButtonPair';
 import { 
   Flame, 
   TrendingUp, 
@@ -344,6 +345,9 @@ export default function HomePage() {
         badge="FOR YOU"
         icon={<Star className="w-5 h-5 text-amber-400" />}
       />
+
+      {/* Action Button Pair: [More Wonderful] and [Change] (Reference Cinema HD Feature) */}
+      <ActionButtonPair moreHref="/explore" />
 
       {/* 19. My List / Recently Watched */}
       <MyListRow />

@@ -4,12 +4,12 @@ import path from 'path';
 
 export async function GET() {
   try {
-    let apkPath = path.join(process.cwd(), 'PROZ-MOVIE-v0.01.apk');
+    let apkPath = path.join(process.cwd(), 'PROZ-ENTERTAINMENT-v0.01.apk');
     if (!fs.existsSync(apkPath)) {
-      apkPath = path.join(process.cwd(), 'public', 'PROZ-MOVIE-v0.01.apk');
+      apkPath = path.join(process.cwd(), 'public', 'download', 'PROZ-ENTERTAINMENT-v0.01.apk');
     }
     if (!fs.existsSync(apkPath)) {
-      apkPath = path.join(process.cwd(), 'PROZ-MOVIE-v1.0.0.apk');
+      apkPath = path.join(process.cwd(), 'PROZ-MOVIE-v0.01.apk');
     }
 
     if (!fs.existsSync(apkPath)) {
@@ -22,7 +22,7 @@ export async function GET() {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.android.package-archive',
-        'Content-Disposition': 'attachment; filename="PROZ-MOVIE-v0.01.apk"',
+        'Content-Disposition': 'attachment; filename="PROZ-ENTERTAINMENT-v0.01.apk"',
         'Content-Length': fileBuffer.length.toString(),
       },
     });

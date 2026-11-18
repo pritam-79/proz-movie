@@ -169,7 +169,7 @@ export default function LoginPage() {
         </button>
 
         <p className="text-center text-xs text-proz-grey pt-2">
-          New to PROZ MOVIE?{' '}
+          New to PROZ Entertainment?{' '}
           <Link href="/auth/register" className="text-proz-cyan font-semibold hover:underline">
             Create an Account
           </Link>

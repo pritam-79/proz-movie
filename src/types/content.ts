@@ -1,5 +1,5 @@
 // ============================================================================
-// PROZ MOVIE — Content Type Definitions
+// PROZ Entertainment — Content Type Definitions
 // Supports both Supabase DB records (snake_case) and legacy mock data
 // ============================================================================
 

@@ -3,8 +3,8 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'Age-Restriction & Parental Controls Policy — PROZ MOVIE',
-  description: 'Maturity ratings, parental controls PIN enforcement, and age verification standards on PROZ MOVIE.',
+  title: 'Age-Restriction & Parental Controls Policy — PROZ Entertainment',
+  description: 'Maturity ratings, parental controls PIN enforcement, and age verification standards on PROZ Entertainment.',
 };
 
 export default function AgePolicyPage() {

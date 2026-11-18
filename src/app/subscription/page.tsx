@@ -165,7 +165,7 @@ export default function SubscriptionPage() {
       {/* Title & Tagline */}
       <div className="text-center space-y-3 max-w-2xl mx-auto">
         <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-proz-purple/20 text-proz-purple border border-proz-purple/30">
-          PROZ MOVIE Subscriptions
+          PROZ Entertainment Subscriptions
         </span>
         <h1 className="text-3xl sm:text-5xl font-black text-proz-white tracking-tight">
           Choose the Perfect Entertainment Plan

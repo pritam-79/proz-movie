@@ -3,8 +3,8 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { brandConfig } from '@/config/brand.config';
 
 export const metadata = {
-  title: 'Terms of Service — PROZ MOVIE',
-  description: 'Terms and conditions governing the authorized access and use of the PROZ MOVIE streaming platform.',
+  title: 'Terms of Service — PROZ Entertainment',
+  description: 'Terms and conditions governing the authorized access and use of the PROZ Entertainment streaming platform.',
 };
 
 export default function TermsPage() {

@@ -1,5 +1,5 @@
 /**
- * PROZ MOVIE — Comprehensive TMDB Metadata Integration Client
+ * PROZ Entertainment — Comprehensive TMDB Metadata Integration Client
  * 
  * Commercial Notice & Attribution:
  * "This product uses the TMDB API but is not endorsed or certified by TMDB."
