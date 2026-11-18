@@ -11,6 +11,59 @@
         android:layout_height="match_parent"
         android:background="@color/proz_midnight" />
 
+    <!-- Native Splash / Initial Loading Container -->
+    <LinearLayout
+        android:id="@+id/splashContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/proz_midnight"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <ImageView
+            android:id="@+id/splashIcon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_launcher"
+            android:contentDescription="@string/app_name" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="PROZ ENTERTAINMENT"
+            android:textColor="#E50914"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.08" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="STREAM YOUR WORLD"
+            android:textColor="#94A3B8"
+            android:textSize="12sp"
+            android:letterSpacing="0.1" />
+
+        <ProgressBar
+            android:id="@+id/splashSpinner"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="28dp"
+            android:indeterminate="true" />
+
+        <TextView
+            android:id="@+id/splashStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Connecting to live server..."
+            android:textColor="#64748B"
+            android:textSize="12sp" />
+    </LinearLayout>
+
     <!-- Fullscreen Video Container -->
     <FrameLayout
         android:id="@+id/customViewContainer"

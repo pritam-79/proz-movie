@@ -6,6 +6,7 @@ import Navbar from '@/components/navigation/Navbar';
 import MobileBottomNav from '@/components/navigation/MobileBottomNav';
 import Footer from '@/components/navigation/Footer';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import InAppUpdater from '@/components/common/InAppUpdater';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -72,6 +73,9 @@ export default function RootLayout({
 
           {/* Mobile Bottom Navigation */}
           <MobileBottomNav />
+
+          {/* In-App Updater (Web & Android) */}
+          <InAppUpdater />
         </AuthProvider>
       </body>
     </html>

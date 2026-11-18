@@ -1,12 +1,21 @@
 package com.prozmovie.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -20,30 +29,69 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
     private WebView webView;
     private FrameLayout customViewContainer;
+    private LinearLayout splashContainer;
+    private TextView splashStatus;
+    private ProgressBar progressBar;
     private WebChromeClient.CustomViewCallback customViewCallback;
     private View customView;
-    private ProgressBar progressBar;
 
-    // Production hosted server on Vercel
-    private static final String PRODUCTION_URL = "https://proz-movie.vercel.app";
+    // Production hosted server
+    public static final String PRODUCTION_URL = "https://proz-movie.vercel.app";
+    public static final String DEFAULT_APK_URL = "https://proz-movie.vercel.app/api/download/apk";
 
-    public class WebAppInterface {
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private int mainFrameErrorCount = 0;
+    private boolean isPageLoaded = false;
+
+    public class AndroidBridge {
         @JavascriptInterface
         public void reconnect() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (webView != null) {
-                        webView.loadUrl(PRODUCTION_URL);
-                    }
-                }
-            });
+            mainHandler.post(() -> reloadProductionUrl());
+        }
+
+        @JavascriptInterface
+        public void startInAppUpdate(String apkUrl) {
+            mainHandler.post(() -> performInAppUpdate(apkUrl != null && !apkUrl.isEmpty() ? apkUrl : DEFAULT_APK_URL));
+        }
+
+        @JavascriptInterface
+        public String getAppVersion() {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return pInfo.versionName;
+            } catch (Exception e) {
+                return "0.01";
+            }
+        }
+
+        @JavascriptInterface
+        public int getVersionCode() {
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                return pInfo.versionCode;
+            } catch (Exception e) {
+                return 1;
+            }
         }
     }
 
@@ -51,7 +99,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configure Immersive Status & Nav Bars matching Liquid Glass theme
+        // Configure Immersive Status & Nav Bars
         Window window = getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -63,11 +111,24 @@ public class MainActivity extends Activity {
 
         webView = findViewById(R.id.webView);
         customViewContainer = findViewById(R.id.customViewContainer);
+        splashContainer = findViewById(R.id.splashContainer);
+        splashStatus = findViewById(R.id.splashStatus);
         progressBar = findViewById(R.id.progressBar);
 
         configureWebView();
 
-        // Load the live hosted platform
+        // Load the live platform
+        reloadProductionUrl();
+    }
+
+    private void reloadProductionUrl() {
+        if (splashContainer != null && !isPageLoaded) {
+            splashContainer.setVisibility(View.VISIBLE);
+            if (splashStatus != null) {
+                splashStatus.setText("Connecting to live streaming server...");
+            }
+        }
+        mainFrameErrorCount = 0;
         webView.loadUrl(PRODUCTION_URL);
     }
 
@@ -88,7 +149,7 @@ public class MainActivity extends Activity {
         // Hardware acceleration
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-        // Cookies management for auth & cross-origin streaming
+        // Cookies management
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -96,10 +157,10 @@ public class MainActivity extends Activity {
             cookieManager.setAcceptThirdPartyCookies(webView, true);
         }
 
-        // Bridge for native retry handling
-        webView.addJavascriptInterface(new WebAppInterface(), "AndroidHost");
+        // Bridge for native updates & reconnect
+        webView.addJavascriptInterface(new AndroidBridge(), "AndroidHost");
 
-        // Set WebChromeClient for Fullscreen Video Playback & Progress
+        // WebChromeClient
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
@@ -145,15 +206,14 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Set WebViewClient
+        // WebViewClient
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
                 if (url.startsWith("http://") || url.startsWith("https://")) {
-                    return false; // Load inside WebView
+                    return false;
                 }
-                // Handle external apps (e.g. intent:, market:, mailto:)
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
@@ -164,34 +224,66 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (url != null && url.contains("proz")) {
+                    isPageLoaded = true;
+                    if (splashContainer != null && splashContainer.getVisibility() == View.VISIBLE) {
+                        splashContainer.animate().alpha(0f).setDuration(300).withEndAction(() -> {
+                            splashContainer.setVisibility(View.GONE);
+                            splashContainer.setAlpha(1f);
+                        }).start();
+                    }
+                }
+            }
+
+            @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                // CRITICAL: Only trigger offline screen if the MAIN FRAME fails to load.
-                // Sub-resource errors (missing icons, 404 posters, blocked tracking) MUST NOT break the app.
+                // Ignore sub-resource errors (images, icons, analytics)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     if (!request.isForMainFrame()) {
                         return;
                     }
                 }
+
+                // If main frame error occurs, retry twice before showing error view
+                mainFrameErrorCount++;
+                if (mainFrameErrorCount < 3) {
+                    mainHandler.postDelayed(() -> {
+                        if (webView != null) webView.loadUrl(PRODUCTION_URL);
+                    }, 1500);
+                    return;
+                }
+
                 showOfflineScreen();
             }
 
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                // Deprecated fallback for older Android devices
                 if (failingUrl != null && (failingUrl.equals(PRODUCTION_URL) || failingUrl.equals(PRODUCTION_URL + "/"))) {
+                    mainFrameErrorCount++;
+                    if (mainFrameErrorCount < 3) {
+                        mainHandler.postDelayed(() -> {
+                            if (webView != null) webView.loadUrl(PRODUCTION_URL);
+                        }, 1500);
+                        return;
+                    }
                     showOfflineScreen();
                 }
             }
 
             @Override
             public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                // Handle mobile network ISP cert chains smoothly
                 handler.proceed();
             }
         });
     }
 
     private void showOfflineScreen() {
+        if (splashContainer != null) {
+            splashContainer.setVisibility(View.GONE);
+        }
+
         String offlineHtml = "<!DOCTYPE html><html><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
             "<style>" +
             "body{background:#080B12;color:#F8FAFC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:24px;text-align:center;box-sizing:border-box;}" +
@@ -212,7 +304,7 @@ public class MainActivity extends Activity {
             "    window.location.replace('" + PRODUCTION_URL + "');" +
             "  }" +
             "}" +
-            "setTimeout(tryReconnect, 5000);" +
+            "setTimeout(tryReconnect, 4000);" +
             "</script>" +
             "</head>" +
             "<body>" +
@@ -222,14 +314,133 @@ public class MainActivity extends Activity {
             "<button id='btn' class='btn' onclick='tryReconnect()'>Reconnect</button>" +
             "</body></html>";
 
-        // Load with PRODUCTION_URL as base so origin is legitimate
         webView.loadDataWithBaseURL(PRODUCTION_URL, offlineHtml, "text/html", "UTF-8", PRODUCTION_URL);
+    }
+
+    // ==========================================
+    // IN-APP UPDATE SYSTEM
+    // ==========================================
+    public void performInAppUpdate(String apkUrl) {
+        // Check Unknown App Sources permission on Android 8.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!getPackageManager().canRequestPackageInstalls()) {
+                new AlertDialog.Builder(this)
+                    .setTitle("Permission Required")
+                    .setMessage("To install the in-app update, please allow installation from this source in the next screen.")
+                    .setPositiveButton("Allow", (dialog, which) -> {
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+                return;
+            }
+        }
+
+        // Create sleek Progress Dialog
+        AlertDialog progressDialog = new AlertDialog.Builder(this)
+            .setTitle("Downloading Update")
+            .setMessage("Downloading PROZ Entertainment v0.01 update... 0%")
+            .setCancelable(false)
+            .create();
+
+        progressDialog.show();
+
+        executor.execute(() -> {
+            File apkFile = null;
+            try {
+                URL url = new URL(apkUrl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzEntertainmentApp/0.01");
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(30000);
+                conn.connect();
+
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_MOVED_TEMP || responseCode == HttpURLConnection.HTTP_MOVED_PERM) {
+                    String newUrl = conn.getHeaderField("Location");
+                    conn = (HttpURLConnection) new URL(newUrl).openConnection();
+                    conn.connect();
+                }
+
+                int fileLength = conn.getContentLength();
+
+                File downloadDir = getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+                if (downloadDir == null) {
+                    downloadDir = getCacheDir();
+                }
+                apkFile = new File(downloadDir, "PROZ-ENTERTAINMENT-update.apk");
+                if (apkFile.exists()) {
+                    apkFile.delete();
+                }
+
+                InputStream input = conn.getInputStream();
+                FileOutputStream output = new FileOutputStream(apkFile);
+
+                byte[] data = new byte[8192];
+                long total = 0;
+                int count;
+
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    if (fileLength > 0) {
+                        final int progress = (int) (total * 100 / fileLength);
+                        final long currentKb = total / 1024;
+                        mainHandler.post(() -> {
+                            progressDialog.setMessage("Downloading update... " + progress + "% (" + currentKb + " KB)");
+                        });
+                    }
+                    output.write(data, 0, count);
+                }
+
+                output.flush();
+                output.close();
+                input.close();
+
+                final File finalApkFile = apkFile;
+                mainHandler.post(() -> {
+                    progressDialog.dismiss();
+                    installDownloadedApk(finalApkFile);
+                });
+
+            } catch (Exception e) {
+                final String errorMsg = e.getMessage();
+                mainHandler.post(() -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(MainActivity.this, "Update download failed: " + errorMsg, Toast.LENGTH_LONG).show();
+                });
+            }
+        });
+    }
+
+    private void installDownloadedApk(File apkFile) {
+        if (apkFile == null || !apkFile.exists()) {
+            Toast.makeText(this, "Downloaded file not found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            Uri apkUri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                apkUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", apkFile);
+            } else {
+                apkUri = Uri.fromFile(apkFile);
+            }
+
+            Intent installIntent = new Intent(Intent.ACTION_VIEW);
+            installIntent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+            installIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            installIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(installIntent);
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to launch installer: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onBackPressed() {
         if (customView != null) {
-            // Exit fullscreen video
             if (customViewCallback != null) {
                 customViewCallback.onCustomViewHidden();
             }
@@ -265,6 +476,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        executor.shutdown();
         if (webView != null) {
             webView.destroy();
         }
