@@ -9,11 +9,15 @@ export const SubHeaderNav: React.FC = () => {
 
   const tabs = [
     { label: 'Recommend', href: '/' },
+    { label: 'Live TV', href: '/live', isLive: true },
     { label: 'Movies', href: '/movies' },
     { label: 'TV Shows', href: '/series' },
-    { label: '18+', href: '/restricted', isAdult: true },
     { label: 'Anime', href: '/anime' },
+    { label: 'Asian Dramas', href: '/drama' },
     { label: 'Channels', href: '/channels' },
+    { label: 'Explore', href: '/explore' },
+    { label: 'Ranking', href: '/ranking' },
+    { label: '18+', href: '/restricted', isAdult: true },
   ];
 
   return (
@@ -27,7 +31,7 @@ export const SubHeaderNav: React.FC = () => {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`relative py-1 whitespace-nowrap font-medium transition-colors ${
+                className={`relative py-1 whitespace-nowrap font-medium transition-colors flex items-center gap-1.5 ${
                   isActive
                     ? 'text-white font-bold'
                     : tab.isAdult
@@ -35,6 +39,9 @@ export const SubHeaderNav: React.FC = () => {
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
+                {tab.isLive && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
+                )}
                 <span>{tab.label}</span>
                 {tab.isAdult && (
                   <span className="ml-1 text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">

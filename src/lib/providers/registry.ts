@@ -2,19 +2,27 @@ import { BaseProviderAdapter } from './base';
 import { WatchmodeAdapter } from './watchmode';
 import { JustWatchAdapter } from './justwatch';
 import { TmdbAdapter } from './tmdb';
+import { AniListAdapter } from './anilist';
+import { TVmazeAdapter } from './tvmaze';
 import { YouTubeAdapter } from './youtube';
 import { InternetArchiveAdapter } from './archive';
-import { ProviderConfig, VideoSource, ProviderId, ChannelSyncResult } from '@/types/provider';
+import { CloudflareStreamAdapter } from './cloudflareStream';
+import { MuxAdapter } from './mux';
+import { ProviderConfig, VideoSource, ProviderId } from '@/types/provider';
 
 class ProviderRegistry {
   private adapters: Map<ProviderId, BaseProviderAdapter> = new Map();
 
   constructor() {
     this.register(new TmdbAdapter());
+    this.register(new AniListAdapter());
+    this.register(new TVmazeAdapter());
     this.register(new WatchmodeAdapter());
     this.register(new JustWatchAdapter());
     this.register(new YouTubeAdapter());
     this.register(new InternetArchiveAdapter());
+    this.register(new CloudflareStreamAdapter());
+    this.register(new MuxAdapter());
   }
 
   register(adapter: BaseProviderAdapter) {
@@ -45,7 +53,7 @@ class ProviderRegistry {
 
   /**
    * Unified multi-provider availability lookup
-   * Resolves sources across Watchmode, TMDB/JustWatch, YouTube and Internet Archive
+   * Resolves sources across Watchmode, TMDB, JustWatch, YouTube, and Internet Archive
    */
   async resolveAvailability(
     title: string, 
@@ -54,7 +62,6 @@ class ProviderRegistry {
   ): Promise<VideoSource[]> {
     const allSources: VideoSource[] = [];
 
-    // Query all capable adapters in parallel
     const tasks = this.getAll().map(async (adapter) => {
       try {
         const sources = await adapter.getAvailability(title, tmdbId, country);
@@ -71,7 +78,7 @@ class ProviderRegistry {
       }
     });
 
-    // Deduplicate sources by providerId and format
+    // Deduplicate sources
     const seen = new Set<string>();
     return allSources.filter((s) => {
       const key = `${s.providerId}-${s.format}-${s.pricingType}`;

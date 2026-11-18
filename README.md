@@ -1,222 +1,134 @@
-# PROZ MOVIE v0.01
-### YOUR WORLD. YOUR ENTERTAINMENT.
+# PROZ MOVIE v0.01 — YOUR WORLD. YOUR ENTERTAINMENT.
 
-A production-oriented, premium OTT streaming web application built with Next.js 14, TypeScript, Tailwind CSS, Supabase, and Shaka Player.
-
----
-
-## 🌐 Live
-
-- **Website:** http://localhost:3000 *(local development)*
-- **GitHub:** https://github.com/pritam-79/proz-movie
+A production-oriented, premium OTT streaming web platform inspired by Cinema v3.0.0, Netflix, and Prime Video, built with Next.js 14 App Router, TypeScript, Tailwind CSS, Shaka Player, and multi-provider automated content discovery.
 
 ---
 
-## ✅ What Is Implemented (v0.01)
+## 🌐 Live Deployments & Repository
 
-### Frontend
-- **Liquid Glass UI** — Cinematic dark theme, frosted glass cards, purple/cyan ambient lighting
-- **Responsive Navigation** — Glass navbar + mobile bottom nav + search modal (⌘K / Ctrl+K)
-- **Homepage** — 12+ content sections: hero banner, trending, Hollywood, Bollywood, Anime, K-Drama, Originals, genre grid
-- **Movies Catalogue** — Tabs: All / Hollywood / Bollywood / South Indian / Bengali / International. Filters, search, pagination.
-- **TV Series** — Dedicated series catalogue with season/episode support
-- **Anime Section** — Full anime hub: trending, dubbed, subbed, movies, seasonal categories
-- **Drama Section** — Korean, Chinese, Japanese, Thai, International dramas
-- **Content Detail Pages** — `/title/[id]`: backdrop, poster, cast, crew, seasons, episodes, similar titles, watchlist toggle, watch button
-- **Video Player** — Shaka Player with HLS/DASH, adaptive bitrate, subtitle selection, audio track selection, PiP, fullscreen, keyboard shortcuts, skip intro, next episode, progress saving
-- **Search** — Global search modal with instant results, filters, trending
-- **My List (Watchlist)** — Add/remove content, persisted in localStorage + synced to Supabase when configured
-- **Watch History** — Track & resume from last position, continue watching row
-- **User Authentication** — Login, register, forgot password (localStorage mock + Supabase when configured)
-- **Multi-Profile Support** — Manage up to 4 profiles per account
-- **18+ Restricted Zone** — Age gate (DOB verification), server-side checks, disabled until compliant
-- **Subscription Page** — Free / Basic / Standard / Premium VIP plans with toggle monthly/annual
-- **Account Settings** — Profile editing, subscription status, parental controls
-- **Admin Dashboard** — Full SPA: stats, content manager (add/edit/delete), import jobs, providers, licence manager, users, analytics
-- **Legal Pages** — Privacy Policy, Terms, Copyright, DMCA Takedown, Refund Policy, Age Policy
-- **About Page** — Brand story, values, CTA
-- **Contact Page** — Support form, FAQ
-- **System Status** — Infrastructure status page
-- **Error Pages** — 404 not-found, custom error pages
-
-### Backend API Routes
-| Route | Method | Description |
-|---|---|---|
-| `/api/content` | GET | Browse content with filters, sorting, pagination |
-| `/api/content/[id]` | GET | Full content detail with joins |
-| `/api/content/trending` | GET | Trending content |
-| `/api/content/featured` | GET | Featured/hero content |
-| `/api/seasons/[contentId]` | GET | Seasons for a series |
-| `/api/episodes/[seasonId]` | GET | Episodes for a season |
-| `/api/watchlist` | GET/POST/DELETE | Manage user watchlist |
-| `/api/history` | GET/POST/DELETE | Watch history and progress |
-| `/api/playback/authorize` | POST | Signed playback session authorization |
-| `/api/playback/progress` | POST | Save viewing progress |
-| `/api/search` | GET | Full-text search with filters |
-| `/api/age-verify` | GET/POST | Age verification |
-| `/api/subscription` | GET | User subscription status |
-| `/api/admin/stats` | GET | Dashboard stats |
-| `/api/admin/content` | GET/POST | Content management |
-| `/api/admin/content/[id]` | GET/PUT/DELETE | Single content management |
-| `/api/admin/providers` | GET/POST | Metadata provider management |
-| `/api/admin/licenses` | GET/POST/PUT | Licence management |
-| `/api/admin/import` | GET/POST | Content import jobs |
-| `/api/webhooks/payment` | POST | Payment webhook handler |
-| `/api/download/apk` | GET | APK download route |
-
-### Database
-- **26 tables** with proper FK constraints, indexes, RLS policies
-- Covers: content, seasons, episodes, genres, metadata_providers, content_sources, provider_sync_logs, content_import_jobs, licenses, video_assets, subtitles, audio_tracks, playback_sessions, watch_history, watchlist, subscriptions, payments, user_devices, age_verifications, audit_logs, trending_cache, and more
+- **Production URL:** [https://proz-movie.vercel.app](https://proz-movie.vercel.app)
+- **GitHub Repository:** [https://github.com/pritam-79/proz-movie](https://github.com/pritam-79/proz-movie)
+- **Status & Compliance Report:** [PROJECT_STATUS.md](./PROJECT_STATUS.md)
 
 ---
 
-## 🔧 Setup & Installation
+## ✨ Features & Architecture
+
+### 1. Zero Manual Uploads & Universal Provider Adapters
+Manual file and personal video uploads are completely deprecated. Catalog harvesting and playback authorization are handled dynamically through 9 standardized provider adapters:
+- **TMDB:** Movies, TV series, episodes, backdrops, cast & crew, trending and watch providers.
+- **AniList (GraphQL):** Direct, no-auth catalog integration for live trending and popular anime.
+- **TVmaze (REST):** Public television series schedule, cast, and episode guide.
+- **Internet Archive:** Authorized public domain cinema with direct playable MP4 streams.
+- **YouTube Data API v3:** Licensed documentaries, creator full movies, and official trailers.
+- **Watchmode:** Regional streaming availability and deep-linking (India region prioritized by default).
+- **JustWatch:** Enterprise partner interface specifications (no scrapers).
+- **Cloudflare Stream:** Direct tokenized HLS video delivery adapter.
+- **Mux Video:** Tokenized HLS playback adapter.
+
+### 2. Upgraded 3-Mode Video Player
+Built on top of Google's Shaka Player with automatic stream detection and responsive fallbacks:
+1. **Direct Stream (Shaka Player / HTML5 MP4):** Adaptive HLS/DASH playback for public domain and licensed streams.
+2. **YouTube Player:** Embedded playback with privacy mode enabled (`youtube-nocookie.com`).
+3. **Official Provider Streaming Hub:** Direct deep links to authorized regional streaming providers (Netflix, Prime Video, Disney+ Hotstar, JioCinema, Zee5, etc.).
+
+### 3. Complete 278-Channel Directory & Live TV Guide
+- **All Channels (`/channels`):** 3-column circular avatar grid on mobile and responsive desktop layout. Filterable by News, Sports, Entertainment, Kids, Movies, and Music.
+- **Channel Detail (`/channels/[id]`):** Verified broadcaster links, Android package launch intents, and integration status chips.
+- **Live TV (`/live`):** Live broadcaster stream player with an Electronic Program Guide (EPG) showing "Now Playing" and "Next Up".
+
+### 4. Complete Application Navigation
+- **Home (`/`):** Dynamic featured carousel, trending row, Bollywood, Hollywood, South Indian, Anime, and Dramas.
+- **Movies (`/movies`):** Dedicated movies catalog with regional and international filters.
+- **TV Series (`/series`):** Complete series catalog with season and episode selectors.
+- **Anime Hub (`/anime`):** Powered by the live AniList GraphQL API.
+- **Asian Dramas (`/drama`):** Korean, Chinese, Japanese, and Thai drama collections.
+- **Explore (`/explore`):** Dynamic multi-category browsing.
+- **Ranking (`/ranking`):** Top 10 trending and critically acclaimed leaderboard.
+- **Adult Zone (`/adult`):** Age-restricted zone protected by a legal birth-year verification gate.
+- **Automated Admin (`/admin`):** Real-time provider health dashboard, sync trigger console, and availability query tool.
+
+---
+
+## 🛠️ Getting Started
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
+- Node.js 18.x or 20.x
+- npm or pnpm
 
-### 1. Clone & Install
+### Installation
+
 ```bash
-cd d:\workspaces\proz-movie
+# Clone the repository
+git clone https://github.com/pritam-79/proz-movie.git
+cd proz-movie
+
+# Install dependencies
 npm install
 ```
 
-### 2. Configure Environment
+### Environment Configuration
+
+Copy the example environment template and populate your keys:
+
 ```bash
 cp .env.example .env.local
 ```
-Edit `.env.local` and fill in your credentials (see **Environment Variables** below).
 
-### 3. Run Development Server
-```bash
-npm run dev
+Essential variables:
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+
+# Provider Credentials
+NEXT_PUBLIC_TMDB_API_KEY=your_tmdb_api_key_v3
+WATCHMODE_API_KEY=your_watchmode_api_key
+YOUTUBE_API_KEY=your_youtube_api_key
+
+# Video Hosting Adapters
+CLOUDFLARE_STREAM_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_STREAM_API_TOKEN=your_cloudflare_stream_token
+MUX_TOKEN_ID=your_mux_token_id
+MUX_TOKEN_SECRET=your_mux_token_secret
 ```
-Open [http://localhost:3000](http://localhost:3000)
 
-### 4. Production Build
+### Running Locally
+
 ```bash
+# Start development server
+npm run dev
+
+# Run production build
 npm run build
 npm run start
 ```
 
 ---
 
-## 🌍 Environment Variables
-
-| Variable | Required | Description |
-|---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Optional | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Optional | Supabase anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Optional | Supabase service role key (server-side only) |
-| `TMDB_API_KEY` | Optional | TMDB metadata API key |
-| `JWT_PLAYBACK_SECRET` | Optional | Secret for signing playback tokens |
-| `ENABLE_RESTRICTED_ZONE` | Optional | Set `true` to enable 18+ section |
-| `PAYMENT_PROVIDER` | Optional | `stripe`, `razorpay`, or `mock` |
-| `STRIPE_SECRET_KEY` | Optional | Stripe secret key |
-| `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhook signing secret |
-
-> **The app runs fully without any environment variables** using mock data and localStorage.
-
----
-
 ## 🗄️ Database Setup (Supabase)
 
-1. Create a Supabase project at [supabase.com](https://supabase.com)
-2. Run migrations:
-   ```bash
-   # In Supabase SQL Editor, run:
-   # 1. supabase/migrations/20261113_initial_schema.sql
-   # 2. supabase/migrations/20261113_seed_plans.sql
-   ```
-3. Add your Supabase credentials to `.env.local`
+Run the consolidated PostgreSQL migration located at:
+`supabase/migrations/20261118_v001_complete_schema.sql`
+
+This creates:
+- 18 core tables (`profiles`, `titles`, `external_title_ids`, `genres`, `seasons`, `episodes`, `content_providers`, `content_rights`, `playback_assets`, `watchlist`, `watch_history`, `playback_sessions`, `subscriptions`, `sync_jobs`, etc.)
+- Full Row-Level Security (RLS) policies protecting user data and private assets
+- Automatic `updated_at` triggers and performance indices
 
 ---
 
-## 📱 Android App
+## 📜 Legal & Compliance Notice
 
-The Android Studio project is at `android/`. Open it in Android Studio to build the companion Android WebView app.
-
-```bash
-cd android
-./gradlew assembleRelease
-```
-
-APK: `android/app/build/outputs/apk/release/app-release.apk`
+PROZ MOVIE is committed to authorized and compliant media delivery:
+- No pirated third-party scrapers or unverified video hosting domains are used.
+- Metadata is attributed in compliance with TMDB, AniList, and TVmaze API terms of use.
+- Direct playback is restricted to public-domain creative commons content, official YouTube embeds, and user-configured Cloudflare/Mux video hosts.
+- Premium commercial content links to official licensed OTT destinations.
 
 ---
 
-## 📋 Pending External Configuration
+## 📄 License
 
-| Feature | What's Needed |
-|---|---|
-| **Live Content Catalogue** | Supabase DB configured + licensed content imported via admin |
-| **User Authentication** | Supabase project with Auth enabled + Google OAuth configured |
-| **Video Streaming** | Authorized video provider (Mux, Cloudflare Stream) + video assets registered in DB |
-| **Payment Processing** | Razorpay or Stripe account + webhook configured |
-| **TMDB Metadata** | TMDB API key |
-| **18+ Zone** | Age verification provider + legal compliance + admin enable |
-| **DRM** | Widevine/FairPlay licensing agreement + DRM provider |
-
----
-
-## 🏗️ Project Structure
-
-```
-proz-movie/
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── (pages)/            # All routes
-│   │   └── api/                # API routes
-│   ├── components/             # Reusable UI components
-│   │   ├── brand/              # Logo, brand assets
-│   │   ├── content/            # ContentCard, ContentRow, FilterBar, etc.
-│   │   ├── home/               # HeroBanner, GenreGrid
-│   │   ├── navigation/         # Navbar, Footer
-│   │   ├── player/             # VideoPlayer (Shaka)
-│   │   └── search/             # SearchModal
-│   ├── config/
-│   │   └── brand.config.ts     # Central brand configuration
-│   ├── context/
-│   │   └── AuthContext.tsx     # Auth state management
-│   ├── lib/
-│   │   ├── data/               # Mock content data
-│   │   ├── supabase/           # Supabase clients
-│   │   └── tmdb/               # TMDB client
-│   └── types/
-│       └── content.ts          # TypeScript interfaces
-├── supabase/
-│   └── migrations/             # DB migration files
-├── public/
-│   └── brand/                  # SVG logos
-├── android/                    # Android Studio project
-├── .env.example                # Environment template
-└── package.json
-```
-
----
-
-## 🔒 Security Notes
-
-- Video playback URLs are **never exposed client-side** without a signed session token
-- Admin routes require authentication and role verification against `admin_users` table
-- Payment status is **verified server-side** via webhook — never trusted from frontend
-- 18+ content requires **server-side age verification** — never client-only
-- All database access uses **Row Level Security** (RLS) policies
-- API secrets are **never committed to Git** — use `.env.local`
-
----
-
-## 📄 Legal
-
-PROZ MOVIE is an original platform. All content on the platform must be:
-1. Properly licensed with documented distribution rights
-2. Compliant with applicable territory laws
-3. Age-classified and access-controlled appropriately
-
-The 18+ section requires legal counsel review before enabling.
-
----
-
-*PROZ MOVIE v0.01 — YOUR WORLD. YOUR ENTERTAINMENT.*  
-*© 2026 PROZ Entertainment Technologies Inc. All rights reserved.*
+Proprietary — Developed for PROZ MOVIE OTT Platform.

@@ -118,12 +118,14 @@ export const brandConfig: BrandConfig = {
   navigation: {
     mainNav: [
       { label: "Home", href: "/" },
-      { label: "Ranking", href: "/ranking" },
-      { label: "Explore", href: "/explore" },
-      { label: "All Channels", href: "/channels" },
+      { label: "Live TV", href: "/live" },
       { label: "Movies", href: "/movies" },
       { label: "TV Shows", href: "/series" },
       { label: "Anime", href: "/anime" },
+      { label: "Asian Dramas", href: "/drama" },
+      { label: "All Channels", href: "/channels" },
+      { label: "Ranking", href: "/ranking" },
+      { label: "Explore", href: "/explore" },
       { label: "18+ Zone", href: "/restricted", badge: "18+" },
     ],
     userNav: [
