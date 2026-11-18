@@ -16,8 +16,10 @@ import {
   Check
 } from 'lucide-react';
 import { getChannelById, getAllChannels } from '@/lib/data/channelsData';
+import { resolveChannelProfile } from '@/lib/providers/channelRegistry';
 import { MOCK_CONTENT } from '@/lib/data/mockContent';
 import ContentCard from '@/components/content/ContentCard';
+import { ExternalLink, Smartphone, Globe, Search } from 'lucide-react';
 
 export default function ChannelDetailPage() {
   const params = useParams();
@@ -25,9 +27,11 @@ export default function ChannelDetailPage() {
   const channelSlug = params?.id as string;
 
   const channel = useMemo(() => {
-    return getChannelById(channelSlug);
+    const raw = getChannelById(channelSlug);
+    return raw ? resolveChannelProfile(raw) : undefined;
   }, [channelSlug]);
 
+  const [channelSearch, setChannelSearch] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'about'>('all');
   const [copied, setCopied] = useState(false);
@@ -157,15 +161,27 @@ export default function ChannelDetailPage() {
 
             {/* Titles & Meta */}
             <div>
-              <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30 uppercase tracking-wide">
                   {channel.category}
                 </span>
-                {channel.featured && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                    VERIFIED
-                  </span>
-                )}
+
+                {/* Integration Status Badge */}
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
+                  channel.integrationStatus === 'API Connected'
+                    ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                    : channel.integrationStatus === 'Official Website Available'
+                    ? 'bg-blue-500/15 text-blue-400 border-blue-500/30'
+                    : channel.integrationStatus === 'Official App Available'
+                    ? 'bg-purple-500/15 text-purple-400 border-purple-500/30'
+                    : channel.integrationStatus === 'Partner API Required'
+                    ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                    : channel.integrationStatus === 'Playback Restricted'
+                    ? 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                    : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                }`}>
+                  {channel.integrationStatus || 'Awaiting Verification'}
+                </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 {channel.name}
@@ -188,22 +204,47 @@ export default function ChannelDetailPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-center">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-center">
+            {channel.officialWebsite && (
+              <a
+                href={channel.officialWebsite}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-semibold transition-all shadow-sm"
+              >
+                <Globe className="w-3.5 h-3.5 text-rose-400" />
+                <span>Official Web</span>
+                <ExternalLink className="w-3 h-3 text-zinc-400" />
+              </a>
+            )}
+
+            {channel.officialAppUrl && (
+              <a
+                href={channel.officialAppUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-semibold transition-all shadow-sm"
+              >
+                <Smartphone className="w-3.5 h-3.5 text-purple-400" />
+                <span>Official App</span>
+              </a>
+            )}
+
             <button
               onClick={toggleFavorite}
-              className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
+              className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
                 isFavorite
                   ? 'bg-rose-600 text-white border-rose-500 shadow-[0_0_15px_rgba(225,29,72,0.4)]'
                   : 'bg-zinc-900 text-zinc-200 border-zinc-700 hover:border-zinc-500 hover:text-white'
               }`}
             >
-              <Heart className={`w-4 h-4 ${isFavorite ? 'fill-white' : ''}`} />
-              <span>{isFavorite ? 'Subscribed' : 'Subscribe Channel'}</span>
+              <Heart className={`w-3.5 h-3.5 ${isFavorite ? 'fill-white' : ''}`} />
+              <span>{isFavorite ? 'Subscribed' : 'Subscribe'}</span>
             </button>
 
             <button
               onClick={handleShare}
-              className="p-2.5 rounded-xl bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-700 transition-colors"
+              className="p-2 rounded-xl bg-zinc-900 text-zinc-300 hover:text-white border border-zinc-700 transition-colors"
               title="Share Channel"
             >
               {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}

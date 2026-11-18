@@ -1,3 +1,5 @@
+import { ChannelIntegrationStatus, PlaybackMethod } from './provider';
+
 export interface Channel {
   id: string;
   name: string;
@@ -13,6 +15,19 @@ export interface Channel {
   tags?: string[];
   featured?: boolean;
   color?: string;
+
+  // Automated Integration & Provider Discovery Fields (V3 Architecture)
+  providerId?: string;
+  officialWebsite?: string;
+  officialAppUrl?: string;
+  androidPackageName?: string;
+  iosBundleId?: string;
+  deepLinkScheme?: string;
+  country?: string;
+  integrationStatus?: ChannelIntegrationStatus;
+  syncEnabled?: boolean;
+  lastSyncedAt?: string;
+  supportedPlaybackMethods?: PlaybackMethod[];
 }
 
 export type ChannelCategoryFilter = 

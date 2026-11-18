@@ -3,6 +3,8 @@
 // Supports both Supabase DB records (snake_case) and legacy mock data
 // ============================================================================
 
+import { VideoSource } from './provider';
+
 export interface ContentItem {
   // Core identifiers
   id: string;
@@ -33,6 +35,10 @@ export interface ContentItem {
   youtubeId?: string;
   available_qualities?: string[];
   tmdb_id?: number;
+  watchmode_id?: number;
+  justwatch_id?: string;
+  video_sources?: VideoSource[];
+  videoSources?: VideoSource[];
   genres?: Array<{ id: string; name: string; slug: string }> | string[];
   tags?: string[];
   cast?: Array<{ name: string; character?: string; profile_url?: string; avatarUrl?: string }>;

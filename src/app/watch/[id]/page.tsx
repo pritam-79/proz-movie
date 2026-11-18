@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MOCK_CONTENT, getNormalizedMockContent } from '@/lib/data/mockContent';
+import { ContentItem } from '@/types/content';
 import VideoPlayer from '@/components/player/VideoPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { ShieldAlert, Lock, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react';
@@ -20,10 +21,21 @@ function WatchContent() {
   const allContent = getNormalizedMockContent();
   const content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
 
+  const [enrichedContent, setEnrichedContent] = useState<ContentItem>(content);
   const [isAuthorizing, setIsAuthorizing] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [sessionToken, setSessionToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    import('@/lib/services/discoveryService').then(({ discoveryService }) => {
+      discoveryService.enrichWithAvailability(content).then(enriched => {
+        if (active) setEnrichedContent(enriched);
+      });
+    });
+    return () => { active = false; };
+  }, [content]);
 
   useEffect(() => {
     let isMounted = true;
@@ -146,7 +158,7 @@ function WatchContent() {
 
   return (
     <VideoPlayer
-      content={content}
+      content={enrichedContent}
       episodeId={episodeId}
       sessionToken={sessionToken || undefined}
     />
