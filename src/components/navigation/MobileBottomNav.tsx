@@ -3,14 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Compass, Tv, User } from 'lucide-react';
+import { Home, Trophy, Compass, Tv, User, FolderLock } from 'lucide-react';
 
 export const MobileBottomNav: React.FC = () => {
   const pathname = usePathname();
 
   const navItems = [
     { label: 'Home', href: '/', icon: Home },
-    { label: 'Ranking', href: '/ranking', icon: Trophy },
+    { label: 'Library', href: '/library', icon: FolderLock },
     { label: 'Explore', href: '/explore', icon: Compass },
     { label: 'Channels', href: '/channels', icon: Tv },
     { label: 'Me', href: '/account', icon: User },

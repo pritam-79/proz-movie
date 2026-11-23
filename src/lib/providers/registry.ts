@@ -8,10 +8,14 @@ import { YouTubeAdapter } from './youtube';
 import { InternetArchiveAdapter } from './archive';
 import { CloudflareStreamAdapter } from './cloudflareStream';
 import { MuxAdapter } from './mux';
+import { stashAdapter, StashProviderAdapter } from './stash';
+import { legalTorrentAdapter, LegalTorrentAdapter } from './torrent';
 import { ProviderConfig, VideoSource, ProviderId } from '@/types/provider';
 
 class ProviderRegistry {
   private adapters: Map<ProviderId, BaseProviderAdapter> = new Map();
+  public readonly stash: StashProviderAdapter = stashAdapter;
+  public readonly torrent: LegalTorrentAdapter = legalTorrentAdapter;
 
   constructor() {
     this.register(new TmdbAdapter());

@@ -103,7 +103,9 @@ export const Footer: React.FC = () => {
             </span>
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-emerald-400 font-medium">All Systems Operational</span>
+              <Link href="/updates" className="text-emerald-400 font-semibold hover:underline">
+                PROZ MOVIE v0.02
+              </Link>
             </div>
           </div>
         </div>

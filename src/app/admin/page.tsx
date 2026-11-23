@@ -33,7 +33,11 @@ import {
   Smartphone,
   Eye,
   Star,
-  Film
+  Film,
+  FolderLock,
+  Radio,
+  Users,
+  HardDrive
 } from 'lucide-react';
 import { brandConfig } from '@/config/brand.config';
 import { getAllChannels } from '@/lib/data/channelsData';
@@ -46,6 +50,9 @@ type AdminSection =
   | 'dashboard'
   | 'providers'
   | 'channels'
+  | 'stash_servers'
+  | 'p2p_sources'
+  | 'users_groups'
   | 'sync'
   | 'discovery'
   | 'logs'
@@ -54,6 +61,9 @@ type AdminSection =
 const NAV_ITEMS: { id: AdminSection; label: string; Icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard Overview', Icon: LayoutDashboard },
   { id: 'providers', label: 'Provider Integrations', Icon: Server },
+  { id: 'stash_servers', label: 'Stash Servers & Vaults', Icon: FolderLock },
+  { id: 'p2p_sources', label: 'Legal P2P Sources', Icon: Radio },
+  { id: 'users_groups', label: 'Users & Permissions', Icon: Users },
   { id: 'channels', label: 'Channel Management', Icon: Tv },
   { id: 'sync', label: 'Catalog Synchronization', Icon: RefreshCw },
   { id: 'discovery', label: 'Content Discovery', Icon: Compass },
@@ -267,6 +277,9 @@ export default function AdminConsolePage() {
         <div className="p-4 sm:p-6 flex-1">
           {activeSection === 'dashboard' && <AdminDashboardOverview onNavigate={setActiveSection} />}
           {activeSection === 'providers' && <AdminProvidersManager />}
+          {activeSection === 'stash_servers' && <AdminStashServersManager />}
+          {activeSection === 'p2p_sources' && <AdminP2PManager />}
+          {activeSection === 'users_groups' && <AdminUsersGroupsManager />}
           {activeSection === 'channels' && <AdminChannelsManager />}
           {activeSection === 'sync' && <AdminSyncManager />}
           {activeSection === 'discovery' && <AdminDiscoveryManager />}
@@ -1030,6 +1043,207 @@ function AdminSettingsManager() {
         <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-400">
           <span>Security: API keys are loaded via secure server environment variables.</span>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── 8. Stash Server & Private Vault Manager (v0.02) ────────────────────────
+function AdminStashServersManager() {
+  const [servers, setServers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('/api/library/servers')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setServers(d.servers);
+      });
+  }, []);
+
+  const triggerStashSync = async (serverId: string) => {
+    setLoading(true);
+    setSyncStatus('Executing Stash GraphQL delta synchronization...');
+    try {
+      const res = await fetch('/api/library/stash/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverId, syncType: 'incremental' })
+      }).then(r => r.json());
+
+      if (res.success) {
+        setSyncStatus(`Sync finished: ${res.summary.scenesUpdated} scenes updated, ${res.summary.performersUpdated} performers updated.`);
+      }
+    } catch {
+      setSyncStatus('Synchronization failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-base font-bold text-white flex items-center gap-2">
+            <FolderLock className="w-5 h-5 text-purple-400" />
+            <span>Federated Stash Vault Servers</span>
+          </h3>
+          <p className="text-xs text-zinc-400 mt-1">
+            Manage multi-server connections to self-hosted Stash instances via official GraphQL endpoint.
+          </p>
+        </div>
+      </div>
+
+      {syncStatus && (
+        <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/30 text-xs text-purple-300 font-semibold">
+          {syncStatus}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {servers.map((srv) => (
+          <div key={srv.id} className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-bold text-white">{srv.name}</span>
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                srv.connectionStatus === 'connected' 
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-zinc-800 text-zinc-400'
+              }`}>
+                {srv.connectionStatus}
+              </span>
+            </div>
+
+            <div className="space-y-1.5 text-xs text-zinc-400">
+              <div className="flex justify-between">
+                <span>Endpoint:</span>
+                <span className="font-mono text-zinc-300">{srv.serverUrl}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Version:</span>
+                <span className="text-zinc-300">{srv.version || 'v0.27.2'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Indexed Media:</span>
+                <span className="text-purple-300 font-bold">{srv.sceneCount || 0} scenes • {srv.performerCount || 0} performers</span>
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-zinc-800 flex items-center justify-between">
+              <button
+                onClick={() => triggerStashSync(srv.id)}
+                disabled={loading}
+                className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 transition disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span>Synchronize Now</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── 9. Authorized Legal P2P & Torrent Manager (v0.02) ──────────────────────
+function AdminP2PManager() {
+  const [sources, setSources] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch('/api/library/p2p/sources')
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setSources(d.sources);
+      });
+  }, []);
+
+  return (
+    <div className="space-y-6">
+      <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800">
+        <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <Radio className="w-5 h-5 text-cyan-400" />
+          <span>Authorized Legal P2P Source Registry</span>
+        </h3>
+        <p className="text-xs text-zinc-400 mt-1">
+          Strictly allowlisted Public Domain, Creative Commons, and verified rights-holder distribution feeds. Commercial piracy scrapers are permanently prohibited.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {sources.map((src) => (
+          <div key={src.id} className="p-4 rounded-xl bg-[#0F1420] border border-zinc-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white text-sm">{src.sourceName}</span>
+                <span className="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-[10px] font-bold uppercase">
+                  {src.licenceType}
+                </span>
+              </div>
+              <p className="text-zinc-400 mt-0.5 font-mono text-[11px]">{src.sourceUrl}</p>
+              <p className="text-zinc-500 text-[10px] mt-1">Rights Holder: {src.rightsOwner} • Verification: {src.verificationStatus}</p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                src.isEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+              }`}>
+                {src.isEnabled ? 'Active & Permitted' : 'Disabled'}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── 10. Multi-User & Group Permissions Manager (v0.02) ─────────────────────
+function AdminUsersGroupsManager() {
+  const users = [
+    { id: 'u-1', name: 'Alex Vance', email: 'alex.proz@example.com', role: 'admin', group: 'Platform Administrators', canAdult: true, canDownload: true },
+    { id: 'u-2', name: 'Elena Rostova', email: 'elena@example.com', role: 'premium_user', group: 'VIP Subscribers', canAdult: true, canDownload: true },
+    { id: 'u-3', name: 'Junior User', email: 'junior@example.com', role: 'restricted_user', group: 'Parental Protected', canAdult: false, canDownload: false }
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800">
+        <h3 className="text-base font-bold text-white flex items-center gap-2">
+          <Users className="w-5 h-5 text-rose-500" />
+          <span>User Accounts & Permission Boundaries</span>
+        </h3>
+        <p className="text-xs text-zinc-400 mt-1">
+          Server-enforced permissions for library visibility, adult section entitlements, and download quotas.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        {users.map((u) => (
+          <div key={u.id} className="p-4 rounded-xl bg-[#0F1420] border border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-4 text-xs">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white text-sm">{u.name}</span>
+                <span className="text-zinc-500 font-mono">({u.email})</span>
+                <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 font-bold uppercase text-[10px]">
+                  {u.role}
+                </span>
+              </div>
+              <p className="text-zinc-400 text-[11px] mt-0.5">Assigned Group: {u.group}</p>
+            </div>
+
+            <div className="flex items-center gap-4 text-xs">
+              <span className={u.canAdult ? 'text-emerald-400 font-semibold' : 'text-zinc-500'}>
+                18+ Vault: {u.canAdult ? 'Authorized' : 'Denied'}
+              </span>
+              <span className={u.canDownload ? 'text-purple-400 font-semibold' : 'text-zinc-500'}>
+                Downloads: {u.canDownload ? 'Enabled' : 'Disabled'}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

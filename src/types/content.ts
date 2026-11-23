@@ -174,15 +174,35 @@ export interface License {
   streaming_permitted?: boolean;
 }
 
-// User profile type (for mock auth)
+// User profile type (v0.02 extended for Multi-User & Private Library)
+export type UserRoleType = 
+  | 'super_admin'
+  | 'admin'
+  | 'moderator'
+  | 'premium_user'
+  | 'standard_user'
+  | 'restricted_user'
+  | 'user'; // legacy support
+
 export interface UserProfile {
   id: string;
   email: string;
   name: string;
   avatarUrl?: string;
   is18PlusVerified: boolean;
-  role: 'user' | 'admin';
+  role: UserRoleType;
+  groupIds?: string[];
   subscription?: UserSubscription;
+  libraryPermissions?: {
+    allowedLibraries: string[];
+    allowedStudios?: string[];
+    hiddenTags?: string[];
+    canDownload: boolean;
+    canPlayAdult: boolean;
+    canSharePlaylists: boolean;
+    canUseExternalPlayer: boolean;
+    storageQuotaMb?: number;
+  };
 }
 
 export interface UserSubscription {

@@ -24,6 +24,8 @@ export type ProviderId =
   | 'shemaroo'
   | 'altbalaji'
   | 'hoichoi'
+  | 'stash'
+  | 'legal_torrent'
   | 'custom_feed';
 
 export type ProviderApiType = 

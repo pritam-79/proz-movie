@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ShieldAlert, 
@@ -15,378 +15,342 @@ import {
   Globe,
   ExternalLink,
   Tv,
-  Play
+  Play,
+  Heart,
+  Star,
+  Users,
+  Building,
+  Image as ImageIcon,
+  FolderLock,
+  Layers,
+  Filter,
+  Eye,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { MOCK_CONTENT } from '@/lib/data/mockContent';
-import ContentCard from '@/components/content/ContentCard';
+import { StashScene, StashPerformer, StashStudio, StashGallery } from '@/types/library';
 
-// Curated Top Adult Sites & Portals
-const TOP_ADULT_SITES = [
-  {
-    name: "Pornhub Official Vault",
-    tagline: "World's largest adult video streaming hub",
-    badge: "TOP TUBE",
-    category: "Full HD Tubes",
-    url: "https://www.pornhub.com",
-    img: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    name: "Xvideos Red Studio",
-    tagline: "Millions of amateur & professional adult videos",
-    badge: "GLOBAL #1",
-    category: "Free Streaming",
-    url: "https://www.xvideos.com",
-    img: "https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    name: "Brazzers Premium Hub",
-    tagline: "High-budget cinematic scenes & iconic adult stars",
-    badge: "PREMIUM STUDIO",
-    category: "4K Studios",
-    url: "https://www.brazzers.com",
-    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    name: "SpankBang 4K Ultra",
-    tagline: "Ultra HD & 4K high bitrate adult video network",
-    badge: "4K ULTRA HD",
-    category: "HD Network",
-    url: "https://spankbang.com",
-    img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    name: "Stripchat Live Network",
-    tagline: "Interactive live adult webcams & private shows",
-    badge: "LIVE CAMS",
-    category: "Live Interactive",
-    url: "https://stripchat.com",
-    img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop"
-  },
-  {
-    name: "Chaturbate Global Stream",
-    tagline: "Top-rated live amateur webcam performances",
-    badge: "COMMUNITY LIVE",
-    category: "Cam Models",
-    url: "https://chaturbate.com",
-    img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=600&auto=format&fit=crop"
-  }
-];
-
-export default function RestrictedZonePage() {
+export default function RestrictedPage() {
   const { user, verify18Plus } = useAuth();
-  const [birthDate, setBirthDate] = useState('2000-01-01');
-  const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<'all' | 'hot_web_series' | 'hentai' | '3d_adult' | 'movies' | 'sites'>('all');
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [birthYear, setBirthYear] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [activeTab, setActiveTab] = useState<'scenes' | 'performers' | 'studios' | 'galleries'>('scenes');
+  
+  // Data from Stash Vault
+  const [scenes, setScenes] = useState<StashScene[]>([]);
+  const [performers, setPerformers] = useState<StashPerformer[]>([]);
+  const [studios, setStudios] = useState<StashStudio[]>([]);
+  const [galleries, setGalleries] = useState<StashGallery[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Filter 18+ content from MOCK_CONTENT
-  const allAdultContent = MOCK_CONTENT.filter(c => c.isRestricted18Plus || c.is_adult);
+  const isUnlocked = user?.is18PlusVerified || false;
 
-  const hasGenre = (item: any, g: string) => {
-    if (!item.genres || !Array.isArray(item.genres)) return false;
-    return item.genres.some((genre: any) => {
-      const name = typeof genre === 'string' ? genre : (genre?.name || '');
-      return name.toLowerCase().includes(g.toLowerCase());
-    });
-  };
+  useEffect(() => {
+    if (isUnlocked) {
+      setIsLoading(true);
+      Promise.all([
+        fetch('/api/library/stash/scenes').then(r => r.json()),
+        fetch('/api/library/stash/performers').then(r => r.json()),
+        fetch('/api/library/stash/studios').then(r => r.json()),
+        fetch('/api/library/stash/galleries').then(r => r.json())
+      ]).then(([sRes, pRes, stdRes, gRes]) => {
+        if (sRes.success) setScenes(sRes.scenes);
+        if (pRes.success) setPerformers(pRes.performers);
+        if (stdRes.success) setStudios(stdRes.studios);
+        if (gRes.success) setGalleries(gRes.galleries);
+      }).finally(() => setIsLoading(false));
+    }
+  }, [isUnlocked]);
 
-  // Tab Filtering
-  const filteredItems = allAdultContent.filter(item => {
-    if (selectedTab === 'hot_web_series') {
-      return item.category === 'hot_web_series' || hasGenre(item, 'Hot Web Series');
-    }
-    if (selectedTab === 'hentai') {
-      return item.category === 'hentai' || hasGenre(item, 'Hentai') || hasGenre(item, 'Anime 18+');
-    }
-    if (selectedTab === '3d_adult') {
-      return item.category === '3d_adult' || hasGenre(item, '3D Adult');
-    }
-    if (selectedTab === 'movies') {
-      return (item.type === 'movie' || item.content_type === 'movie') && item.category !== '3d_adult' && item.category !== 'hentai';
-    }
-    return true;
-  });
-
-  const handleInstantConfirm = () => {
-    setIsAgeConfirmed(true);
-    if (user) {
-      verify18Plus('2000-01-01');
-    }
-    setErrorMsg(null);
-  };
-
-  const handleDateConfirm = (e: React.FormEvent) => {
+  const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!birthDate) return;
-    const birth = new Date(birthDate);
-    const now = new Date();
-    if (now.getFullYear() - birth.getFullYear() >= 18) {
-      setIsAgeConfirmed(true);
-      if (user) {
-        verify18Plus(birthDate);
-      }
-      setErrorMsg(null);
-    } else {
-      setErrorMsg('Access denied: You must be at least 18 years old.');
+    const year = parseInt(birthYear);
+    const currentYear = new Date().getFullYear();
+    if (!year || isNaN(year) || year < 1920 || year > currentYear) {
+      setErrorMsg('Please enter a valid four-digit birth year.');
+      return;
     }
-  };
+    const age = currentYear - year;
+    if (age < 18) {
+      setErrorMsg('Access denied: You must be at least 18 years of age to access this section.');
+      return;
+    }
 
-  const isUnlocked = isAgeConfirmed || user?.is18PlusVerified;
+    verify18Plus(`${birthYear}-01-01`);
+    setErrorMsg('');
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* 18+ Warning Banner */}
-      <div className="p-6 rounded-3xl bg-rose-950/30 border border-rose-500/40 shadow-glass flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-3.5 rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-400 shrink-0">
-            <ShieldAlert className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-rose-300 tracking-tight flex items-center gap-2">
-              <span>18+ Restricted Zone</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-rose-600 text-white">
-                ADULT ONLY
-              </span>
-            </h1>
-            <p className="text-xs text-rose-200/80 mt-0.5 max-w-2xl">
-              Adults-only entertainment vault featuring Hot Web Series, Hentai, 3D Adult CGI, Erotic Cinema, and Top Tube Portals. Strictly restricted to ages 18+.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-xs font-mono text-rose-300 self-start sm:self-center">
-          <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-          <span>ADULT 18+ COMPLIANCE</span>
-        </div>
-      </div>
-
-      {/* Access Gate: Age Confirmation (NO PIN REQUIRED) */}
+    <div className="min-h-screen bg-[#06080F] text-slate-100 pt-28 pb-20 px-4 md:px-8">
+      {/* ─── LOCKED STATE: STRICT AGE VERIFICATION GATE ─── */}
       {!isUnlocked ? (
-        <div className="max-w-md mx-auto my-12 p-8 rounded-3xl glass-card border border-rose-500/40 shadow-glass-lg space-y-6 text-center">
-          
-          <div className="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mx-auto">
-            <Lock className="w-8 h-8" />
+        <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl text-center">
+          <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-500 flex items-center justify-center mx-auto mb-6">
+            <ShieldAlert className="w-9 h-9" />
           </div>
 
-          <div className="space-y-1">
-            <h2 className="text-xl font-bold text-proz-white">
-              Age Confirmation
-            </h2>
-            <p className="text-xs text-proz-grey">
-              Confirm your age below to unlock the 18+ mature entertainment vault.
-            </p>
-          </div>
+          <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-[11px] font-extrabold uppercase tracking-wider">
+            Statutory Age Verification
+          </span>
 
-          {errorMsg && (
-            <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs">
-              {errorMsg}
+          <h2 className="text-2xl font-black text-white tracking-tight mt-4">
+            PROZ RESTRICTED 18+ ECOSYSTEM
+          </h2>
+
+          <p className="text-sm text-slate-400 mt-2 leading-relaxed">
+            This section contains adult media collections intended exclusively for consenting adults aged 18 and older. 
+            All content is managed through federated private Stash repositories and licensed partner feeds.
+          </p>
+
+          <div className="my-6 p-4 rounded-2xl bg-red-950/20 border border-red-500/20 text-xs text-red-300 text-left flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 flex-shrink-0 text-red-400 mt-0.5" />
+            <div>
+              <span className="font-bold">Strict Legal Notice:</span> Content involving non-consensual material, minors, or unverified origin is strictly prohibited and denied by default.
             </div>
-          )}
-
-          {/* Instant 1-Click Age Confirmation */}
-          <button
-            onClick={handleInstantConfirm}
-            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-extrabold text-sm shadow-lg transition-all flex items-center justify-center gap-2"
-          >
-            <Unlock className="w-4 h-4" />
-            <span>I Am 18 Or Older (Unlock Vault)</span>
-          </button>
-
-          <div className="relative flex py-1 items-center">
-            <div className="flex-grow border-t border-rose-500/20"></div>
-            <span className="flex-shrink mx-4 text-[10px] text-proz-grey uppercase tracking-widest">or enter birth date</span>
-            <div className="flex-grow border-t border-rose-500/20"></div>
           </div>
 
-          {/* Date of Birth Form */}
-          <form onSubmit={handleDateConfirm} className="space-y-4 text-left">
-            <div className="space-y-1">
-              <label className="text-xs font-semibold text-proz-grey">
-                Your Date of Birth
+          <form onSubmit={handleVerify} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1.5 text-left">
+                Enter Your Birth Year to Confirm Age (18+)
               </label>
-              <div className="relative">
-                <Calendar className="w-4 h-4 text-proz-grey absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="date"
-                  required
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-xs sm:text-sm text-proz-white"
-                />
-              </div>
+              <input
+                type="number"
+                placeholder="YYYY (e.g. 1998)"
+                value={birthYear}
+                onChange={e => setBirthYear(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-slate-500 text-center font-bold text-lg tracking-widest focus:outline-none focus:border-red-500"
+              />
             </div>
+
+            {errorMsg && (
+              <p className="text-xs text-red-400 font-semibold">{errorMsg}</p>
+            )}
 
             <button
               type="submit"
-              className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition-all"
+              className="w-full py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-sm shadow-xl shadow-red-600/30 transition"
             >
-              Verify Age & Unlock
+              Verify Age & Unlock Adult Ecosystem
             </button>
           </form>
 
-          <div className="pt-2 text-[11px] text-proz-grey/80">
-            By proceeding, you affirm that you are at least 18 years old and legally permitted to view mature content.
+          <div className="mt-6 text-[11px] text-slate-500">
+            By unlocking, you agree to our <Link href="/legal/age-policy" className="underline hover:text-slate-300">Age Policy</Link> and certify compliance with regional regulations.
           </div>
-
         </div>
       ) : (
-        /* Unlocked Catalogue */
-        <div className="space-y-8">
-          
-          {/* Header & Category Filter Tabs */}
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 border-b border-proz-border/40 pb-4">
+        /* ─── UNLOCKED STATE: PEEK / STASH ADULT VAULT ECOSYSTEM ─── */
+        <div className="max-w-7xl mx-auto">
+          {/* Top Banner */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-red-500/20 pb-6 mb-8">
             <div>
-              <h3 className="text-lg font-bold text-proz-white uppercase tracking-wider flex items-center gap-2">
-                <Flame className="w-5 h-5 text-rose-500" />
-                <span>18+ Adult Vault ({allAdultContent.length} Titles Available)</span>
-              </h3>
-              <p className="text-xs text-proz-grey mt-0.5">
-                Browse Hot Web Series, Hentai Anime, 3D Adult CGI, Erotic Cinema & Top Tube Portals
-              </p>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400">
+                  <Flame className="w-7 h-7" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-red-200 to-rose-400 bg-clip-text text-transparent">
+                      PROZ 18+ Private Vault
+                    </h1>
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-[10px] font-extrabold">
+                      AGE VERIFIED
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-400 mt-0.5">
+                    Private media federation inspired by Peek Stash Browser. End-to-end encrypted proxy streaming.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            {/* Category Navigation Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl glass-card border border-proz-border/50 text-[11px]">
-              <button
-                onClick={() => setSelectedTab('all')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === 'all'
-                    ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🔥 All ({allAdultContent.length})
-              </button>
-              <button
-                onClick={() => setSelectedTab('hot_web_series')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === 'hot_web_series'
-                    ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🌶️ Hot Web Series
-              </button>
-              <button
-                onClick={() => setSelectedTab('hentai')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === 'hentai'
-                    ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🌸 Hentai & 18+ Anime
-              </button>
-              <button
-                onClick={() => setSelectedTab('3d_adult')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === '3d_adult'
-                    ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🎮 3D Adult & CGI
-              </button>
-              <button
-                onClick={() => setSelectedTab('movies')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === 'movies'
-                    ? 'bg-rose-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🎬 Erotic Cinema
-              </button>
-              <button
-                onClick={() => setSelectedTab('sites')}
-                className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
-                  selectedTab === 'sites'
-                    ? 'bg-amber-600 text-white shadow-md'
-                    : 'text-proz-grey hover:text-white'
-                }`}
-              >
-                🌐 Top Adult Sites
-              </button>
+            {/* Quick Filter Tabs */}
+            <div className="flex items-center gap-2">
+              {(['scenes', 'performers', 'studios', 'galleries'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition ${
+                    activeTab === tab
+                      ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
+                      : 'bg-white/5 hover:bg-white/10 text-slate-400 border border-white/5'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Top Adult Sites & Studios Grid (When 'sites' or 'all' selected) */}
-          {(selectedTab === 'sites' || selectedTab === 'all') && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-proz-white uppercase tracking-wider flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-amber-400" />
-                  <span>Top Adult Sites & Studios</span>
-                </h4>
-                <span className="text-[10px] text-amber-400 font-mono">DIRECT STREAM PORTALS</span>
+          {/* TAB 1: SCENES */}
+          {activeTab === 'scenes' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Film className="w-4 h-4 text-red-400" />
+                  <span>Curated Scenes ({scenes.length})</span>
+                </h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {TOP_ADULT_SITES.map((site) => (
-                  <a
-                    key={site.name}
-                    href={site.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group relative p-4 rounded-2xl glass-card border border-rose-500/30 hover:border-amber-400/60 transition-all overflow-hidden flex flex-col justify-between h-36"
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {scenes.map(scene => (
+                  <div
+                    key={scene.id}
+                    className="group bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-red-500/40 rounded-2xl overflow-hidden transition shadow-xl flex flex-col"
                   >
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center opacity-20 group-hover:opacity-35 transition-opacity"
-                      style={{ backgroundImage: `url(${site.img})` }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent" />
+                    <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
+                      <img
+                        src={scene.paths.screenshot || scene.paths.webp}
+                        alt={scene.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                      
+                      {/* Rating / Badges */}
+                      <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+                        {scene.rating && (
+                          <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-amber-400 flex items-center gap-1">
+                            <Star className="w-2.5 h-2.5 fill-amber-400" /> {scene.rating}
+                          </span>
+                        )}
+                      </div>
 
-                    <div className="relative z-10 flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[9px] font-extrabold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                        {site.badge}
-                      </span>
-                      <ExternalLink className="w-4 h-4 text-proz-grey group-hover:text-amber-300 transition-colors" />
+                      {/* Play Button Link */}
+                      <Link
+                        href={`/watch/stash-${scene.id}`}
+                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-xs"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-600/50 transform group-hover:scale-110 transition">
+                          <Play className="w-5 h-5 fill-white ml-0.5" />
+                        </div>
+                      </Link>
                     </div>
 
-                    <div className="relative z-10 space-y-0.5">
-                      <h5 className="text-sm font-bold text-proz-white group-hover:text-amber-300 transition-colors">
-                        {site.name}
-                      </h5>
-                      <p className="text-[11px] text-proz-grey line-clamp-1">
-                        {site.tagline}
-                      </p>
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                          <span className="text-red-400 font-semibold">{scene.studio?.name}</span>
+                          <span>{scene.date}</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white line-clamp-1 group-hover:text-red-300 transition">
+                          {scene.title}
+                        </h4>
+                        {scene.performers && (
+                          <p className="text-xs text-slate-400 mt-1 line-clamp-1">
+                            {scene.performers.map(p => p.name).join(', ')}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5 text-xs text-slate-400">
+                        <span>{scene.playCount || 0} views</span>
+                        <div className="flex items-center gap-2">
+                          <button className="hover:text-red-400 transition" title="Favourite">
+                            <Heart className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Adult Videos & Series Grid */}
-          {selectedTab !== 'sites' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold text-proz-white uppercase tracking-wider flex items-center gap-2">
-                  <Film className="w-4 h-4 text-rose-400" />
-                  <span>
-                    {selectedTab === 'hot_web_series' && 'Hot Web Series & Provocative Sagas'}
-                    {selectedTab === 'hentai' && 'Hentai & 18+ Uncensored Anime'}
-                    {selectedTab === '3d_adult' && '3D Adult & CGI Masterworks'}
-                    {selectedTab === 'movies' && 'Erotic Cinema & Adult Thrillers'}
-                    {selectedTab === 'all' && 'All 18+ Titles'}
-                    {` (${filteredItems.length} Titles)`}
-                  </span>
-                </h4>
+          {/* TAB 2: PERFORMERS */}
+          {activeTab === 'performers' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Users className="w-4 h-4 text-red-400" />
+                  <span>Featured Performers ({performers.length})</span>
+                </h3>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-5">
-                {filteredItems.map((item) => (
-                  <ContentCard key={item.id} item={item} aspectRatio="poster" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {performers.map(perf => (
+                  <div
+                    key={perf.id}
+                    className="group bg-white/[0.03] border border-white/10 hover:border-red-500/40 rounded-2xl p-3 text-center transition"
+                  >
+                    <div className="w-24 h-24 mx-auto rounded-full overflow-hidden bg-slate-800 mb-3 border-2 border-transparent group-hover:border-red-500 transition">
+                      <img
+                        src={perf.imagePath}
+                        alt={perf.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-300"
+                      />
+                    </div>
+                    <h4 className="text-sm font-bold text-white truncate">{perf.name}</h4>
+                    <span className="text-[11px] text-red-400 font-medium">{perf.sceneCount || 0} Scenes</span>
+                  </div>
                 ))}
               </div>
             </div>
           )}
 
+          {/* TAB 3: STUDIOS */}
+          {activeTab === 'studios' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Building className="w-4 h-4 text-red-400" />
+                  <span>Authorized Studios ({studios.length})</span>
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {studios.map(studio => (
+                  <div
+                    key={studio.id}
+                    className="bg-white/[0.03] border border-white/10 hover:border-red-500/40 rounded-2xl p-5 flex items-center gap-4 transition"
+                  >
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-800 border border-white/10 flex-shrink-0">
+                      <img src={studio.imagePath} alt={studio.name} className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-white">{studio.name}</h4>
+                      <p className="text-xs text-slate-400 mt-1">High-Definition Cinematic Production</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: GALLERIES */}
+          {activeTab === 'galleries' && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <ImageIcon className="w-4 h-4 text-red-400" />
+                  <span>High-Resolution Photo Galleries ({galleries.length})</span>
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {galleries.map(gal => (
+                  <div
+                    key={gal.id}
+                    className="group bg-white/[0.03] border border-white/10 hover:border-red-500/40 rounded-2xl overflow-hidden transition"
+                  >
+                    <div className="relative aspect-video w-full bg-slate-800 overflow-hidden">
+                      <img src={gal.coverPath} alt={gal.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                      <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/60 text-[10px] font-bold text-white backdrop-blur-md">
+                        {gal.imageCount} Photos
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h4 className="text-sm font-bold text-white line-clamp-1">{gal.title}</h4>
+                      <p className="text-xs text-slate-400 mt-1">{gal.details}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
-
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MOCK_CONTENT, getNormalizedMockContent } from '@/lib/data/mockContent';
 import { ContentItem } from '@/types/content';
+import { VideoSource } from '@/types/provider';
 import VideoPlayer from '@/components/player/VideoPlayer';
 import { useAuth } from '@/context/AuthContext';
 import { ShieldAlert, Lock, ArrowLeft, RefreshCw, Sparkles } from 'lucide-react';
@@ -19,7 +20,77 @@ function WatchContent() {
   const episodeId = searchParams.get('episode') || undefined;
 
   const allContent = getNormalizedMockContent();
-  const content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
+  let content: ContentItem;
+
+  if (contentId?.startsWith('stash-')) {
+    const rawStashId = contentId.replace('stash-', '');
+    const stashSource: VideoSource = {
+      id: `src-${rawStashId}`,
+      contentId,
+      providerId: 'stash',
+      providerName: 'Stash Vault (Encrypted Proxy)',
+      sourceType: 'html5_mp4',
+      format: 'mp4',
+      playbackUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
+      officialWatchUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
+      pricingType: 'free',
+      quality: '1080p',
+      country: 'GLOBAL',
+      rightsStatus: 'authorized',
+      verificationStatus: 'verified',
+      lastChecked: new Date().toISOString()
+    };
+
+    content = {
+      id: contentId,
+      title: 'Stash Vault Private Stream',
+      slug: contentId,
+      content_type: 'movie',
+      is_adult: true,
+      age_rating: 'A 18+',
+      fallbackMp4: `/api/library/stash/proxy-stream?id=${rawStashId}`,
+      streamUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
+      description: 'Authorized private playback session served via secure Stash proxy.',
+      poster_url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop',
+      backdrop_url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop',
+      video_sources: [stashSource],
+      videoSources: [stashSource]
+    };
+  } else if (contentId?.startsWith('p2p-')) {
+    const p2pSource: VideoSource = {
+      id: `src-p2p-${contentId}`,
+      contentId,
+      providerId: 'archive_org',
+      providerName: 'Authorized Public Domain Stream',
+      sourceType: 'html5_mp4',
+      format: 'mp4',
+      playbackUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      officialWatchUrl: 'https://archive.org/details/feature_films',
+      pricingType: 'free',
+      quality: '1080p',
+      country: 'GLOBAL',
+      rightsStatus: 'public_domain',
+      verificationStatus: 'verified',
+      lastChecked: new Date().toISOString()
+    };
+
+    content = {
+      id: contentId,
+      title: 'Authorized Legal P2P Cinema',
+      slug: contentId,
+      content_type: 'movie',
+      age_rating: 'U/A 13+',
+      fallbackMp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      streamUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      description: 'Verified public-domain / Creative Commons stream distributed via authorized legal P2P.',
+      poster_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
+      backdrop_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop',
+      video_sources: [p2pSource],
+      videoSources: [p2pSource]
+    };
+  } else {
+    content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
+  }
 
   const [enrichedContent, setEnrichedContent] = useState<ContentItem>(content);
   const [isAuthorizing, setIsAuthorizing] = useState(true);

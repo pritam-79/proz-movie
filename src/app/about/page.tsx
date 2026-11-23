@@ -28,7 +28,7 @@ export default function AboutPage() {
         <div className="relative max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-sm font-medium mb-6">
             <Film className="w-4 h-4" />
-            About PROZ Entertainment
+            PROZ Entertainment v0.02
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-[#F8FAFC] mb-6 leading-tight">
             YOUR WORLD.{' '}

@@ -11,6 +11,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
     }
 
+    // Handle v0.02 Stash Private Vault & P2P Stream Authorization
+    if (contentId.startsWith('stash-')) {
+      if (!is18PlusVerified) {
+        return NextResponse.json({
+          error: 'age_verification_required',
+          message: 'Adult Zone PIN or Age Verification required to access this title.',
+          code: 'AGE_VERIFICATION_REQUIRED'
+        }, { status: 403 });
+      }
+
+      const sessionToken = `proz_stash_sess_${Date.now()}`;
+      const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+
+      return NextResponse.json({
+        session: { token: sessionToken },
+        sessionToken,
+        hlsUrl: null,
+        dashUrl: null,
+        fallbackMp4: `/api/library/stash/proxy-stream?id=${contentId.replace('stash-', '')}`,
+        drmConfig: null,
+        subtitles: [],
+        audioTracks: [],
+        expiresAt
+      });
+    }
+
+    if (contentId.startsWith('p2p-')) {
+      const sessionToken = `proz_p2p_sess_${Date.now()}`;
+      const expiresAt = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+
+      return NextResponse.json({
+        session: { token: sessionToken },
+        sessionToken,
+        hlsUrl: null,
+        dashUrl: null,
+        fallbackMp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+        drmConfig: null,
+        subtitles: [],
+        audioTracks: [],
+        expiresAt
+      });
+    }
+
     // Attempt Supabase authorization if available
     try {
       const supabase = createSupabaseServerClient();

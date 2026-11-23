@@ -14,6 +14,7 @@ export const SubHeaderNav: React.FC = () => {
     { label: 'TV Shows', href: '/series' },
     { label: 'Anime', href: '/anime' },
     { label: 'Asian Dramas', href: '/drama' },
+    { label: 'My Library', href: '/library', isVault: true },
     { label: 'Channels', href: '/channels' },
     { label: 'Explore', href: '/explore' },
     { label: 'Ranking', href: '/ranking' },
@@ -36,6 +37,8 @@ export const SubHeaderNav: React.FC = () => {
                     ? 'text-white font-bold'
                     : tab.isAdult
                     ? 'text-rose-400 hover:text-rose-300'
+                    : tab.isVault
+                    ? 'text-purple-400 hover:text-purple-300'
                     : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
