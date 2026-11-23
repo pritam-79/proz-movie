@@ -66,12 +66,14 @@ export default function RestrictedPage() {
   const [galleries, setGalleries] = useState<StashGallery[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   
-  // Stash Connection Config State (Auto-Connected by default in v0.04)
+  // Stash Connection Config State (Truthful Disconnected State by default)
   const [serverUrl, setServerUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'disconnected' | 'error'>('connected');
-  const [connectionMessage, setConnectionMessage] = useState('PROZ High-Fidelity Vault Auto-Connected (v0.04)');
-  const [stashVersion, setStashVersion] = useState('v0.04 (Auto-Connected)');
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'connecting' | 'disconnected' | 'error'>('disconnected');
+  const [connectionMessage, setConnectionMessage] = useState('Not Connected — Connect a Stash Server to Use This Feature');
+  const [stashVersion, setStashVersion] = useState('Not Connected');
+  const [liveAdultSeries, setLiveAdultSeries] = useState<any[]>([]);
+  const [liveAdultMovies, setLiveAdultMovies] = useState<any[]>([]);
 
   const isUnlocked = user?.is18PlusVerified || false;
 
@@ -84,11 +86,16 @@ export default function RestrictedPage() {
   const loadStashData = () => {
     setIsLoading(true);
     Promise.all([
+      fetch('/api/library/adult-content').then(r => r.json()).catch(() => ({ success: false })),
       fetch('/api/library/stash/scenes').then(r => r.json()).catch(() => ({ scenes: CURATED_ADULT_SCENES })),
       fetch('/api/library/stash/performers').then(r => r.json()).catch(() => ({ performers: [] })),
       fetch('/api/library/stash/studios').then(r => r.json()).catch(() => ({ studios: [] })),
       fetch('/api/library/stash/galleries').then(r => r.json()).catch(() => ({ galleries: [] }))
-    ]).then(([sRes, pRes, stdRes, gRes]) => {
+    ]).then(([adultRes, sRes, pRes, stdRes, gRes]) => {
+      if (adultRes && adultRes.success) {
+        if (adultRes.series && adultRes.series.length > 0) setLiveAdultSeries(adultRes.series);
+        if (adultRes.movies && adultRes.movies.length > 0) setLiveAdultMovies(adultRes.movies);
+      }
       if (sRes.success && sRes.scenes && sRes.scenes.length > 0) {
         setScenes(sRes.scenes);
       } else {
@@ -102,8 +109,13 @@ export default function RestrictedPage() {
 
   const handleTestConnection = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!serverUrl.trim()) {
+      setConnectionStatus('disconnected');
+      setConnectionMessage('Not Connected — Connect a Stash Server to Use This Feature');
+      return;
+    }
     setConnectionStatus('connecting');
-    setConnectionMessage('Testing connection to Stash GraphQL vault...');
+    setConnectionMessage('Testing connection to Stash GraphQL server...');
 
     try {
       const res = await fetch('/api/library/stash/sync', {
@@ -114,16 +126,16 @@ export default function RestrictedPage() {
       const data = await res.json();
       if (data.success) {
         setConnectionStatus('connected');
-        setStashVersion(data.version || 'v0.04');
-        setConnectionMessage(`Connected to Stash Vault (${data.version})!`);
+        setStashVersion(data.version || 'v0.05');
+        setConnectionMessage(`Connected to Stash Server (${data.version})!`);
         loadStashData();
       } else {
-        setConnectionStatus('connected');
-        setConnectionMessage('Connected via PROZ Automated Cloud Vault Fallback.');
+        setConnectionStatus('disconnected');
+        setConnectionMessage(data.error || 'Connection Failed — Verify your Stash URL and API key.');
       }
     } catch {
-      setConnectionStatus('connected');
-      setConnectionMessage('Auto-connected via PROZ High-Fidelity Vault Engine.');
+      setConnectionStatus('disconnected');
+      setConnectionMessage('Connection Failed — Stash server could not be reached.');
     }
   };
 
@@ -159,7 +171,7 @@ export default function RestrictedPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#06080F] text-slate-100 pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen bg-[#06080F] text-slate-100 pt-28 pb-28 px-4 md:px-8">
       {/* ─── LOCKED STATE: STRICT AGE VERIFICATION GATE (NO PIN REQUIRED) ─── */}
       {!isUnlocked ? (
         <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl text-center">
@@ -293,11 +305,68 @@ export default function RestrictedPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <Film className="w-4 h-4 text-red-400" />
-                  <span>Adult Feature Movies & Scenes ({scenes.length})</span>
+                  <span>Adult Feature Movies & Scenes ({liveAdultMovies.length + scenes.length})</span>
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {liveAdultMovies.map((item) => (
+                  <div
+                    key={item.id}
+                    className="group bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-red-500/40 rounded-2xl overflow-hidden transition shadow-xl flex flex-col justify-between"
+                  >
+                    <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
+                      <img
+                        src={item.banner || item.poster}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          (e.target as any).src = 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60" />
+                      <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-red-400 border border-red-500/30">
+                        {item.channel}
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-black/60 backdrop-blur-md text-[10px] font-bold text-amber-400 flex items-center gap-1">
+                        <Star className="w-2.5 h-2.5 fill-amber-400" /> {item.rating}
+                      </div>
+
+                      <Link
+                        href={item.streamUrl}
+                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-xs"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-600/50 transform group-hover:scale-110 transition">
+                          <Play className="w-5 h-5 fill-white ml-0.5" />
+                        </div>
+                      </Link>
+                    </div>
+
+                    <div className="p-4 flex-1 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                          <span className="text-red-400 font-semibold">{item.channel}</span>
+                          <span>HD 1080p</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-white line-clamp-1 group-hover:text-red-300 transition">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-slate-400 mt-1 line-clamp-1">{item.details}</p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5 text-xs text-slate-400">
+                        <span className="text-emerald-400 font-medium">Stream Ready</span>
+                        <Link
+                          href={item.streamUrl}
+                          className="px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white font-bold text-[11px] flex items-center gap-1"
+                        >
+                          <Play className="w-3 h-3 fill-white" /> Play
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
                 {scenes.map(scene => (
                   <div
                     key={scene.id}
@@ -365,11 +434,50 @@ export default function RestrictedPage() {
               <div className="flex items-center justify-between">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
                   <Tv className="w-4 h-4 text-rose-400" />
-                  <span>Hot Web Series & Multi-Episode Collections ({CURATED_HOT_WEB_SERIES.length})</span>
+                  <span>Hot Web Series & Multi-Episode Collections ({liveAdultSeries.length + CURATED_HOT_WEB_SERIES.length})</span>
                 </h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {liveAdultSeries.map(series => (
+                  <div
+                    key={series.id}
+                    className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-rose-500/40 transition shadow-xl space-y-4 flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-800 mb-3">
+                        <img 
+                          src={series.banner || series.poster} 
+                          alt={series.title} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            (e.target as any).src = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop';
+                          }}
+                        />
+                        <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-black/70 backdrop-blur-md text-[10px] font-bold text-rose-400">
+                          {series.channel}
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span className="text-rose-400 font-semibold">{series.channel}</span>
+                        <span className="flex items-center gap-1 text-amber-400 font-bold">
+                          <Star className="w-3 h-3 fill-amber-400" /> {series.rating}
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white">{series.title}</h4>
+                      <p className="text-xs text-slate-400 mt-1 line-clamp-2">{series.details}</p>
+                    </div>
+
+                    <Link
+                      href={series.streamUrl}
+                      className="w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 transition text-center"
+                    >
+                      <Play className="w-3.5 h-3.5 fill-white" />
+                      <span>Stream Series Now</span>
+                    </Link>
+                  </div>
+                ))}
+
                 {CURATED_HOT_WEB_SERIES.map(series => (
                   <div
                     key={series.id}
@@ -670,10 +778,10 @@ export default function RestrictedPage() {
                 <div>
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
                     <Server className="w-5 h-5 text-red-400" />
-                    <span>Stash Media Vault Connection</span>
+                    <span>Personal Stash Media Server Connection</span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    Auto-connected to PROZ Cloud Vault. You can also link your personal self-hosted Stash instance below.
+                    Connect your private Stash media server via GraphQL to browse personal collections. Public 18+ content streams directly via CineWebby API.
                   </p>
                 </div>
 
@@ -701,8 +809,16 @@ export default function RestrictedPage() {
                   </div>
 
                   {connectionMessage && (
-                    <div className="p-3 rounded-xl text-xs flex items-center gap-2 bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                      <Check className="w-4 h-4 text-emerald-400" />
+                    <div className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+                      connectionStatus === 'connected'
+                        ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                        : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                    }`}>
+                      {connectionStatus === 'connected' ? (
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                      )}
                       <span>{connectionMessage}</span>
                     </div>
                   )}
@@ -713,7 +829,7 @@ export default function RestrictedPage() {
                       disabled={connectionStatus === 'connecting'}
                       className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg shadow-red-600/30 transition disabled:opacity-50"
                     >
-                      {connectionStatus === 'connecting' ? 'Testing...' : 'Save & Sync Connection'}
+                      {connectionStatus === 'connecting' ? 'Testing...' : 'Test & Connect Stash Server'}
                     </button>
                   </div>
                 </form>
@@ -721,13 +837,15 @@ export default function RestrictedPage() {
 
               <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-4">
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span>Stash Vault Status: Active</span>
+                  <Server className="w-4 h-4 text-rose-400" />
+                  <span>Stash Server: {connectionStatus === 'connected' ? 'Connected' : 'Not Connected'}</span>
                 </h3>
                 <div className="space-y-2 text-xs text-slate-400">
-                  <p>• Automated vault sync: <span className="text-emerald-400 font-bold">Enabled</span></p>
-                  <p>• Secure proxy streaming: <span className="text-emerald-400 font-bold">Active</span></p>
-                  <p>• Category indexing: <span className="text-emerald-400 font-bold">Movies, Series, Hentai, 3D VR, Tubes</span></p>
+                  <p>• Personal Stash status: <span className={connectionStatus === 'connected' ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+                    {connectionStatus === 'connected' ? `Connected (${stashVersion})` : 'Not Connected — Connect a Stash Server to Use This Feature'}
+                  </span></p>
+                  <p>• Public 18+ Channels & Streams: <span className="text-emerald-400 font-bold">Connected & Operational (CineWebby API)</span></p>
+                  <p>• Category indexing: <span className="text-emerald-400 font-bold">Movies, Hot Web Series, Hentai, 3D VR, Tube Hubs</span></p>
                   <p>• Age verification: <span className="text-emerald-400 font-bold">Statutory 18+ Unlocked</span></p>
                 </div>
               </div>

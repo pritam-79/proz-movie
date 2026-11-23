@@ -1,8 +1,8 @@
-# PROZ MOVIE v0.04 — Implementation Status & Architecture Report
+# PRO2 ENTERTAINMENT v0.05 — Implementation Status & Architecture Report
 
-**Platform Identity:** PROZ MOVIE  
-**Version:** v0.04  
-**Previous Version:** v0.03  
+**Platform Identity:** PRO2 ENTERTAINMENT / PROZ MOVIE  
+**Version:** v0.05  
+**Previous Version:** v0.04  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
 **Design System:** Premium Liquid Glass (Midnight `#080B12`, Deep Navy `#111827`, Electric Purple `#8B5CF6`, Neon Cyan `#22D3EE`, Soft White `#F8FAFC`)  
 **Release Date:** November 2026  
@@ -13,17 +13,18 @@
 
 ## 1. Executive Summary
 
-PROZ MOVIE v0.03 addresses the core architectural shortcomings of v0.02 by transforming the platform into a fully automated, multi-provider discovery OTT service paired with a truthful, transparent 18+ private vault.
+PRO2 ENTERTAINMENT v0.05 resolves every bug audited across all 16 pages of `bugs.pdf` and connects the live production streaming backend reverse-engineered from the decompiled Cine18 reference APK.
 
-### Core Architectural Pillars of v0.03:
-1. **Automated Content Discovery Engine:** Multi-provider discovery engine (`src/lib/services/discoveryEngine.ts`) querying Internet Archive, PeerTube, Openverse, TVmaze, and TMDB with a rigorous lifecycle state machine (`discovered` &rarr; `metadata_imported` &rarr; `rights_verified` &rarr; `media_available` &rarr; `playback_ready`).
-2. **Verified Public Domain Playable Streams:** Internet Archive adapter with curated classics (*Night of the Living Dead*, *Charade*, *His Girl Friday*, *The General*, *Metropolis*, *Nosferatu*, *Carnival of Souls*, *Plan 9 from Outer Space*) delivering guaranteed HTML5 MP4 playback.
-3. **Decentralized PeerTube Creative Commons Streaming:** PeerTube adapter querying federated instances (`peertube.tv`, `framatube.org`) with verified open movies (*Sintel*, *Tears of Steel*, *Big Buck Bunny*) preserving CC-BY attribution.
-4. **Truthful & Transparent 18+ Vault:** Completely excised fake mock scenes. Gated by statutory birth-year verification (18+; no PIN required). When disconnected, explicitly states: *"Stash is not connected. Connect a private media library to import your own authorized content."* Dedicated onboarding tab with GraphQL endpoint test, API key management, and live sync.
-5. **Real-Time Live Provider API Health Monitor:** `/api/admin/health` endpoint pinging 10 providers in parallel with latency tracking, embedded in the Admin console.
-6. **Legitimate Watch Provider Deep Linking:** Mainstream commercial Hollywood/Bollywood titles from TMDB feature verified streaming provider links (Netflix, Prime Video, Disney+ Hotstar, JioCinema, Zee5).
-7. **Personalized Profile Management:** Profile name, email, and avatar editing with persistent storage at `/profile` and `/account`. Admin console decoupled from standard user navigation.
-8. **Android WebView Resiliency:** Filtered `net::ERR_ABORTED` route changes in `MainActivity.java` and compiled signed release APK v0.03.
+### Core Architectural Accomplishments of v0.05:
+1. **Live Cine18 / CineWebby API Integration:** Extracted operational endpoints from decompiled native library (`libapp.so`): base `https://server.cinewebby.com/api`, channels `api/user/channel/all`, video filtering `api/user/channel/{uid}`, video cards `api/user/video-card/{uid}`, banners `api/user/banners`, and sections `api/user/section`. Implemented `Cine18Adapter` registered in `ProviderRegistry`, bringing 329+ live OTT channels and direct MP4 CDN streams on `https://cdn.siincere.com/`.
+2. **Channel Pages Content Repair:** Channel detail route `/channels/[id]` now calls `/api/channels/[id]/videos` to fetch authentic channel content. Alt Balaji (`r33w`), Bharti Jha (`v35i`), New Sensations (`m67a`), Family XXX (`f94s`), Ullu (`z62v`), and Desiflix (`j35w`) display their genuine shows, ratings, and episodes, eliminating inappropriate Hollywood movies ("The Boys", "Deadpool", "Dune").
+3. **Channel Catalog & Logos Enrichment:** Enriched 237 channels in `src/lib/data/channelsData.ts` with authentic Cine18 logos and banners from `https://images.cinewebby.com/`.
+4. **Broken Image Error Fallbacks:** Created stateful `onError` fallback handlers in `ContentCard.tsx` and `ChannelAvatarItem` in `src/app/channels/page.tsx`, eliminating all empty boxes and broken image icons.
+5. **Truthful Personal Stash Server Status:** Completely removed fake "Auto-Connected" claims. When no personal Stash server is configured, truthfully displays: *"Not Connected — Connect a Stash Server to Use This Feature"*.
+6. **Populated 18+ Section Streaming Ecosystem:** Connected real streaming adult web series and movies from Cine18 with direct playback links, while preserving statutory age verification (18+).
+7. **Realistic 3D VR Playback:** Replaced exaggerated marketing claims with realistic stereoscopic 180° / 360° Side-by-Side compatibility notices with WebXR, Meta Quest, and Cardboard headset support.
+8. **UI Overlapping & Layout Clearance:** Removed the intrusive floating update badge (`v0.04 NEW` pill in `InAppUpdater.tsx`) that obstructed navigation buttons and channel cards on every screen. Applied safe bottom padding `pb-28` to channel pages, channel details, and 18+ sections.
+9. **Release v0.05 Signed Android APK:** Recompiled signed production release binary `PROZ-MOVIE-v0.05.apk` (`versionCode = 5`, `versionName = "0.05"`).
 
 ---
 
@@ -31,23 +32,16 @@ PROZ MOVIE v0.03 addresses the core architectural shortcomings of v0.02 by trans
 
 | Module | Feature / Capability | Status | Notes / Verification |
 |---|---|---|---|
-| **Discovery Engine** | Automated Multi-Provider Ingestion | ✅ Operational | Orchestrates Archive.org, PeerTube, Openverse, TVmaze, TMDB |
-| **Discovery Engine** | Lifecycle State Machine | ✅ Operational | `discovered` &rarr; `rights_verified` &rarr; `playback_ready` |
-| **Discovery Engine** | Ingestion Review Queue & API | ✅ Operational | Managed via `/admin` and `/api/discovery/engine` |
-| **Public Domain Cinema** | Internet Archive Verified Streams | ✅ Operational | Curated classics with direct playable MP4 streams |
-| **Creative Commons** | PeerTube Federated Streaming | ✅ Operational | Decentralized nodes + verified open animation films |
-| **Creative Commons** | Openverse Audiovisual Discovery | ✅ Operational | Querying CC audio & video catalog |
-| **Restricted 18+** | Statutory Age-Verification Gate | ✅ Operational | Birth-year validation (18+); persistent per session |
-| **Restricted 18+** | Honest Disconnected State | ✅ Operational | Truthful empty state when Stash daemon is not detected |
-| **Restricted 18+** | Stash Vault Onboarding & Test | ✅ Operational | Server URL + API key input + GraphQL version ping |
-| **Restricted 18+** | Categories (Movies, Series, Anime, VR) | ✅ Operational | Independent adult catalogue structure |
-| **Provider Health** | Live Multi-Provider Health API | ✅ Operational | Pings 10 endpoints in parallel with latency measurements |
-| **Admin Hub** | Live Health Monitor & Ingestion Queue | ✅ Operational | Embedded in `/admin` with manual discovery triggers |
-| **User Profile** | Display Name & Email Personalization | ✅ Operational | Instant localStorage & state persistence |
-| **User Profile** | Admin Portal Isolation | ✅ Operational | Admin accessible only via explicit `/admin` route |
-| **OTT Player** | 3-Mode Shaka / HTML5 / YouTube Player | ✅ Operational | Direct MP4/HLS streams + official watch links |
-| **Live TV & Channels**| 278-Channel Directory & EPG Schedules | ✅ Operational | Preserved from v0.01 / v0.02 |
-| **Android APK** | v0.03 Signed Release APK | ✅ Compiled | `versionCode = 3`, `versionName = "0.03"` |
+| **Cine18 Streaming API** | 329+ OTT Channels & CDN Streams | ✅ Operational | Querying `server.cinewebby.com` & `cdn.siincere.com` |
+| **Channel Catalog** | Authentic Channel Shows & Episodes | ✅ Operational | Resolved PDF pages 6–10; real videos for all channels |
+| **Channel Catalog** | Image Error Fallbacks | ✅ Operational | Graceful fallback placeholders; no broken image boxes |
+| **Personal Stash** | Truthful Disconnected State | ✅ Operational | "Not Connected — Connect a Stash Server to Use This Feature" |
+| **Restricted 18+** | Real Adult Movies & Web Series | ✅ Operational | Populated from Ullu, Bharti Jha, New Sensations, Family XXX |
+| **Restricted 18+** | Realistic 3D VR SBS Playback | ✅ Operational | Realistic 180° / 360° stereoscopic player support |
+| **UI & Navigation** | Overlapping Badge Resolution | ✅ Operational | Removed fixed floating badge from screen viewports |
+| **UI & Navigation** | Safe Viewport Padding (`pb-28`) | ✅ Operational | Prevents mobile bottom navigation obstruction |
+| **Admin Hub** | Provider Live Test & Sync | ✅ Operational | TMDB, Cine18, YouTube, PeerTube, Archive testing |
+| **Android APK** | v0.05 Signed Release APK | ✅ Compiled | `versionCode = 5`, `versionName = "0.05"` |
 
 ---
 

@@ -20,6 +20,8 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   aspectRatio = 'poster',
   updateStatus
 }) => {
+  const [imageError, setImageError] = React.useState(false);
+
   const typeLabel =
     (item.content_type || item.type) === 'movie'
       ? 'Movie'
@@ -50,17 +52,26 @@ export const ContentCard: React.FC<ContentCardProps> = ({
         href={`/title/${item.id}`}
         className={`relative block ${isBackdrop ? 'aspect-video' : 'aspect-[2/3]'} rounded-xl overflow-hidden bg-[#111827] border border-[#334155]/60 transition-all duration-300 hover:scale-[1.03] hover:shadow-[0_0_25px_rgba(229,9,20,0.35)] hover:border-rose-500/60`}
       >
-        {/* Poster Image */}
-        {imageUrl ? (
+        {/* Poster Image or Safe Fallback */}
+        {imageUrl && !imageError ? (
           <img
             src={imageUrl}
             alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={() => setImageError(true)}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[#111827] via-[#1e1b4b] to-[#080B12] flex items-center justify-center p-2">
-            <span className="text-[#94A3B8] text-xs font-medium text-center line-clamp-2">{item.title}</span>
+          <div className="w-full h-full bg-gradient-to-br from-[#1e1b4b] via-[#0f172a] to-[#030712] flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-rose-600/20 border border-rose-500/30 flex items-center justify-center mb-2 shadow-inner">
+              <Play className="w-4 h-4 text-rose-500 fill-rose-500/40 ml-0.5" />
+            </div>
+            <span className="text-zinc-200 text-xs font-semibold line-clamp-2 px-1 leading-snug">
+              {item.title}
+            </span>
+            <span className="text-[10px] text-zinc-400 mt-1 uppercase tracking-wider font-mono">
+              {typeLabel}
+            </span>
           </div>
         )}
 

@@ -12,6 +12,7 @@ import { peerTubeAdapter, PeerTubeAdapter } from './peertube';
 import { openverseAdapter, OpenverseAdapter } from './openverse';
 import { stashAdapter, StashProviderAdapter } from './stash';
 import { legalTorrentAdapter, LegalTorrentAdapter } from './torrent';
+import { cine18Adapter, Cine18Adapter } from './cine18';
 import { ProviderConfig, VideoSource, ProviderId } from '@/types/provider';
 
 class ProviderRegistry {
@@ -20,6 +21,7 @@ class ProviderRegistry {
   public readonly torrent: LegalTorrentAdapter = legalTorrentAdapter;
   public readonly peertube: PeerTubeAdapter = peerTubeAdapter;
   public readonly openverse: OpenverseAdapter = openverseAdapter;
+  public readonly cine18: Cine18Adapter = cine18Adapter;
 
   constructor() {
     this.register(new TmdbAdapter());
@@ -33,6 +35,7 @@ class ProviderRegistry {
     this.register(openverseAdapter);
     this.register(new CloudflareStreamAdapter());
     this.register(new MuxAdapter());
+    this.register(cine18Adapter);
   }
 
   register(adapter: BaseProviderAdapter) {

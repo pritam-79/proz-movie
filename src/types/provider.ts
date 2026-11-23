@@ -27,6 +27,7 @@ export type ProviderId =
   | 'stash'
   | 'peertube'
   | 'openverse'
+  | 'cine18'
   | 'legal_torrent'
   | 'custom_feed';
 

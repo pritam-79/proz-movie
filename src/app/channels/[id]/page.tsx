@@ -20,6 +20,7 @@ import { resolveChannelProfile } from '@/lib/providers/channelRegistry';
 import { MOCK_CONTENT } from '@/lib/data/mockContent';
 import ContentCard from '@/components/content/ContentCard';
 import { ExternalLink, Smartphone, Globe, Search } from 'lucide-react';
+import { ContentItem } from '@/types/content';
 
 export default function ChannelDetailPage() {
   const params = useParams();
@@ -35,6 +36,34 @@ export default function ChannelDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'about'>('all');
   const [copied, setCopied] = useState(false);
+  const [apiVideos, setApiVideos] = useState<ContentItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [logoError, setLogoError] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    setIsLoading(true);
+    fetch(`/api/channels/${encodeURIComponent(channelSlug)}/videos`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!mounted) return;
+        if (data.videos && Array.isArray(data.videos) && data.videos.length > 0) {
+          setApiVideos(data.videos);
+        } else {
+          setApiVideos([]);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load channel videos:', err);
+      })
+      .finally(() => {
+        if (mounted) setIsLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, [channelSlug]);
 
   useEffect(() => {
     if (!channel) return;
@@ -75,20 +104,17 @@ export default function ChannelDetailPage() {
     }
   };
 
-  // Associated content from MOCK_CONTENT
+  // Associated content from live Cine18 / provider discovery
   const channelContent = useMemo(() => {
-    if (!channel) return [];
-    // Match based on category or distribute deterministically
-    const filtered = MOCK_CONTENT.filter((item) => {
-      if (channel.category === '18+ Exclusive') return item.isRestricted18Plus;
-      if (channel.category === 'Drama') return item.type === 'drama' || item.category === 'drama';
-      if (channel.category === 'Comedy') return (item.genres as string[])?.includes('Comedy');
-      if (channel.category === 'Regional') return item.category === 'south' || item.category === 'bollywood';
-      return !item.isRestricted18Plus;
-    });
-
-    return filtered.length > 0 ? filtered.slice(0, 18) : MOCK_CONTENT.slice(0, 12);
-  }, [channel]);
+    if (apiVideos.length > 0) {
+      if (channelSearch.trim()) {
+        const q = channelSearch.toLowerCase();
+        return apiVideos.filter((v) => v.title.toLowerCase().includes(q));
+      }
+      return apiVideos;
+    }
+    return [];
+  }, [apiVideos, channelSearch]);
 
   if (!channel) {
     return (
@@ -116,7 +142,7 @@ export default function ChannelDetailPage() {
     .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#07090E] text-zinc-100 pb-16">
+    <div className="min-h-screen bg-[#07090E] text-zinc-100 pb-28">
       
       {/* Top Banner Artwork */}
       <div className="relative w-full h-48 sm:h-64 lg:h-72 overflow-hidden bg-zinc-900">
@@ -146,17 +172,26 @@ export default function ChannelDetailPage() {
           <div className="flex flex-col sm:flex-row items-center sm:items-end gap-4 text-center sm:text-left">
             
             {/* Big Circular Avatar matching screenshot style */}
-            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-b from-zinc-700 via-zinc-800 to-zinc-950 border-2 border-zinc-700 shadow-2xl shrink-0">
-              <div 
-                className="w-full h-full rounded-full flex items-center justify-center shadow-inner"
-                style={{
-                  background: `radial-gradient(circle at 30% 30%, ${channel.color || '#991B1B'}ee, #0B0E14 85%)`
-                }}
-              >
-                <span className="font-extrabold text-white text-2xl sm:text-3xl tracking-wider select-none drop-shadow-md">
-                  {initials}
-                </span>
-              </div>
+            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-b from-zinc-700 via-zinc-800 to-zinc-950 border-2 border-zinc-700 shadow-2xl shrink-0 overflow-hidden">
+              {channel.logo && !logoError ? (
+                <img
+                  src={channel.logo}
+                  alt={channel.name}
+                  className="w-full h-full rounded-full object-cover"
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <div 
+                  className="w-full h-full rounded-full flex items-center justify-center shadow-inner"
+                  style={{
+                    background: `radial-gradient(circle at 30% 30%, ${channel.color || '#991B1B'}ee, #0B0E14 85%)`
+                  }}
+                >
+                  <span className="font-extrabold text-white text-2xl sm:text-3xl tracking-wider select-none drop-shadow-md">
+                    {initials}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Titles & Meta */}
@@ -318,6 +353,20 @@ export default function ChannelDetailPage() {
                   <span className="text-rose-400 font-semibold">4K UHD & 1080p FHD</span>
                 </div>
               </div>
+            </div>
+          ) : isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="aspect-[2/3] rounded-xl bg-zinc-900/60 border border-zinc-800 animate-pulse" />
+              ))}
+            </div>
+          ) : channelContent.length === 0 ? (
+            <div className="py-16 text-center bg-[#10141D]/50 border border-zinc-800/80 rounded-2xl p-8">
+              <Tv className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
+              <h3 className="text-base font-semibold text-white mb-1">Catalog Synchronizing</h3>
+              <p className="text-xs text-zinc-400 max-w-sm mx-auto">
+                Episodes and playable streams for {channel.name} are currently being indexed by our discovery engine.
+              </p>
             </div>
           ) : (
             <div>

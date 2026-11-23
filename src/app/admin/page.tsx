@@ -505,7 +505,30 @@ function AdminProvidersManager() {
         body: JSON.stringify({ action: 'test', providerId })
       });
       const data = await res.json();
-      setTestResults(prev => ({ ...prev, [providerId]: data.result }));
+      if (providerId === 'all' && data.results) {
+        setTestResults(data.results);
+        setProviders(prev => prev.map(p => {
+          const resItem = data.results[p.id];
+          if (!resItem) return p;
+          return {
+            ...p,
+            connectionStatus: resItem.success ? 'connected' : (p.authenticationType === 'api_key' ? 'pending' : 'error')
+          };
+        }));
+      } else {
+        setTestResults(prev => ({ ...prev, [providerId]: data.result }));
+        if (data.result) {
+          setProviders(prev => prev.map(p => {
+            if (p.id === providerId) {
+              return {
+                ...p,
+                connectionStatus: data.result.success ? 'connected' : (p.authenticationType === 'api_key' ? 'pending' : 'error')
+              };
+            }
+            return p;
+          }));
+        }
+      }
     } catch (err: any) {
       setTestResults(prev => ({ ...prev, [providerId]: { success: false, message: err.message } }));
     } finally {

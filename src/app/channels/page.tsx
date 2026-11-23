@@ -30,6 +30,38 @@ const CATEGORIES = [
   'International'
 ];
 
+function ChannelAvatarItem({ channel, initials }: { channel: Channel; initials: string }) {
+  const [imgErr, setImgErr] = useState(false);
+
+  return (
+    <div 
+      className="w-full h-full rounded-full overflow-hidden flex items-center justify-center relative shadow-inner"
+      style={{
+        background: `radial-gradient(circle at 30% 30%, ${channel.color || '#991B1B'}dd, #0B0E14 85%)`
+      }}
+    >
+      {channel.logo && !imgErr ? (
+        <img
+          src={channel.logo}
+          alt={channel.name}
+          className="w-full h-full object-cover rounded-full"
+          loading="lazy"
+          onError={() => setImgErr(true)}
+        />
+      ) : (
+        <span className="font-extrabold text-white text-base sm:text-lg tracking-wider drop-shadow-md select-none">
+          {initials}
+        </span>
+      )}
+
+      {/* Subtle channel badge overlay */}
+      {channel.featured && (
+        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#0B0E14]" />
+      )}
+    </div>
+  );
+}
+
 export default function ChannelsPage() {
   const allChannels = useMemo(() => getAllChannels(), []);
   
@@ -121,7 +153,7 @@ export default function ChannelsPage() {
       <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-rose-950/40 via-red-950/10 to-transparent pointer-events-none -z-10" />
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 pb-28">
         
         {/* Header & Title */}
         <div className="mb-4">
@@ -241,24 +273,7 @@ export default function ChannelsPage() {
                 >
                   {/* Circular Avatar Container */}
                   <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full p-1 bg-gradient-to-b from-zinc-700/40 via-zinc-800/20 to-zinc-900 border border-zinc-800 group-hover:border-rose-500/80 transition-all duration-300 shadow-lg group-hover:shadow-[0_0_15px_rgba(225,29,72,0.3)]">
-                    
-                    {/* Circle Inner with stylized gradient or image */}
-                    <div 
-                      className="w-full h-full rounded-full overflow-hidden flex items-center justify-center relative shadow-inner"
-                      style={{
-                        background: `radial-gradient(circle at 30% 30%, ${channel.color || '#991B1B'}dd, #0B0E14 85%)`
-                      }}
-                    >
-                      {/* Stylized Branding Text / Initials in circle */}
-                      <span className="font-extrabold text-white text-base sm:text-lg tracking-wider drop-shadow-md select-none">
-                        {initials}
-                      </span>
-
-                      {/* Subtle channel badge overlay */}
-                      {channel.featured && (
-                        <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-[#0B0E14]" />
-                      )}
-                    </div>
+                    <ChannelAvatarItem channel={channel} initials={initials} />
 
                     {/* Quick favorite heart button */}
                     <button

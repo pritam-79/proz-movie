@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getNormalizedMockContent } from '@/lib/data/mockContent';
+import { cine18Adapter } from '@/lib/providers/cine18';
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,6 +10,33 @@ export async function POST(req: NextRequest) {
 
     if (!contentId) {
       return NextResponse.json({ error: 'contentId is required' }, { status: 400 });
+    }
+
+    // Handle Cine18 direct streaming playback
+    if (contentId.startsWith('cine18-')) {
+      const cleanUid = contentId.replace('cine18-', '');
+      const details = await cine18Adapter.getVideoDetails(cleanUid);
+      let streamUrl = details?.videos?.[0]?.video_link || '';
+      
+      if (episodeId && details?.videos) {
+        const found = details.videos.find((v: any) => v.uid === episodeId);
+        if (found) streamUrl = found.video_link;
+      }
+
+      const sessionToken = `proz_cine18_sess_${Date.now()}`;
+      const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
+
+      return NextResponse.json({
+        session: { token: sessionToken },
+        sessionToken,
+        hlsUrl: null,
+        dashUrl: null,
+        fallbackMp4: streamUrl,
+        drmConfig: null,
+        subtitles: [],
+        audioTracks: [],
+        expiresAt
+      });
     }
 
     // Handle v0.02 Stash Private Vault & P2P Stream Authorization

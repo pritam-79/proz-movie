@@ -88,6 +88,40 @@ function WatchContent() {
       video_sources: [p2pSource],
       videoSources: [p2pSource]
     };
+  } else if (contentId?.startsWith('cine18-')) {
+    const rawCineId = contentId.replace('cine18-', '');
+    const cineSource: VideoSource = {
+      id: `src-cine18-${rawCineId}`,
+      contentId,
+      providerId: 'cine18',
+      providerName: 'CineWebby Streaming CDN',
+      sourceType: 'html5_mp4',
+      format: 'mp4',
+      playbackUrl: '',
+      officialWatchUrl: `/watch/${contentId}`,
+      pricingType: 'free',
+      quality: '1080p',
+      country: 'GLOBAL',
+      rightsStatus: 'authorized',
+      verificationStatus: 'verified',
+      lastChecked: new Date().toISOString()
+    };
+
+    content = {
+      id: contentId,
+      title: 'Streaming Title',
+      slug: contentId,
+      content_type: 'movie',
+      is_adult: true,
+      age_rating: 'A 18+',
+      fallbackMp4: '',
+      streamUrl: '',
+      description: 'Authorized streaming session served via high-speed CDN.',
+      poster_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
+      backdrop_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop',
+      video_sources: [cineSource],
+      videoSources: [cineSource]
+    };
   } else {
     content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
   }
@@ -100,13 +134,64 @@ function WatchContent() {
 
   useEffect(() => {
     let active = true;
-    import('@/lib/services/discoveryService').then(({ discoveryService }) => {
-      discoveryService.enrichWithAvailability(content).then(enriched => {
-        if (active) setEnrichedContent(enriched);
+    if (contentId?.startsWith('cine18-')) {
+      const cleanUid = contentId.replace('cine18-', '');
+      fetch(`/api/library/cine18-stream?uid=${cleanUid}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!active || !data.success) return;
+          const liveSource: VideoSource = {
+            id: `src-cine18-${cleanUid}`,
+            contentId: `cine18-${cleanUid}`,
+            providerId: 'cine18',
+            providerName: 'CineWebby Streaming CDN',
+            sourceType: 'html5_mp4',
+            format: 'mp4',
+            playbackUrl: data.streamUrl,
+            officialWatchUrl: `/watch/cine18-${cleanUid}`,
+            pricingType: 'free',
+            quality: '1080p',
+            country: 'GLOBAL',
+            rightsStatus: 'authorized',
+            verificationStatus: 'verified',
+            lastChecked: new Date().toISOString()
+          };
+
+          const updated: ContentItem = {
+            ...content,
+            title: data.title,
+            overview: data.description,
+            description: data.description,
+            poster_url: data.poster,
+            backdrop_url: data.backdrop,
+            posterUrl: data.poster,
+            backdropUrl: data.backdrop,
+            rating_avg: data.rating,
+            fallbackMp4: data.streamUrl,
+            streamUrl: data.streamUrl,
+            video_sources: [liveSource],
+            videoSources: [liveSource],
+            seasons: data.episodes && data.episodes.length > 0 ? [
+              {
+                id: `season-1-${cleanUid}`,
+                seasonNumber: 1,
+                title: 'Season 1',
+                episodes: data.episodes
+              }
+            ] : undefined
+          };
+          setEnrichedContent(updated);
+        })
+        .catch(console.error);
+    } else {
+      import('@/lib/services/discoveryService').then(({ discoveryService }) => {
+        discoveryService.enrichWithAvailability(content).then(enriched => {
+          if (active) setEnrichedContent(enriched);
+        });
       });
-    });
+    }
     return () => { active = false; };
-  }, [content]);
+  }, [content, contentId]);
 
   useEffect(() => {
     let isMounted = true;

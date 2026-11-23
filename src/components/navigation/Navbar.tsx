@@ -317,7 +317,7 @@ export const Navbar: React.FC = () => {
                 className="w-full text-center py-2.5 rounded-xl text-xs font-bold bg-purple-600/20 text-purple-300 border border-purple-500/30 flex items-center justify-center gap-1.5"
               >
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Check for Updates (v0.02)</span>
+                <span>Check for Updates ({brandConfig.version})</span>
               </button>
             </div>
           </div>

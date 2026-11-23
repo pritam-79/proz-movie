@@ -15,24 +15,26 @@ import {
   MediaBrowsingFilters 
 } from '@/types/library';
 
-// In-memory server registry auto-connected by default
-export const DEFAULT_STASH_SERVERS: StashServerConfig[] = [
-  {
-    id: 'stash-srv-primary',
-    name: 'PROZ Cloud Vault (Auto-Connected)',
-    serverUrl: process.env.STASH_SERVER_URL || 'http://localhost:9999/graphql',
-    connectionStatus: 'connected',
-    lastSyncAt: new Date().toISOString(),
-    syncSchedule: 'hourly',
-    isEnabled: true,
-    libraryIdentifier: 'vault-auto-01',
-    version: 'v0.04 (Auto-Connected)',
-    sceneCount: 36,
-    performerCount: 18,
-    studioCount: 12,
-    galleryCount: 8
-  }
-];
+// In-memory server registry: default empty unless configured by user
+export const DEFAULT_STASH_SERVERS: StashServerConfig[] = process.env.STASH_SERVER_URL
+  ? [
+      {
+        id: 'stash-srv-configured',
+        name: 'Configured Stash Vault',
+        serverUrl: process.env.STASH_SERVER_URL,
+        connectionStatus: 'connected',
+        lastSyncAt: new Date().toISOString(),
+        syncSchedule: 'hourly',
+        isEnabled: true,
+        libraryIdentifier: 'vault-custom-01',
+        version: 'v0.05',
+        sceneCount: 36,
+        performerCount: 18,
+        studioCount: 12,
+        galleryCount: 8
+      }
+    ]
+  : [];
 
 // Curated high-fidelity adult scenes with direct playable proxy streams
 export const CURATED_ADULT_SCENES: StashScene[] = [
@@ -314,23 +316,23 @@ export const CURATED_VR_SCENES = [
   {
     id: 'vr-penthouse-3d',
     title: '3D VR 180°: Penthouse Romance Experience',
-    format: 'Stereoscopic 180° VR 8K',
+    format: 'Stereoscopic 180° VR SBS',
     duration: '28m',
     rating: 5.0,
     cover: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800&auto=format&fit=crop',
     performer: 'Elena Vance & Maya Lin',
-    features: ['Binaural 3D Audio', 'Interactive View Angles', 'Meta Quest / Apple Vision Pro Ready'],
+    features: ['Stereoscopic 180° Side-by-Side', 'WebXR Browser Compatible', 'Meta Quest & Vision Pro Ready'],
     streamId: 'stash-sc-001'
   },
   {
     id: 'vr-coastal-villa',
     title: '3D VR 360°: Private Beachfront Sanctuary',
-    format: 'Full 360° Spatial Immersion',
+    format: 'Equirectangular 360° VR SBS',
     duration: '32m',
     rating: 4.9,
     cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop',
     performer: 'Charlotte Dubois',
-    features: ['Spatial Head-Tracking', '60 FPS Ultra Clarity', 'Passthrough Mode Compatible'],
+    features: ['Equirectangular 360° Side-by-Side', 'Mobile Gyroscope Navigation', 'Cardboard & VR Headset Ready'],
     streamId: 'stash-sc-003'
   }
 ];
@@ -449,45 +451,47 @@ export class StashProviderAdapter {
       server = this.servers[0];
     }
 
-    if (!server) {
-      server = DEFAULT_STASH_SERVERS[0];
+    if (!server || !server.serverUrl) {
+      return {
+        success: false,
+        error: 'Not Connected — Connect a Stash Server to Use This Feature'
+      };
     }
 
     // Attempt real GraphQL query if an explicit remote URL is set
-    if (server.serverUrl && !server.serverUrl.includes('localhost') && !server.serverUrl.includes('127.0.0.1')) {
-      try {
-        const query = `query Version { version { version build_time } }`;
-        const response = await fetch(server.serverUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...(server.apiKey ? { 'ApiKey': server.apiKey } : {})
-          },
-          body: JSON.stringify({ query }),
-          signal: AbortSignal.timeout(3000)
-        });
+    try {
+      const query = `query Version { version { version build_time } }`;
+      const response = await fetch(server.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(server.apiKey ? { 'ApiKey': server.apiKey } : {})
+        },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(4000)
+      });
 
-        if (response.ok) {
-          const json = await response.json();
-          const version = json.data?.version?.version || 'Stash GraphQL v0.27+';
-          server.connectionStatus = 'connected';
-          server.version = version;
-          server.lastSyncAt = new Date().toISOString();
-          return { success: true, version };
-        }
-      } catch {
-        // Fall back to auto-connected cloud vault
+      if (response.ok) {
+        const json = await response.json();
+        const version = json.data?.version?.version || 'Stash GraphQL v0.27+';
+        server.connectionStatus = 'connected';
+        server.version = version;
+        server.lastSyncAt = new Date().toISOString();
+        return { success: true, version };
+      } else {
+        server.connectionStatus = 'error';
+        return {
+          success: false,
+          error: `Stash server returned HTTP ${response.status}. Check endpoint URL and API key.`
+        };
       }
+    } catch (err: any) {
+      server.connectionStatus = 'disconnected';
+      return {
+        success: false,
+        error: `Could not reach Stash server at ${server.serverUrl}. Make sure your local or remote Stash instance is running.`
+      };
     }
-
-    // Auto-connected vault state
-    server.connectionStatus = 'connected';
-    server.version = 'v0.04 (PROZ Cloud Vault Auto-Connected)';
-    server.lastSyncAt = new Date().toISOString();
-    return { 
-      success: true, 
-      version: 'v0.04 (PROZ Cloud Vault Auto-Connected)' 
-    };
   }
 
   /**

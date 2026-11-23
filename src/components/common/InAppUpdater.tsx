@@ -178,28 +178,7 @@ export default function InAppUpdater() {
         </div>
       )}
 
-      {/* ─── 2. FLOATING UPDATE PILL (Permanent Access) ─── */}
-      <div className="fixed bottom-20 right-4 z-40 md:bottom-6 md:right-6">
-        <button
-          onClick={() => setIsOpen(true)}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-full border text-xs font-semibold shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95 group ${
-            hasUpdate 
-              ? 'bg-purple-900/80 border-purple-400/60 text-white shadow-purple-900/40' 
-              : 'bg-[#111827]/90 border-slate-700 text-slate-300 hover:text-white'
-          }`}
-          title="App Version & In-App Updates"
-        >
-          <span className={`w-2 h-2 rounded-full ${hasUpdate ? 'bg-cyan-400 animate-ping' : 'bg-emerald-400'}`} />
-          <span>v{updateInfo.latestVersion}</span>
-          {hasUpdate ? (
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500 text-white font-extrabold uppercase">
-              NEW
-            </span>
-          ) : (
-            <Download className="w-3.5 h-3.5 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
-          )}
-        </button>
-      </div>
+      {/* ─── 2. FLOATING UPDATE PILL REMOVED TO PREVENT CARD & NAV OVERLAPPING (PDF BUGS 1-16) ─── */}
 
       {/* ─── 3. IN-APP UPDATE MODAL ─── */}
       {isOpen && (

@@ -17,6 +17,7 @@ export interface Channel {
   color?: string;
 
   // Automated Integration & Provider Discovery Fields (V3 Architecture)
+  channelUid?: string;
   providerId?: string;
   officialWebsite?: string;
   officialAppUrl?: string;

@@ -4,7 +4,35 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
-## [0.04.0] — 2026-11-24
+## [0.05.0] — 2026-11-24
+
+### Major System Repair & Backend Integration (Audit of bugs.pdf)
+- **Live Cine18 / CineWebby API Integration:**
+  - Extracted production endpoints from decompiled reference APK: base `https://server.cinewebby.com/api`, channels `api/user/channel/all`, video filtering `api/user/channel/{uid}`, video details `api/user/video-card/{uid}`, banners `api/user/banners`, and sections `api/user/section`.
+  - Created robust `Cine18Adapter` (`src/lib/providers/cine18.ts`) registered in universal `ProviderRegistry`.
+  - Connected 329+ live OTT channels and hundreds of web series, movies, and scenes with high-speed CDN stream links (`https://cdn.siincere.com/`) and verified image covers (`https://images.cinewebby.com/`).
+- **Channel Pages & Authentic Content Alignment:**
+  - Repaired `src/app/channels/[id]/page.tsx` and created dedicated backend route `/api/channels/[id]/videos`.
+  - Replaced arbitrary Hollywood fallback content ("The Boys", "Deadpool", "Dune") with authentic channel video catalogs for Alt Balaji (`r33w`), Bharti Jha (`v35i`), New Sensations (`m67a`), Family XXX (`f94s`), Ullu (`z62v`), and Desiflix (`j35w`).
+  - Enriched 237 channels in `src/lib/data/channelsData.ts` with authentic Cine18 logos, banners, and channel UIDs.
+- **Robust Image Error Fallbacks:**
+  - Added stateful `onError` fallback handlers in `src/components/content/ContentCard.tsx` and `src/app/channels/page.tsx` (ChannelAvatarItem).
+  - Eliminated all broken image icons, missing cover boxes, and raw alt-text displays; replaced with stylized cinematic gradients, category badges, and play icons.
+- **Truthful Personal Stash Server Status:**
+  - Completely removed false "Auto-Connected" claims when no private server is configured.
+  - Truthfully displays: *"Not Connected — Connect a Stash Server to Use This Feature"* with an explicit configuration interface for self-hosted GraphQL instances.
+- **Enhanced 18+ Section Streaming Ecosystem:**
+  - Populated 18+ section with real, playable adult web series and movies via `/api/library/adult-content` querying Ullu, Bharti Jha, New Sensations, and Family XXX.
+  - Implemented direct playback authorization for `cine18-` streams in `/api/playback/authorize` and `/watch/[id]`.
+- **Realistic 3D VR Playback:**
+  - Removed exaggerated marketing claims (60 FPS, binaural audio, spatial head-tracking).
+  - Replaced with realistic Stereoscopic 180° / 360° Side-by-Side format notices with WebXR, Meta Quest, and Cardboard headset support.
+- **UI Overlapping & Layout Clearance:**
+  - Permanently removed intrusive floating version badge (`v0.04 NEW` pill in `src/components/common/InAppUpdater.tsx`) that obstructed navigation buttons and channel cards on every screen (PDF pages 1–16).
+  - Added safe bottom viewport padding (`pb-28`) to channel pages, channel detail views, and restricted 18+ sections to prevent collision with mobile bottom navigation.
+- **Global v0.05 Version Bump & Android Build:**
+  - Synchronized `v0.05` across `package.json`, `brand.config.ts`, `build.gradle.kts`, `InAppUpdater.tsx`, updates page, API update endpoint, and navigation headers.
+  - Recompiled signed release APK: `PROZ-MOVIE-v0.05.apk` (`versionCode = 5`, `versionName = "0.05"`).
 
 ### Major New Capabilities & Architecture
 - **Automatic Stash Vault Connection:**
