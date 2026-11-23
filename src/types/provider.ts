@@ -25,6 +25,8 @@ export type ProviderId =
   | 'altbalaji'
   | 'hoichoi'
   | 'stash'
+  | 'peertube'
+  | 'openverse'
   | 'legal_torrent'
   | 'custom_feed';
 
@@ -106,7 +108,7 @@ export interface VideoSource {
   price?: string;
   quality: '4K' | '1080p' | '720p' | 'SD';
   country: string;
-  rightsStatus: 'authorized' | 'public_domain' | 'official_embed' | 'licensed_partner' | 'third_party_subscription';
+  rightsStatus: 'authorized' | 'public_domain' | 'creative_commons' | 'official_embed' | 'licensed_partner' | 'third_party_subscription';
   verificationStatus: 'verified' | 'unverified' | 'failed';
   lastChecked: string;
 }

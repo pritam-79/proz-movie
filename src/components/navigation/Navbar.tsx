@@ -216,7 +216,7 @@ export const Navbar: React.FC = () => {
                           <span>Check for Updates</span>
                         </div>
                         <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">
-                          v0.02
+                          {brandConfig.version}
                         </span>
                       </button>
                     </div>

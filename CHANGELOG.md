@@ -4,6 +4,39 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
+## [0.03.0] — 2026-11-24
+
+### Major New Capabilities & Architecture
+- **Automated Multi-Provider Content Discovery Engine:**
+  - Automated discovery engine (`src/lib/services/discoveryEngine.ts`) orchestrating catalog ingestion across Internet Archive, PeerTube, Openverse, TVmaze, and TMDB.
+  - Lifecycle state machine: `discovered` &rarr; `metadata_imported` &rarr; `rights_verified` &rarr; `media_available` &rarr; `playback_ready` &rarr; `rejected`.
+  - Ingestion review and curation API routes (`/api/discovery/engine`, `/api/discovery/import`).
+- **Verified Playable Internet Archive Stream Integration:**
+  - Enhanced Internet Archive adapter (`src/lib/providers/archive.ts`) with curated verified public domain cinema classics (*Night of the Living Dead*, *Charade*, *His Girl Friday*, *The General*, *Metropolis*, *Nosferatu*, *Carnival of Souls*, *Plan 9 from Outer Space*).
+  - Direct HTML5 MP4 playback streams with metadata extraction and reliable fallback streams.
+- **Federated PeerTube Creative Commons Integration:**
+  - Integrated PeerTube REST adapter (`src/lib/providers/peertube.ts`) querying public instances (`peertube.tv`, `framatube.org`) with verified open films (*Sintel*, *Tears of Steel*, *Big Buck Bunny*).
+  - Openverse Creative Commons adapter (`src/lib/providers/openverse.ts`) for openly licensed media discovery.
+- **Truthful & Transparent 18+ Adult Ecosystem:**
+  - Completely excised all fake mock adult scenes masquerading as real media.
+  - Clear, honest empty states: *"Stash is not connected. Connect a private media library to import your own authorized content."*
+  - Dedicated onboarding portal for self-hosted Stash instances (`/restricted` settings tab) with GraphQL endpoint test, API key management, and live sync.
+  - Comprehensive category structure: Adult Movies, Hot Web Series, Hentai & Anime, 3D & VR Adult, Performers, Studios, Galleries.
+  - Statutory age verification via birth-year confirmation (18+); eliminated parental control PIN.
+- **Live Multi-Provider API Health Monitoring:**
+  - Parallel health ping endpoint (`/api/admin/health`) monitoring 10 providers in real-time with latency measurements (Internet Archive, PeerTube, Openverse, TVmaze, AniList, TMDB, Watchmode, Supabase, Cloudflare, Stash).
+  - Live Provider Health Dashboard embedded directly in Admin console (`/admin`).
+- **Personalized Profile Management & Navigation:**
+  - User profile editing at `/profile` and `/account` with persistent display name, email, and avatar updates.
+  - Admin console decoupled from regular user profile menus; accessible via dedicated `/admin` security route.
+- **Android WebView Resiliency:**
+  - Fixed false-positive offline screen reconnect loops in `MainActivity.java` by filtering `ERR_ABORTED` on client-side route changes and adding `isPageLoaded` checks.
+  - Recompiled release APK v0.03 (`PROZ-MOVIE-v0.03.apk`) signed with production release keystore.
+- **Database Schema Migration:**
+  - PostgreSQL schema migration (`supabase/migrations/20261124_v003_complete_schema.sql`) adding `content_sources`, `discovered_content`, `content_import_queue`, `content_rights`, `provider_health_logs`, and `adult_providers`.
+
+---
+
 ## [0.02.0] — 2026-11-23
 
 ### Major New Capabilities & Architecture

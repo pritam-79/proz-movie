@@ -392,6 +392,82 @@ function AdminDashboardOverview({ onNavigate }: { onNavigate: (s: AdminSection) 
         </div>
       </div>
 
+      {/* ─── Live Multi-Provider Health Status (v0.03) ─── */}
+      <AdminLiveHealthMonitor />
+
+    </div>
+  );
+}
+
+function AdminLiveHealthMonitor() {
+  const [healthData, setHealthData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchHealth = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/health');
+      const data = await res.json();
+      if (data.success) {
+        setHealthData(data);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch provider health', e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHealth();
+  }, []);
+
+  return (
+    <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800">
+        <div className="flex items-center gap-2">
+          <Activity className="w-5 h-5 text-emerald-400" />
+          <h3 className="text-sm font-bold text-white">Live Provider API Health Monitor</h3>
+          {healthData?.summary && (
+            <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+              {healthData.summary.connected} / {healthData.summary.total} Live
+            </span>
+          )}
+        </div>
+        <button
+          onClick={fetchHealth}
+          disabled={loading}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold transition disabled:opacity-50"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
+          <span>{loading ? 'Pinging APIs...' : 'Refresh Health'}</span>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {healthData?.providers ? (
+          healthData.providers.map((p: any) => (
+            <div
+              key={p.id}
+              className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 space-y-1.5 flex flex-col justify-between"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white truncate">{p.name}</span>
+                <span className={`w-2 h-2 rounded-full ${p.status === 'connected' ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}`} />
+              </div>
+              <p className="text-[11px] text-zinc-400 line-clamp-2">{p.message}</p>
+              <div className="flex items-center justify-between pt-1 border-t border-zinc-800/50 text-[10px] text-zinc-500">
+                <span className="uppercase font-semibold">{p.category}</span>
+                <span className="font-mono text-zinc-400">{p.latencyMs}ms</span>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full py-4 text-center text-xs text-zinc-500">
+            {loading ? 'Performing parallel provider health checks...' : 'No health data available.'}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -887,11 +963,75 @@ function AdminSyncManager() {
 
 // ─── 5. Content Discovery & Availability Monitor ────────────────────────────
 function AdminDiscoveryManager() {
+  const [activeTab, setActiveTab] = useState<'queue' | 'query'>('queue');
   const [query, setQuery] = useState('');
   const [country, setCountry] = useState('IN');
   const [sources, setSources] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+
+  // Ingestion Queue state
+  const [queueItems, setQueueItems] = useState<any[]>([]);
+  const [queueStats, setQueueStats] = useState<any>(null);
+  const [runningDiscovery, setRunningDiscovery] = useState(false);
+  const [discoveryMsg, setDiscoveryMsg] = useState('');
+
+  const fetchQueue = async () => {
+    try {
+      const res = await fetch('/api/discovery/engine');
+      const data = await res.json();
+      if (data.success) {
+        setQueueItems(data.items || []);
+        setQueueStats(data.stats);
+      }
+    } catch (e) {
+      console.warn('Failed to fetch discovery queue', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchQueue();
+  }, []);
+
+  const handleRunDiscovery = async () => {
+    setRunningDiscovery(true);
+    setDiscoveryMsg('Running automated discovery across Archive.org, PeerTube, and Openverse...');
+    try {
+      const res = await fetch('/api/discovery/engine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          providers: ['archive_org', 'peertube', 'openverse'],
+          limitPerProvider: 8,
+          autoPromoteToReady: true
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDiscoveryMsg(`Discovery complete! Ingested ${data.discoveredCount} new open & public-domain titles.`);
+        fetchQueue();
+      } else {
+        setDiscoveryMsg(`Discovery failed: ${data.error}`);
+      }
+    } catch (err: any) {
+      setDiscoveryMsg(`Discovery error: ${err.message}`);
+    } finally {
+      setRunningDiscovery(false);
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, action: string) => {
+    try {
+      await fetch('/api/discovery/import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, action })
+      });
+      fetchQueue();
+    } catch (e) {
+      console.warn('Action failed', e);
+    }
+  };
 
   const checkAvailability = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -911,74 +1051,201 @@ function AdminDiscoveryManager() {
 
   return (
     <div className="space-y-6">
-      <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 space-y-4">
-        <h3 className="text-base font-bold text-white">Multi-Provider Availability Query Tool</h3>
-        <p className="text-xs text-zinc-400">
-          Query live streaming rights and official watch options for any movie or TV series across connected providers.
-        </p>
-
-        <form onSubmit={checkAvailability} className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            required
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. Deadpool & Wolverine, Kalki 2898 AD, RRR"
-            className={`${glassInput} flex-1`}
-          />
-          <select
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="px-4 py-2.5 rounded-xl bg-[#080B12] border border-zinc-800 text-xs text-white"
-          >
-            <option value="IN">India (IN)</option>
-            <option value="US">United States (US)</option>
-            <option value="GB">United Kingdom (GB)</option>
-            <option value="GLOBAL">Global</option>
-          </select>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs whitespace-nowrap shadow-md disabled:opacity-50"
-          >
-            {loading ? 'Querying APIs...' : 'Check Availability'}
-          </button>
-        </form>
+      {/* Tab Switcher */}
+      <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
+        <button
+          onClick={() => setActiveTab('queue')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+            activeTab === 'queue'
+              ? 'bg-rose-600 text-white shadow-md'
+              : 'bg-zinc-900 text-zinc-400 hover:text-white'
+          }`}
+        >
+          Automated Ingestion Queue ({queueItems.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('query')}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+            activeTab === 'query'
+              ? 'bg-rose-600 text-white shadow-md'
+              : 'bg-zinc-900 text-zinc-400 hover:text-white'
+          }`}
+        >
+          Multi-Provider Availability Query
+        </button>
       </div>
 
-      {/* Results */}
-      {searched && (
-        <div className="space-y-3">
-          <h3 className="text-sm font-bold text-white">Discovered Watch Sources for &quot;{query}&quot; ({country})</h3>
-          {sources.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {sources.map((s, idx) => (
-                <div key={idx} className="p-4 rounded-xl bg-[#0F1420] border border-zinc-800 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-white">{s.providerName}</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 uppercase">
-                      {s.pricingType}
+      {activeTab === 'queue' ? (
+        <div className="space-y-4">
+          <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Compass className="w-5 h-5 text-rose-500" />
+                <span>Automated Discovery & Ingestion Pipeline</span>
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1">
+                Discovers playable Public Domain (Internet Archive), Creative Commons (PeerTube), and Openverse catalog feeds with strict rights provenance.
+              </p>
+            </div>
+            <button
+              onClick={handleRunDiscovery}
+              disabled={runningDiscovery}
+              className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md transition disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${runningDiscovery ? 'animate-spin' : ''}`} />
+              <span>{runningDiscovery ? 'Discovering...' : 'Run Discovery Engine'}</span>
+            </button>
+          </div>
+
+          {discoveryMsg && (
+            <div className="p-3 rounded-xl bg-zinc-900 text-xs text-zinc-300 border border-zinc-800">
+              {discoveryMsg}
+            </div>
+          )}
+
+          {/* Queue Items Table */}
+          <div className="rounded-2xl bg-[#0F1420] border border-zinc-800 overflow-hidden">
+            <div className="p-4 border-b border-zinc-800 flex items-center justify-between text-xs text-zinc-400 font-semibold">
+              <span>Title & Media Origin</span>
+              <span>Rights Status</span>
+              <span>Lifecycle State</span>
+              <span>Actions</span>
+            </div>
+
+            <div className="divide-y divide-zinc-800/60">
+              {queueItems.map(item => (
+                <div key={item.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div className="space-y-0.5 max-w-md">
+                    <h4 className="font-bold text-white text-sm">{item.title} ({item.releaseYear || 'N/A'})</h4>
+                    <p className="text-[11px] text-zinc-400 line-clamp-1">{item.description}</p>
+                    <div className="flex items-center gap-2 text-[10px] text-zinc-500 pt-0.5">
+                      <span className="text-rose-400 font-semibold">{item.providerName}</span>
+                      <span>•</span>
+                      <span>{item.contentType.toUpperCase()}</span>
+                      <span>•</span>
+                      <span>{item.sources?.length || 0} Playable Stream(s)</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                      item.rightsStatus === 'public_domain'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                        : item.rightsStatus === 'creative_commons'
+                        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                        : 'bg-zinc-800 text-zinc-400'
+                    }`}>
+                      {item.rightsStatus.replace('_', ' ')}
                     </span>
                   </div>
-                  <p className="text-xs text-zinc-400 font-mono text-[10px] truncate">{s.officialWatchUrl}</p>
-                  <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs">
-                    <span className="text-zinc-500">{s.quality} • {s.rightsStatus}</span>
-                    <a
-                      href={s.officialWatchUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
-                    >
-                      <span>Visit</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+
+                  <div>
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      item.lifecycleStatus === 'playback_ready'
+                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/40'
+                        : 'bg-amber-950/60 text-amber-300 border border-amber-500/40'
+                    }`}>
+                      {item.lifecycleStatus.replace('_', ' ').toUpperCase()}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {item.lifecycleStatus !== 'playback_ready' ? (
+                      <button
+                        onClick={() => handleUpdateStatus(item.id, 'approve')}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition"
+                      >
+                        Approve
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-emerald-400 font-semibold">Active</span>
+                    )}
+                    {item.lifecycleStatus !== 'rejected' && (
+                      <button
+                        onClick={() => handleUpdateStatus(item.id, 'reject')}
+                        className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-red-400 font-semibold text-[11px] transition"
+                      >
+                        Reject
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="p-8 rounded-xl bg-[#0F1420] border border-zinc-800 text-center text-xs text-zinc-500">
-              No direct API watch sources found for &quot;{query}&quot; in {country}. Title can be located via TMDB Watch provider hub.
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 space-y-4">
+            <h3 className="text-base font-bold text-white">Multi-Provider Availability Query Tool</h3>
+            <p className="text-xs text-zinc-400">
+              Query live streaming rights and official watch options for any movie or TV series across connected providers.
+            </p>
+
+            <form onSubmit={checkAvailability} className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="text"
+                required
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="e.g. Deadpool & Wolverine, Kalki 2898 AD, RRR"
+                className={`${glassInput} flex-1`}
+              />
+              <select
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                className="px-4 py-2.5 rounded-xl bg-[#080B12] border border-zinc-800 text-xs text-white"
+              >
+                <option value="IN">India (IN)</option>
+                <option value="US">United States (US)</option>
+                <option value="GB">United Kingdom (GB)</option>
+                <option value="GLOBAL">Global</option>
+              </select>
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs whitespace-nowrap shadow-md disabled:opacity-50"
+              >
+                {loading ? 'Querying APIs...' : 'Check Availability'}
+              </button>
+            </form>
+          </div>
+
+          {/* Results */}
+          {searched && (
+            <div className="space-y-3">
+              <h3 className="text-sm font-bold text-white">Discovered Watch Sources for &quot;{query}&quot; ({country})</h3>
+              {sources.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {sources.map((s, idx) => (
+                    <div key={idx} className="p-4 rounded-xl bg-[#0F1420] border border-zinc-800 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-white">{s.providerName}</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 uppercase">
+                          {s.pricingType}
+                        </span>
+                      </div>
+                      <p className="text-xs text-zinc-400 font-mono text-[10px] truncate">{s.officialWatchUrl}</p>
+                      <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs">
+                        <span className="text-zinc-500">{s.quality} • {s.rightsStatus}</span>
+                        <a
+                          href={s.officialWatchUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
+                        >
+                          <span>Visit</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-8 rounded-xl bg-[#0F1420] border border-zinc-800 text-center text-xs text-zinc-500">
+                  No direct API watch sources found for &quot;{query}&quot; in {country}. Title can be located via TMDB Watch provider hub.
+                </div>
+              )}
             </div>
           )}
         </div>

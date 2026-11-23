@@ -8,6 +8,8 @@
 
 export interface BrandConfig {
   name: string;
+  version: string;
+  versionCode: number;
   tagline: string;
   websiteTitle: string;
   description: string;
@@ -68,6 +70,8 @@ export interface BrandConfig {
 
 export const brandConfig: BrandConfig = {
   name: "PROZ Entertainment",
+  version: "v0.03",
+  versionCode: 3,
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
   websiteTitle: "PROZ Entertainment – Stream Your World",
   description:

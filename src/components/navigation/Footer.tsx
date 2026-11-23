@@ -104,7 +104,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <Link href="/updates" className="text-emerald-400 font-semibold hover:underline">
-                PROZ MOVIE v0.02
+                PROZ MOVIE {brandConfig.version}
               </Link>
             </div>
           </div>

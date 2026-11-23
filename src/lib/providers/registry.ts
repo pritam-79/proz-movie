@@ -8,6 +8,8 @@ import { YouTubeAdapter } from './youtube';
 import { InternetArchiveAdapter } from './archive';
 import { CloudflareStreamAdapter } from './cloudflareStream';
 import { MuxAdapter } from './mux';
+import { peerTubeAdapter, PeerTubeAdapter } from './peertube';
+import { openverseAdapter, OpenverseAdapter } from './openverse';
 import { stashAdapter, StashProviderAdapter } from './stash';
 import { legalTorrentAdapter, LegalTorrentAdapter } from './torrent';
 import { ProviderConfig, VideoSource, ProviderId } from '@/types/provider';
@@ -16,6 +18,8 @@ class ProviderRegistry {
   private adapters: Map<ProviderId, BaseProviderAdapter> = new Map();
   public readonly stash: StashProviderAdapter = stashAdapter;
   public readonly torrent: LegalTorrentAdapter = legalTorrentAdapter;
+  public readonly peertube: PeerTubeAdapter = peerTubeAdapter;
+  public readonly openverse: OpenverseAdapter = openverseAdapter;
 
   constructor() {
     this.register(new TmdbAdapter());
@@ -25,6 +29,8 @@ class ProviderRegistry {
     this.register(new JustWatchAdapter());
     this.register(new YouTubeAdapter());
     this.register(new InternetArchiveAdapter());
+    this.register(peerTubeAdapter);
+    this.register(openverseAdapter);
     this.register(new CloudflareStreamAdapter());
     this.register(new MuxAdapter());
   }
@@ -35,6 +41,10 @@ class ProviderRegistry {
 
   get(id: ProviderId): BaseProviderAdapter | undefined {
     return this.adapters.get(id);
+  }
+
+  getAdapter(id: string): BaseProviderAdapter | undefined {
+    return this.adapters.get(id as ProviderId);
   }
 
   getAll(): BaseProviderAdapter[] {

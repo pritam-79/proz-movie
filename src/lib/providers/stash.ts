@@ -1,9 +1,10 @@
 /**
- * PROZ Entertainment v0.02 — Stash GraphQL Provider Adapter
+ * PROZ Entertainment v0.03 — Stash GraphQL Provider Adapter
  * Built according to Stash official GraphQL specifications (https://docs.stashapp.cc/)
  * Preserves MIT license compatibility with Peek Stash Browser architecture.
  * 
  * SECURITY: All internal URLs and API Keys remain strictly on the server.
+ * INTEGRITY: Zero mock data, zero fake connections. Honest disconnected states.
  */
 
 import { 
@@ -21,210 +22,17 @@ export const DEFAULT_STASH_SERVERS: StashServerConfig[] = [
   {
     id: 'stash-srv-primary',
     name: 'Primary Vault (Local Stash)',
-    serverUrl: process.env.STASH_SERVER_URL || 'http://localhost:9999/graphql',
-    connectionStatus: process.env.STASH_SERVER_URL ? 'connected' : 'pending',
-    lastSyncAt: new Date().toISOString(),
-    syncSchedule: 'hourly',
-    isEnabled: true,
-    libraryIdentifier: 'vault-01',
-    version: 'v0.27.2',
-    sceneCount: 1420,
-    performerCount: 285,
-    studioCount: 64,
-    galleryCount: 198
-  },
-  {
-    id: 'stash-srv-secondary',
-    name: 'Archive Vault (Private S3/NAS)',
-    serverUrl: process.env.STASH_SECONDARY_URL || 'http://192.168.1.150:9999/graphql',
-    connectionStatus: 'pending',
+    serverUrl: process.env.STASH_SERVER_URL || '',
+    connectionStatus: process.env.STASH_SERVER_URL ? 'pending' : 'disconnected',
     lastSyncAt: null,
-    syncSchedule: 'manual',
-    isEnabled: false,
-    libraryIdentifier: 'vault-02',
-    version: 'v0.26.1',
+    syncSchedule: 'hourly',
+    isEnabled: Boolean(process.env.STASH_SERVER_URL),
+    libraryIdentifier: 'vault-01',
+    version: undefined,
     sceneCount: 0,
     performerCount: 0,
     studioCount: 0,
     galleryCount: 0
-  }
-];
-
-// Curated high-fidelity mock scenes for demonstration when no physical Stash instance is active
-const MOCK_STASH_SCENES: StashScene[] = [
-  {
-    id: 'stash-sc-001',
-    title: 'Neon Nights & Cyber City Romance',
-    details: 'A cinematic high-production romantic encounter set in a futuristic midnight city.',
-    date: '2026-05-14',
-    rating: 4.8,
-    organized: true,
-    oCounter: 12,
-    resumeTime: 180,
-    playCount: 45,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop',
-      preview: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-001',
-      webp: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-cyber',
-      name: 'CyberVelvet Studios',
-      rating: 5,
-      imagePath: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-elena',
-        name: 'Elena Vance',
-        gender: 'FEMALE',
-        rating: 5,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 38
-      }
-    ],
-    tags: [
-      { id: 'tag-cinematic', name: 'Cinematic' },
-      { id: 'tag-romantic', name: 'Romantic' },
-      { id: 'tag-4k', name: '4K Ultra HD' }
-    ],
-    isFavorite: true,
-    isWatched: false,
-    userRating: 5
-  },
-  {
-    id: 'stash-sc-002',
-    title: 'Midnight Velvet Noir Session',
-    details: 'Elegant vintage lounge aesthetic featuring velvet drapery and sensual atmospheric jazz.',
-    date: '2026-06-20',
-    rating: 4.9,
-    organized: true,
-    oCounter: 24,
-    resumeTime: 420,
-    playCount: 88,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=800&auto=format&fit=crop',
-      preview: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-002',
-      webp: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-noir',
-      name: 'Noir Intimate Cinema',
-      rating: 4.9,
-      imagePath: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-maya',
-        name: 'Maya Lin',
-        gender: 'FEMALE',
-        rating: 4.9,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 29
-      }
-    ],
-    tags: [
-      { id: 'tag-sensual', name: 'Sensual' },
-      { id: 'tag-noir', name: 'Noir' },
-      { id: 'tag-aesthetic', name: 'Aesthetic' }
-    ],
-    isFavorite: true,
-    isWatched: true,
-    userRating: 4.5
-  },
-  {
-    id: 'stash-sc-003',
-    title: 'Tokyo Sunset Penthouse Rendezvous',
-    details: 'Luxury high-rise penthouse view over Shinjuku during golden hour.',
-    date: '2026-07-02',
-    rating: 4.7,
-    organized: true,
-    oCounter: 8,
-    resumeTime: 0,
-    playCount: 19,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=800&auto=format&fit=crop',
-      preview: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-003',
-      webp: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-tokyo',
-      name: 'Pacific Luxe Media',
-      rating: 4.7,
-      imagePath: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-chloe',
-        name: 'Chloe Kim',
-        gender: 'FEMALE',
-        rating: 4.8,
-        favorite: false,
-        imagePath: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 15
-      }
-    ],
-    tags: [
-      { id: 'tag-penthouse', name: 'Penthouse' },
-      { id: 'tag-luxury', name: 'Luxury' }
-    ],
-    isFavorite: false,
-    isWatched: false
-  },
-  {
-    id: 'stash-sc-004',
-    title: 'Crimson Velvet Studio Showcase',
-    details: 'Deep red ambiance with exquisite cinematography and high fidelity audio.',
-    date: '2026-08-11',
-    rating: 4.9,
-    organized: true,
-    oCounter: 31,
-    resumeTime: 650,
-    playCount: 112,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop',
-      preview: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-004',
-      webp: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-crimson',
-      name: 'Crimson Passion Productions',
-      rating: 5,
-      imagePath: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-elena',
-        name: 'Elena Vance',
-        gender: 'FEMALE',
-        rating: 5,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 38
-      },
-      {
-        id: 'perf-maya',
-        name: 'Maya Lin',
-        gender: 'FEMALE',
-        rating: 4.9,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 29
-      }
-    ],
-    tags: [
-      { id: 'tag-duo', name: 'All-Star Duo' },
-      { id: 'tag-glamour', name: 'Glamour' }
-    ],
-    isFavorite: true,
-    isWatched: true,
-    userRating: 5
   }
 ];
 
@@ -246,9 +54,54 @@ export class StashProviderAdapter {
   }
 
   /**
+   * Add or update a server config
+   */
+  public updateServer(config: Partial<StashServerConfig> & { id: string }): StashServerConfig {
+    const idx = this.servers.findIndex(s => s.id === config.id);
+    if (idx >= 0) {
+      this.servers[idx] = { ...this.servers[idx], ...config };
+      return this.servers[idx];
+    } else {
+      const newServer: StashServerConfig = {
+        id: config.id,
+        name: config.name || 'Custom Stash Server',
+        serverUrl: config.serverUrl || '',
+        apiKey: config.apiKey,
+        connectionStatus: 'pending',
+        lastSyncAt: null,
+        syncSchedule: config.syncSchedule || 'manual',
+        isEnabled: config.isEnabled ?? true,
+        libraryIdentifier: config.libraryIdentifier || `vault-${Date.now()}`,
+        sceneCount: 0,
+        performerCount: 0,
+        studioCount: 0,
+        galleryCount: 0
+      };
+      this.servers.push(newServer);
+      return newServer;
+    }
+  }
+
+  /**
    * Test connection to a Stash server via official GraphQL version query
    */
-  public async testConnection(server: StashServerConfig): Promise<{ success: boolean; version?: string; error?: string }> {
+  public async testConnection(serverOrId?: StashServerConfig | string): Promise<{ success: boolean; version?: string; error?: string }> {
+    let server: StashServerConfig | undefined;
+    if (typeof serverOrId === 'string') {
+      server = this.servers.find(s => s.id === serverOrId);
+    } else if (serverOrId) {
+      server = serverOrId;
+    } else {
+      server = this.servers[0];
+    }
+
+    if (!server || !server.serverUrl) {
+      return { 
+        success: false, 
+        error: 'No Stash server URL configured. Please enter a valid GraphQL endpoint URL.' 
+      };
+    }
+
     try {
       const query = `
         query Version {
@@ -270,19 +123,23 @@ export class StashProviderAdapter {
       });
 
       if (!response.ok) {
+        if (server) server.connectionStatus = 'error';
         return { success: false, error: `HTTP ${response.status}: ${response.statusText}` };
       }
 
       const json = await response.json();
+      const version = json.data?.version?.version || 'Stash GraphQL v0.27+';
+      if (server) {
+        server.connectionStatus = 'connected';
+        server.version = version;
+        server.lastSyncAt = new Date().toISOString();
+      }
+      return { success: true, version };
+    } catch (err: any) {
+      if (server) server.connectionStatus = 'disconnected';
       return { 
-        success: true, 
-        version: json.data?.version?.version || 'Stash Community v0.27' 
-      };
-    } catch {
-      // In standalone demo / sandbox environments without local Stash daemon
-      return { 
-        success: true, 
-        version: 'v0.27.2 (Simulated Vault)' 
+        success: false, 
+        error: `Could not connect to Stash endpoint (${server.serverUrl}): ${err?.message || 'Network unreachable'}` 
       };
     }
   }
@@ -291,117 +148,312 @@ export class StashProviderAdapter {
    * Query scenes using Stash GraphQL schema
    */
   public async findScenes(filters?: MediaBrowsingFilters): Promise<{ count: number; scenes: StashScene[] }> {
-    let result = [...MOCK_STASH_SCENES];
-
-    if (filters?.searchQuery) {
-      const q = filters.searchQuery.toLowerCase();
-      result = result.filter(s => 
-        s.title.toLowerCase().includes(q) || 
-        s.details?.toLowerCase().includes(q) ||
-        s.performers?.some(p => p.name.toLowerCase().includes(q)) ||
-        s.tags?.some(t => t.name.toLowerCase().includes(q))
-      );
+    const activeServer = this.servers.find(s => s.isEnabled && s.serverUrl);
+    if (!activeServer) {
+      return { count: 0, scenes: [] };
     }
 
-    if (filters?.studioId) {
-      result = result.filter(s => s.studio?.id === filters.studioId);
-    }
+    try {
+      const query = `
+        query FindScenes($filter: FindFilterType, $scene_filter: SceneFilterType) {
+          findScenes(filter: $filter, scene_filter: $scene_filter) {
+            count
+            scenes {
+              id
+              title
+              details
+              url
+              date
+              rating100
+              organized
+              o_counter
+              resume_time
+              play_count
+              paths {
+                screenshot
+                preview
+                stream
+                webp
+              }
+              studio {
+                id
+                name
+                image_path
+              }
+              performers {
+                id
+                name
+                gender
+                rating100
+                favorite
+                image_path
+                scene_count
+              }
+              tags {
+                id
+                name
+              }
+            }
+          }
+        }
+      `;
 
-    if (filters?.performerId) {
-      result = result.filter(s => s.performers?.some(p => p.id === filters.performerId));
-    }
+      const response = await fetch(activeServer.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(activeServer.apiKey ? { 'ApiKey': activeServer.apiKey } : {})
+        },
+        body: JSON.stringify({ 
+          query,
+          variables: {
+            filter: {
+              q: filters?.searchQuery || '',
+              sort: filters?.sortBy === 'rating' ? 'rating' : 'date',
+              direction: 'DESC'
+            }
+          }
+        }),
+        signal: AbortSignal.timeout(4000)
+      });
 
-    if (filters?.isFavorite !== undefined) {
-      result = result.filter(s => s.isFavorite === filters.isFavorite);
-    }
+      if (!response.ok) return { count: 0, scenes: [] };
+      const json = await response.json();
+      const rawScenes = json.data?.findScenes?.scenes || [];
+      const count = json.data?.findScenes?.count || rawScenes.length;
 
-    if (filters?.isWatched !== undefined) {
-      result = result.filter(s => s.isWatched === filters.isWatched);
-    }
+      const scenes: StashScene[] = rawScenes.map((s: any) => ({
+        id: s.id,
+        title: s.title || `Scene #${s.id}`,
+        details: s.details,
+        url: s.url,
+        date: s.date,
+        rating: s.rating100 ? s.rating100 / 20 : undefined,
+        organized: s.organized,
+        oCounter: s.o_counter,
+        resumeTime: s.resume_time,
+        playCount: s.play_count,
+        paths: {
+          screenshot: s.paths?.screenshot || '',
+          preview: s.paths?.preview || '',
+          stream: `/api/library/stash/proxy-stream?id=${s.id}`,
+          webp: s.paths?.webp || ''
+        },
+        studio: s.studio ? {
+          id: s.studio.id,
+          name: s.studio.name,
+          imagePath: s.studio.image_path
+        } : undefined,
+        performers: s.performers?.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          gender: p.gender,
+          rating: p.rating100 ? p.rating100 / 20 : undefined,
+          favorite: p.favorite,
+          imagePath: p.image_path,
+          sceneCount: p.scene_count
+        })),
+        tags: s.tags?.map((t: any) => ({ id: t.id, name: t.name })),
+        isFavorite: false,
+        isWatched: (s.play_count || 0) > 0
+      }));
 
-    if (filters?.sortBy === 'rating') {
-      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    } else if (filters?.sortBy === 'date') {
-      result.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
+      return { count, scenes };
+    } catch {
+      return { count: 0, scenes: [] };
     }
-
-    return {
-      count: result.length,
-      scenes: result
-    };
   }
 
   /**
    * Query performers
    */
   public async findPerformers(): Promise<StashPerformer[]> {
-    const map = new Map<string, StashPerformer>();
-    MOCK_STASH_SCENES.forEach(s => {
-      s.performers?.forEach(p => {
-        if (!map.has(p.id)) map.set(p.id, p);
+    const activeServer = this.servers.find(s => s.isEnabled && s.serverUrl);
+    if (!activeServer) return [];
+
+    try {
+      const query = `
+        query FindPerformers {
+          findPerformers(filter: { per_page: 50 }) {
+            count
+            performers {
+              id
+              name
+              gender
+              rating100
+              favorite
+              image_path
+              scene_count
+            }
+          }
+        }
+      `;
+      const response = await fetch(activeServer.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(activeServer.apiKey ? { 'ApiKey': activeServer.apiKey } : {})
+        },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(4000)
       });
-    });
-    return Array.from(map.values());
+      if (!response.ok) return [];
+      const json = await response.json();
+      return (json.data?.findPerformers?.performers || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        gender: p.gender,
+        rating: p.rating100 ? p.rating100 / 20 : undefined,
+        favorite: p.favorite,
+        imagePath: p.image_path,
+        sceneCount: p.scene_count
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /**
    * Query studios
    */
   public async findStudios(): Promise<StashStudio[]> {
-    const map = new Map<string, StashStudio>();
-    MOCK_STASH_SCENES.forEach(s => {
-      if (s.studio && !map.has(s.studio.id)) {
-        map.set(s.studio.id, s.studio);
-      }
-    });
-    return Array.from(map.values());
+    const activeServer = this.servers.find(s => s.isEnabled && s.serverUrl);
+    if (!activeServer) return [];
+
+    try {
+      const query = `
+        query FindStudios {
+          findStudios(filter: { per_page: 50 }) {
+            count
+            studios {
+              id
+              name
+              url
+              image_path
+              scene_count
+            }
+          }
+        }
+      `;
+      const response = await fetch(activeServer.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(activeServer.apiKey ? { 'ApiKey': activeServer.apiKey } : {})
+        },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(4000)
+      });
+      if (!response.ok) return [];
+      const json = await response.json();
+      return (json.data?.findStudios?.studios || []).map((st: any) => ({
+        id: st.id,
+        name: st.name,
+        url: st.url,
+        imagePath: st.image_path,
+        sceneCount: st.scene_count
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /**
    * Query tags
    */
   public async findTags(): Promise<StashTag[]> {
-    const map = new Map<string, StashTag>();
-    MOCK_STASH_SCENES.forEach(s => {
-      s.tags?.forEach(t => {
-        if (!map.has(t.id)) map.set(t.id, t);
+    const activeServer = this.servers.find(s => s.isEnabled && s.serverUrl);
+    if (!activeServer) return [];
+
+    try {
+      const query = `
+        query FindTags {
+          findTags(filter: { per_page: 50 }) {
+            count
+            tags {
+              id
+              name
+              scene_count
+            }
+          }
+        }
+      `;
+      const response = await fetch(activeServer.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(activeServer.apiKey ? { 'ApiKey': activeServer.apiKey } : {})
+        },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(4000)
       });
-    });
-    return Array.from(map.values());
+      if (!response.ok) return [];
+      const json = await response.json();
+      return (json.data?.findTags?.tags || []).map((t: any) => ({
+        id: t.id,
+        name: t.name,
+        sceneCount: t.scene_count
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /**
    * Query galleries
    */
   public async findGalleries(): Promise<StashGallery[]> {
-    return [
-      {
-        id: 'gal-001',
-        title: 'Neon Velvet Exclusive Photo Session',
-        details: 'High-resolution gallery set captured during the Tokyo studio session.',
-        imageCount: 48,
-        rating: 5,
-        coverPath: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop',
-        studio: { id: 'std-cyber', name: 'CyberVelvet Studios' }
-      },
-      {
-        id: 'gal-002',
-        title: 'Midnight Noir Backstage Portraits',
-        details: 'Atmospheric monochrome and deep burgundy backstage captures.',
-        imageCount: 64,
-        rating: 4.8,
-        coverPath: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop',
-        studio: { id: 'std-noir', name: 'Noir Intimate Cinema' }
-      }
-    ];
+    const activeServer = this.servers.find(s => s.isEnabled && s.serverUrl);
+    if (!activeServer) return [];
+
+    try {
+      const query = `
+        query FindGalleries {
+          findGalleries(filter: { per_page: 50 }) {
+            count
+            galleries {
+              id
+              title
+              details
+              paths {
+                cover
+              }
+              studio {
+                id
+                name
+              }
+            }
+          }
+        }
+      `;
+      const response = await fetch(activeServer.serverUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(activeServer.apiKey ? { 'ApiKey': activeServer.apiKey } : {})
+        },
+        body: JSON.stringify({ query }),
+        signal: AbortSignal.timeout(4000)
+      });
+      if (!response.ok) return [];
+      const json = await response.json();
+      return (json.data?.findGalleries?.galleries || []).map((g: any) => ({
+        id: g.id,
+        title: g.title || `Gallery #${g.id}`,
+        details: g.details,
+        coverPath: g.paths?.cover,
+        studio: g.studio ? { id: g.studio.id, name: g.studio.name } : undefined
+      }));
+    } catch {
+      return [];
+    }
   }
 
   /**
    * Retrieve secure playback stream URL for a given scene
    */
   public getSceneStreamUrl(sceneId: string): string {
-    const scene = MOCK_STASH_SCENES.find(s => s.id === sceneId);
-    return scene?.paths.stream || `/api/library/stash/proxy-stream?id=${sceneId}`;
+    return `/api/library/stash/proxy-stream?id=${sceneId}`;
   }
 }
 

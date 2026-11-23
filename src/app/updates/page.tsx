@@ -14,57 +14,61 @@ import {
   Layers, 
   Server,
   Zap,
-  Globe
+  Globe,
+  Compass,
+  Film,
+  Activity
 } from 'lucide-react';
+import { brandConfig } from '@/config/brand.config';
 
 export default function UpdatesPage() {
   const features = [
     {
-      title: "Private Multi-User Library",
-      desc: "Isolated personal libraries with independent ratings, favourites, watch progress, and hidden collections.",
-      icon: FolderLock,
-      color: "text-purple-400"
-    },
-    {
-      title: "Multiple Stash Connections",
-      desc: "Federated integration with self-hosted Stash instances via official GraphQL API without leaking internal credentials.",
-      icon: Server,
+      title: "Automated Content Discovery Engine",
+      desc: "Zero manual video uploads. Autonomous catalog ingestion across official provider APIs, public domain archives, and Creative Commons repositories.",
+      icon: Compass,
       color: "text-cyan-400"
     },
     {
-      title: "Playlists & Group Sharing",
-      desc: "Customizable playlists with shuffle, repeat, and permission-governed group collaboration.",
-      icon: Layers,
+      title: "Verified Internet Archive Stream Integration",
+      desc: "Direct, high-fidelity HTML5 MP4 playback of legendary public-domain cinema classics (Night of the Living Dead, Charade, Metropolis, His Girl Friday).",
+      icon: Film,
+      color: "text-purple-400"
+    },
+    {
+      title: "Federated PeerTube CC Streaming",
+      desc: "Integrated decentralized streaming from verified PeerTube instances featuring licensed Creative Commons open films (Sintel, Tears of Steel).",
+      icon: Radio,
       color: "text-emerald-400"
     },
     {
-      title: "Direct Authorized Media Playback",
-      desc: "Unified Shaka/HTML5 player supporting short-lived signed sessions and encrypted streaming proxy.",
-      icon: Zap,
-      color: "text-amber-400"
-    },
-    {
-      title: "Download Permissions & Queue Manager",
-      desc: "Offline download management with per-user storage quotas and pause/resume capabilities.",
-      icon: Download,
-      color: "text-purple-300"
-    },
-    {
-      title: "Adult-Section Privacy Controls",
-      desc: "Dedicated 18+ ecosystem with strict birth-year gate, performer profiles, studio directories, and galleries.",
+      title: "Truthful, Transparent 18+ Adult Ecosystem",
+      desc: "Completely eliminated fake mock scenes. Dedicated onboarding portal for self-hosted Stash instances with honest empty states and birth-year statutory age gate.",
       icon: ShieldCheck,
       color: "text-rose-400"
     },
     {
-      title: "Authorized P2P Integration Framework",
-      desc: "Strictly allowlisted Public Domain, Creative Commons, and rights-holder distribution adapter.",
-      icon: Radio,
+      title: "Live Provider API Health Dashboard",
+      desc: "Real-time latency monitoring across 10 major providers (Internet Archive, PeerTube, Openverse, TVmaze, AniList, TMDB, Supabase, Stash).",
+      icon: Activity,
+      color: "text-amber-400"
+    },
+    {
+      title: "Legitimate Watch Provider Deep Linking",
+      desc: "Commercial Hollywood & Bollywood titles feature official streaming provider links (Netflix, Prime Video, Disney+ Hotstar, JioCinema, Zee5).",
+      icon: Globe,
       color: "text-cyan-300"
     },
     {
-      title: "10-Foot TV Mode & Media Timeline",
-      desc: "Remote-friendly navigation with big media cards and chronological activity feeds.",
-      icon: Tv,
+      title: "Unified Profile Management",
+      desc: "Persistent user profile name and email personalization with zero intrusive admin links; security portal accessible at designated administrative routes.",
+      icon: Layers,
+      color: "text-purple-300"
+    },
+    {
+      title: "Android v0.03 WebView Resiliency",
+      desc: "Eliminated false offline reconnect loops; seamless single-page application navigation with immediate in-app update checks.",
+      icon: Zap,
       color: "text-emerald-300"
     }
   ];
@@ -80,46 +84,46 @@ export default function UpdatesPage() {
         </Link>
 
         {/* Release Hero Header */}
-        <div className="p-8 rounded-3xl bg-white/[0.03] border border-purple-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="p-8 rounded-3xl bg-white/[0.03] border border-cyan-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold uppercase tracking-wider">
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              Stable Build
+              Production Stable
             </span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
-            PROZ MOVIE v0.02
+            PROZ MOVIE {brandConfig.version}
           </h1>
           <p className="text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Premium OTT Streaming meets Private Federated Media Library and Restricted 18+ Ecosystem.
+            Automated Content Discovery Engine, Verified Playable Cinema, PeerTube Federation, and Truthful 18+ Private Vault Architecture.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              href="/library"
-              className="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/30 transition flex items-center gap-2"
+              href="/movies"
+              className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg shadow-cyan-600/30 transition flex items-center gap-2"
             >
-              <FolderLock className="w-4 h-4" />
-              <span>Explore My Library</span>
+              <Film className="w-4 h-4" />
+              <span>Browse Playable Movies</span>
             </Link>
             <Link
               href="/restricted"
               className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition flex items-center gap-2"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Open 18+ Vault</span>
+              <span>18+ Adult Zone</span>
             </Link>
           </div>
         </div>
 
         {/* Feature Cards Grid */}
         <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-400" />
-          <span>What&apos;s New in v0.02</span>
+          <Sparkles className="w-5 h-5 text-cyan-400" />
+          <span>What&apos;s New in {brandConfig.version}</span>
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -128,7 +132,7 @@ export default function UpdatesPage() {
             return (
               <div 
                 key={i} 
-                className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-purple-500/40 transition flex items-start gap-4"
+                className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-cyan-500/40 transition flex items-start gap-4"
               >
                 <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${f.color} flex-shrink-0`}>
                   <Icon className="w-6 h-6" />
