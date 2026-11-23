@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionName;
             } catch (Exception e) {
-                return "0.01";
+                return "0.02";
             }
         }
 
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionCode;
             } catch (Exception e) {
-                return 1;
+                return 2;
             }
         }
     }
@@ -125,7 +125,7 @@ public class MainActivity extends Activity {
         if (splashContainer != null && !isPageLoaded) {
             splashContainer.setVisibility(View.VISIBLE);
             if (splashStatus != null) {
-                splashStatus.setText("Connecting to live streaming server...");
+                splashStatus.setText("Connecting to streaming server...");
             }
         }
         mainFrameErrorCount = 0;
@@ -145,6 +145,10 @@ public class MainActivity extends Activity {
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        // Set modern mobile User-Agent to avoid web engine compatibility blocks
+        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.02";
+        settings.setUserAgentString(customUa);
 
         // Hardware acceleration
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -206,7 +210,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // WebViewClient
+        // WebViewClient with robust network resilience & no loop
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
@@ -223,11 +227,28 @@ public class MainActivity extends Activity {
                 }
             }
 
+            @SuppressWarnings("deprecation")
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
+                    return false;
+                }
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                    return true;
+                } catch (Exception ignored) {
+                    return true;
+                }
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                if (url != null && url.contains("proz")) {
+                if (url != null && !url.equals("about:blank") && !url.startsWith("data:")) {
                     isPageLoaded = true;
+                    mainFrameErrorCount = 0; // Successfully loaded, reset errors
+
                     if (splashContainer != null && splashContainer.getVisibility() == View.VISIBLE) {
                         splashContainer.animate().alpha(0f).setDuration(300).withEndAction(() -> {
                             splashContainer.setVisibility(View.GONE);
@@ -239,33 +260,59 @@ public class MainActivity extends Activity {
 
             @Override
             public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                // Ignore sub-resource errors (images, icons, analytics)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    // Ignore sub-resource errors (images, icons, analytics, fonts, prefetch)
                     if (!request.isForMainFrame()) {
+                        return;
+                    }
+
+                    int errorCode = error.getErrorCode();
+                    CharSequence descChar = error.getDescription();
+                    String desc = descChar != null ? descChar.toString() : "";
+
+                    // CRITICAL: Ignore aborted requests (Chromium net::ERR_ABORTED = -1)
+                    // This happens when Next.js client-side router navigates, redirects, or cancels prefetch!
+                    if (errorCode == -1 || desc.contains("net::ERR_ABORTED") || desc.contains("ERR_CACHE_MISS")) {
+                        return;
+                    }
+
+                    // If user is already browsing inside the app, NEVER kick them out to offline screen
+                    if (isPageLoaded) {
                         return;
                     }
                 }
 
-                // If main frame error occurs, retry twice before showing error view
+                // If initial load fails, retry up to 2 times
                 mainFrameErrorCount++;
-                if (mainFrameErrorCount < 3) {
+                if (mainFrameErrorCount <= 2) {
                     mainHandler.postDelayed(() -> {
-                        if (webView != null) webView.loadUrl(PRODUCTION_URL);
-                    }, 1500);
+                        if (webView != null && !isPageLoaded) {
+                            webView.loadUrl(PRODUCTION_URL);
+                        }
+                    }, 2500);
                     return;
                 }
 
                 showOfflineScreen();
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-                if (failingUrl != null && (failingUrl.equals(PRODUCTION_URL) || failingUrl.equals(PRODUCTION_URL + "/"))) {
+                if (errorCode == -1 || (description != null && description.contains("ERR_ABORTED"))) {
+                    return;
+                }
+                if (isPageLoaded) {
+                    return;
+                }
+                if (failingUrl != null && failingUrl.startsWith(PRODUCTION_URL)) {
                     mainFrameErrorCount++;
-                    if (mainFrameErrorCount < 3) {
+                    if (mainFrameErrorCount <= 2) {
                         mainHandler.postDelayed(() -> {
-                            if (webView != null) webView.loadUrl(PRODUCTION_URL);
-                        }, 1500);
+                            if (webView != null && !isPageLoaded) {
+                                webView.loadUrl(PRODUCTION_URL);
+                            }
+                        }, 2500);
                         return;
                     }
                     showOfflineScreen();
@@ -304,13 +351,12 @@ public class MainActivity extends Activity {
             "    window.location.replace('" + PRODUCTION_URL + "');" +
             "  }" +
             "}" +
-            "setTimeout(tryReconnect, 4000);" +
             "</script>" +
             "</head>" +
             "<body>" +
             "<div class='spinner'></div>" +
             "<h1>PROZ ENTERTAINMENT</h1>" +
-            "<p>Connecting to streaming server... Tap below to reconnect.</p>" +
+            "<p>Unable to connect to streaming server. Check network connection and tap below.</p>" +
             "<button id='btn' class='btn' onclick='tryReconnect()'>Reconnect</button>" +
             "</body></html>";
 
@@ -340,7 +386,7 @@ public class MainActivity extends Activity {
         // Create sleek Progress Dialog
         AlertDialog progressDialog = new AlertDialog.Builder(this)
             .setTitle("Downloading Update")
-            .setMessage("Downloading PROZ Entertainment v0.01 update... 0%")
+            .setMessage("Downloading PROZ MOVIE v0.02 update... 0%")
             .setCancelable(false)
             .create();
 
@@ -351,7 +397,7 @@ public class MainActivity extends Activity {
             try {
                 URL url = new URL(apkUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzEntertainmentApp/0.01");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.02");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(30000);
                 conn.connect();
@@ -369,7 +415,7 @@ public class MainActivity extends Activity {
                 if (downloadDir == null) {
                     downloadDir = getCacheDir();
                 }
-                apkFile = new File(downloadDir, "PROZ-ENTERTAINMENT-update.apk");
+                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.02.apk");
                 if (apkFile.exists()) {
                     apkFile.delete();
                 }
