@@ -201,6 +201,24 @@ export const Navbar: React.FC = () => {
                         <Sparkles className="w-4 h-4 text-proz-purple" />
                         <span>Subscription Plans</span>
                       </Link>
+
+                      <button
+                        onClick={() => {
+                          setIsUserDropdownOpen(false);
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new CustomEvent('proz:check-update'));
+                          }
+                        }}
+                        className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-proz-white/90 hover:bg-proz-navy/70 hover:text-cyan-400 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Sparkles className="w-4 h-4 text-purple-400" />
+                          <span>Check for Updates</span>
+                        </div>
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">
+                          v0.02
+                        </span>
+                      </button>
                     </div>
 
                     <div className="pt-1 border-t border-proz-border/40">
@@ -286,6 +304,21 @@ export const Navbar: React.FC = () => {
               >
                 Account
               </Link>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('proz:check-update'));
+                  }
+                }}
+                className="w-full text-center py-2.5 rounded-xl text-xs font-bold bg-purple-600/20 text-purple-300 border border-purple-500/30 flex items-center justify-center gap-1.5"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Check for Updates (v0.02)</span>
+              </button>
             </div>
           </div>
         )}

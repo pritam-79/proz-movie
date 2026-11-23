@@ -2,21 +2,27 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   return NextResponse.json({
-    latestVersion: '0.01',
-    latestVersionCode: 1,
+    latestVersion: '0.02',
+    latestVersionCode: 2,
     minVersionCode: 1,
-    appName: 'PROZ Entertainment',
-    title: 'PROZ Entertainment v0.01 Update',
-    releaseDate: '2026-11-19',
+    appName: 'PROZ MOVIE',
+    title: 'PROZ MOVIE v0.02 Update',
+    releaseDate: '2026-11-23',
     apkUrl: 'https://proz-movie.vercel.app/api/download/apk',
-    directGithubUrl: 'https://github.com/pritam-79/proz-movie/releases/download/v0.01/PROZ-ENTERTAINMENT-v0.01.apk',
-    fileSize: '652 KB',
+    directGithubUrl: 'https://github.com/pritam-79/proz-movie/releases/tag/v0.02',
+    fileSize: '1.2 MB',
     changelog: [
-      'Fixed reconnect loop & blank screen issue',
-      'Added seamless In-App Updater with background download & auto-installer',
-      'Integrated native Liquid Glass splash screen with smooth crossfade',
-      'Added multi-frame retry mechanism for mobile network stability',
-      'Enhanced 278-channel Live TV circular directory & EPG player'
+      'Private multi-user library with isolated watch history, ratings and favourites',
+      'Multiple Stash connections via official GraphQL API without leaking internal credentials',
+      'Advanced personal history and resume point synchronization',
+      'Playlists and group sharing with permission inheritance',
+      'Library restrictions and denied-by-default server-side access control',
+      'Direct authorized media playback via encrypted chunk stream proxy (HTTP 206)',
+      'Download permissions with offline queue and storage quota manager',
+      'Advanced browsing: Grid, Compact Grid, List view, 10-foot TV mode and chronological timeline',
+      'Adult-section privacy controls with statutory birth-year verification gate (18+)',
+      'Authorized P2P integration framework for Public Domain and Creative Commons archives',
+      'Security improvements, Row-Level Security database migration, and rate limiting'
     ]
   });
 }

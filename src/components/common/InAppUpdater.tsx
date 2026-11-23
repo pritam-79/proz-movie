@@ -1,11 +1,26 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Download, Sparkles, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
+import { 
+  Download, 
+  Sparkles, 
+  X, 
+  CheckCircle2, 
+  AlertCircle, 
+  RefreshCw, 
+  ArrowRight,
+  ShieldCheck,
+  FolderLock,
+  Layers,
+  Zap,
+  Info
+} from 'lucide-react';
 
 interface UpdateInfo {
   latestVersion: string;
   latestVersionCode: number;
+  minVersionCode: number;
   appName: string;
   title: string;
   releaseDate: string;
@@ -18,47 +33,108 @@ interface UpdateInfo {
 export default function InAppUpdater() {
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [showBanner, setShowBanner] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [updateProgress, setUpdateProgress] = useState(0);
   const [isAndroidApp, setIsAndroidApp] = useState(false);
   const [currentVersion, setCurrentVersion] = useState<string>('0.01');
+  const [hasUpdate, setHasUpdate] = useState(false);
 
   useEffect(() => {
-    // Detect native Android app
+    // 1. Detect native Android host wrapper
     if (typeof window !== 'undefined' && (window as any).AndroidHost) {
       setIsAndroidApp(true);
       try {
         const ver = (window as any).AndroidHost.getAppVersion();
         if (ver) setCurrentVersion(ver);
-      } catch (e) {
-        // Ignore
+      } catch {
+        // Fallback
       }
     }
 
-    // Fetch latest update info
+    // 2. Fetch latest update metadata
     fetch('/api/app/update')
       .then((res) => res.json())
       .then((data: UpdateInfo) => {
         setUpdateInfo(data);
-      })
-      .catch(() => {});
-  }, []);
 
-  const handleUpdate = () => {
+        // Check if user is on an older version or hasn't acknowledged v0.02
+        const acknowledged = localStorage.getItem('proz_acknowledged_version');
+        const isNewVersion = data.latestVersion !== currentVersion || data.latestVersionCode > 1;
+
+        if (isNewVersion) {
+          setHasUpdate(true);
+          // Show non-intrusive banner on load
+          if (acknowledged !== data.latestVersion) {
+            setShowBanner(true);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('In-app update check failed:', err);
+      });
+
+    // 3. Listen for manual "Check for Updates" trigger from Account or Settings
+    const handleManualCheck = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener('proz:check-update', handleManualCheck);
+    return () => window.removeEventListener('proz:check-update', handleManualCheck);
+  }, [currentVersion]);
+
+  const handleApplyUpdate = async () => {
     if (!updateInfo) return;
     setIsUpdating(true);
+    setUpdateProgress(15);
 
+    // If native Android app with injected host
     if (typeof window !== 'undefined' && (window as any).AndroidHost?.startInAppUpdate) {
-      (window as any).AndroidHost.startInAppUpdate(updateInfo.apkUrl);
+      setUpdateProgress(40);
+      try {
+        (window as any).AndroidHost.startInAppUpdate(updateInfo.apkUrl);
+        setUpdateProgress(100);
+        setTimeout(() => {
+          setIsOpen(false);
+          setIsUpdating(false);
+        }, 1500);
+      } catch {
+        window.location.href = updateInfo.apkUrl;
+      }
+      return;
+    }
+
+    // If Web / PWA: Execute Safe Service-Worker & Cache Refresh Lifecycle
+    try {
+      setUpdateProgress(35);
+      if ('caches' in window) {
+        // Clear old runtime asset caches safely while preserving user data in localStorage
+        const keys = await caches.keys();
+        await Promise.all(
+          keys.filter(k => k.includes('proz') || k.includes('next')).map(k => caches.delete(k))
+        );
+      }
+      setUpdateProgress(70);
+
+      // Save acknowledged version
+      localStorage.setItem('proz_acknowledged_version', updateInfo.latestVersion);
+      setUpdateProgress(95);
+
       setTimeout(() => {
-        setIsOpen(false);
-        setIsUpdating(false);
-      }, 2000);
-    } else {
+        setUpdateProgress(100);
+        // Clean reload to pull fresh bundle
+        window.location.reload();
+      }, 1000);
+    } catch {
       window.location.href = updateInfo.apkUrl;
-      setTimeout(() => {
-        setIsOpen(false);
-        setIsUpdating(false);
-      }, 2000);
+      setIsUpdating(false);
+    }
+  };
+
+  const handleDismissBanner = () => {
+    setShowBanner(false);
+    if (updateInfo) {
+      localStorage.setItem('proz_acknowledged_version', updateInfo.latestVersion);
     }
   };
 
@@ -66,93 +142,190 @@ export default function InAppUpdater() {
 
   return (
     <>
-      {/* Floating Pill for Quick Access */}
+      {/* ─── 1. TOP IN-APP UPDATE BANNER (Auto-notifies when v0.02 is available) ─── */}
+      {showBanner && (
+        <div className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-purple-950/95 via-[#080B12]/95 to-cyan-950/95 border-b border-purple-500/40 backdrop-blur-xl shadow-2xl animate-fade-in">
+          <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <span className="p-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 flex-shrink-0 animate-pulse">
+                <Sparkles className="w-4 h-4" />
+              </span>
+              <div className="truncate">
+                <span className="font-bold text-white">PROZ MOVIE v{updateInfo.latestVersion} Available:</span>{' '}
+                <span className="text-slate-300 hidden sm:inline">
+                  Private Multi-User Library, Stash Vault, and 18+ Ecosystem.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md shadow-purple-600/30 transition flex items-center gap-1.5"
+              >
+                <span>What&apos;s New</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={handleDismissBanner}
+                className="p-1 text-slate-400 hover:text-white transition"
+                title="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 2. FLOATING UPDATE PILL (Permanent Access) ─── */}
       <div className="fixed bottom-20 right-4 z-40 md:bottom-6 md:right-6">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-proz-navy/90 hover:bg-proz-navy border border-proz-purple/40 hover:border-proz-purple text-proz-white text-xs font-semibold shadow-lg shadow-proz-purple/20 backdrop-blur-md transition-all hover:scale-105 active:scale-95 group"
-          title="App Version & Updates"
+          className={`flex items-center gap-2 px-3.5 py-2 rounded-full border text-xs font-semibold shadow-xl backdrop-blur-md transition-all hover:scale-105 active:scale-95 group ${
+            hasUpdate 
+              ? 'bg-purple-900/80 border-purple-400/60 text-white shadow-purple-900/40' 
+              : 'bg-[#111827]/90 border-slate-700 text-slate-300 hover:text-white'
+          }`}
+          title="App Version & In-App Updates"
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>v{currentVersion}</span>
-          <Download className="w-3.5 h-3.5 text-proz-purple group-hover:translate-y-0.5 transition-transform" />
+          <span className={`w-2 h-2 rounded-full ${hasUpdate ? 'bg-cyan-400 animate-ping' : 'bg-emerald-400'}`} />
+          <span>v{updateInfo.latestVersion}</span>
+          {hasUpdate ? (
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-purple-500 text-white font-extrabold uppercase">
+              NEW
+            </span>
+          ) : (
+            <Download className="w-3.5 h-3.5 text-purple-400 group-hover:translate-y-0.5 transition-transform" />
+          )}
         </button>
       </div>
 
-      {/* In-App Update Modal */}
+      {/* ─── 3. IN-APP UPDATE MODAL ─── */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
-          <div className="relative w-full max-w-md bg-proz-card border border-white/10 rounded-2xl p-6 shadow-2xl shadow-rose-950/30 overflow-hidden">
-            {/* Top gradient glow */}
-            <div className="absolute -top-16 -left-16 w-32 h-32 bg-proz-purple/30 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-16 -right-16 w-32 h-32 bg-proz-red/25 rounded-full blur-3xl pointer-events-none" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fade-in">
+          <div className="relative w-full max-w-lg bg-[#0F1420] border border-purple-500/30 rounded-3xl p-6 sm:p-7 shadow-2xl shadow-purple-950/50 overflow-hidden">
+            {/* Ambient Background Glows */}
+            <div className="absolute -top-16 -left-16 w-44 h-44 bg-purple-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -right-16 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
 
             {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-1.5 rounded-full text-proz-grey hover:text-white hover:bg-white/10 transition-colors"
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
             {/* Header */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-gradient-to-br from-proz-red to-proz-purple text-white shadow-md shadow-proz-red/30">
+            <div className="flex items-center gap-3.5 mb-5">
+              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 text-white shadow-lg shadow-purple-600/30">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  {updateInfo.appName}
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-proz-purple/20 border border-proz-purple/40 text-proz-purple font-mono">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-xl font-black text-white tracking-tight">
+                    {updateInfo.appName}
+                  </h3>
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/40 text-purple-300 font-mono font-bold">
                     v{updateInfo.latestVersion}
                   </span>
-                </h3>
-                <p className="text-xs text-proz-grey">
-                  {isAndroidApp ? 'Android In-App Direct Update' : 'Live Platform & APK Engine'} • {updateInfo.fileSize}
+                </div>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Released on {updateInfo.releaseDate} • {updateInfo.fileSize}
                 </p>
               </div>
             </div>
 
-            {/* Changelog */}
-            <div className="bg-proz-midnight/70 rounded-xl p-3.5 border border-white/5 mb-5">
-              <h4 className="text-xs font-semibold text-proz-white mb-2.5 flex items-center gap-1.5 uppercase tracking-wider">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> What's New in v{updateInfo.latestVersion}:
+            {/* Version Comparison Card */}
+            <div className="grid grid-cols-2 gap-3 mb-5 p-3 rounded-2xl bg-white/[0.03] border border-white/5 text-xs">
+              <div>
+                <span className="text-slate-400 block text-[11px]">Installed Build</span>
+                <span className="font-mono font-bold text-slate-200">v{currentVersion}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block text-[11px]">Available Release</span>
+                <span className="font-mono font-bold text-cyan-400 flex items-center gap-1">
+                  v{updateInfo.latestVersion}
+                  <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+                </span>
+              </div>
+            </div>
+
+            {/* What's New Changelog */}
+            <div className="bg-[#080B12]/80 rounded-2xl p-4 border border-white/5 mb-6 max-h-56 overflow-y-auto custom-scrollbar">
+              <h4 className="text-xs font-bold text-purple-300 mb-3 flex items-center gap-1.5 uppercase tracking-wider">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" /> What&apos;s New in v{updateInfo.latestVersion}:
               </h4>
-              <ul className="space-y-1.5">
+              <ul className="space-y-2">
                 {updateInfo.changelog.map((item, idx) => (
-                  <li key={idx} className="text-xs text-proz-grey flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-proz-purple mt-1 flex-shrink-0" />
-                    <span>{item}</span>
+                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0" />
+                    <span className="leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
+            {/* Update Progress Indicator */}
+            {isUpdating && (
+              <div className="mb-5 space-y-2">
+                <div className="flex items-center justify-between text-xs text-slate-300">
+                  <span className="flex items-center gap-2">
+                    <RefreshCw className="w-3.5 h-3.5 text-purple-400 animate-spin" />
+                    <span>Applying in-app update...</span>
+                  </span>
+                  <span className="font-bold text-cyan-400">{updateProgress}%</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full transition-all duration-300"
+                    style={{ width: `${updateProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex flex-col gap-2.5">
               <button
-                onClick={handleUpdate}
+                onClick={handleApplyUpdate}
                 disabled={isUpdating}
-                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-proz-red via-proz-purple to-proz-cyan shadow-lg shadow-proz-red/30 hover:opacity-95 active:scale-98 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 shadow-xl shadow-purple-600/30 hover:opacity-95 active:scale-98 transition-all disabled:opacity-50"
               >
-                <Download className="w-4 h-4" />
-                {isUpdating
-                  ? isAndroidApp
-                    ? 'Launching In-App Installer...'
-                    : 'Downloading APK...'
-                  : isAndroidApp
-                  ? 'Update Now (In-App)'
-                  : 'Download Latest APK (v0.01)'}
+                {isUpdating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Upgrading Application...</span>
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    <span>
+                      {isAndroidApp ? 'Update Now (In-App APK)' : 'Update Now (Reload Assets)'}
+                    </span>
+                  </>
+                )}
               </button>
 
-              <a
-                href={updateInfo.directGithubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full text-center py-2 text-xs text-proz-grey hover:text-proz-white transition-colors"
-              >
-                View release on GitHub →
-              </a>
+              <div className="flex items-center justify-between text-xs pt-1 px-1">
+                <Link
+                  href="/updates"
+                  onClick={() => setIsOpen(false)}
+                  className="text-purple-400 hover:text-purple-300 font-semibold"
+                >
+                  Full Architecture Notes →
+                </Link>
+
+                <a
+                  href={updateInfo.apkUrl}
+                  download="PROZ-MOVIE-v0.02.apk"
+                  className="text-slate-400 hover:text-white flex items-center gap-1"
+                >
+                  <span>Direct APK File</span>
+                  <Download className="w-3 h-3" />
+                </a>
+              </div>
             </div>
           </div>
         </div>
