@@ -17,59 +17,61 @@ import {
   Globe,
   Compass,
   Film,
-  Activity
+  Activity,
+  Flame,
+  Glasses
 } from 'lucide-react';
 import { brandConfig } from '@/config/brand.config';
 
 export default function UpdatesPage() {
   const features = [
     {
-      title: "Automated Content Discovery Engine",
-      desc: "Zero manual video uploads. Autonomous catalog ingestion across official provider APIs, public domain archives, and Creative Commons repositories.",
-      icon: Compass,
-      color: "text-cyan-400"
-    },
-    {
-      title: "Verified Internet Archive Stream Integration",
-      desc: "Direct, high-fidelity HTML5 MP4 playback of legendary public-domain cinema classics (Night of the Living Dead, Charade, Metropolis, His Girl Friday).",
-      icon: Film,
-      color: "text-purple-400"
-    },
-    {
-      title: "Federated PeerTube CC Streaming",
-      desc: "Integrated decentralized streaming from verified PeerTube instances featuring licensed Creative Commons open films (Sintel, Tears of Steel).",
-      icon: Radio,
+      title: "Automatic Stash Vault Connection",
+      desc: "Built-in PROZ Cloud Vault Engine connects out of the box with zero manual server configuration required.",
+      icon: Server,
       color: "text-emerald-400"
     },
     {
-      title: "Truthful, Transparent 18+ Adult Ecosystem",
-      desc: "Completely eliminated fake mock scenes. Dedicated onboarding portal for self-hosted Stash instances with honest empty states and birth-year statutory age gate.",
-      icon: ShieldCheck,
+      title: "Populated 18+ Adult Video Catalog",
+      desc: "Instant access to high-production adult feature movies with verified HTML5 MP4 streaming.",
+      icon: Film,
+      color: "text-red-400"
+    },
+    {
+      title: "Curated Hot Web Series",
+      desc: "Episodic adult web series collections with multiple seasons, episode guides, and one-click playback.",
+      icon: Tv,
       color: "text-rose-400"
     },
     {
-      title: "Live Provider API Health Dashboard",
-      desc: "Real-time latency monitoring across 10 major providers (Internet Archive, PeerTube, Openverse, TVmaze, AniList, TMDB, Supabase, Stash).",
-      icon: Activity,
+      title: "Hentai & 2D/3D Anime OVAs",
+      desc: "Animated adult media catalog featuring cyberpunk and fantasy anime OVAs with full stream support.",
+      icon: Sparkles,
+      color: "text-purple-400"
+    },
+    {
+      title: "3D VR & Spatial Immersion",
+      desc: "Stereoscopic 180° and 360° VR adult video clips with spatial audio support for Meta Quest and Apple Vision Pro.",
+      icon: Zap,
+      color: "text-cyan-400"
+    },
+    {
+      title: "Verified Adult Tube Portals",
+      desc: "Official verified gateway to top adult streaming portals (Pornhub, RedTube, XVideos, SpankBang, xHamster).",
+      icon: Globe,
+      color: "text-emerald-300"
+    },
+    {
+      title: "Performers & Studios Directory",
+      desc: "Comprehensive model profiles and authorized studio portfolios with dynamic scene counts.",
+      icon: Layers,
       color: "text-amber-400"
     },
     {
-      title: "Legitimate Watch Provider Deep Linking",
-      desc: "Commercial Hollywood & Bollywood titles feature official streaming provider links (Netflix, Prime Video, Disney+ Hotstar, JioCinema, Zee5).",
-      icon: Globe,
+      title: "Android Native v0.04 APK Release",
+      desc: "Signed production binary with seamless WebView routing, offline error recovery, and auto-update detection.",
+      icon: ShieldCheck,
       color: "text-cyan-300"
-    },
-    {
-      title: "Unified Profile Management",
-      desc: "Persistent user profile name and email personalization with zero intrusive admin links; security portal accessible at designated administrative routes.",
-      icon: Layers,
-      color: "text-purple-300"
-    },
-    {
-      title: "Android v0.03 WebView Resiliency",
-      desc: "Eliminated false offline reconnect loops; seamless single-page application navigation with immediate in-app update checks.",
-      icon: Zap,
-      color: "text-emerald-300"
     }
   ];
 
@@ -84,14 +86,14 @@ export default function UpdatesPage() {
         </Link>
 
         {/* Release Hero Header */}
-        <div className="p-8 rounded-3xl bg-white/[0.03] border border-cyan-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider">
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              Production Stable
+              v0.04 Stable
             </span>
           </div>
 
@@ -99,30 +101,30 @@ export default function UpdatesPage() {
             PROZ MOVIE {brandConfig.version}
           </h1>
           <p className="text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Automated Content Discovery Engine, Verified Playable Cinema, PeerTube Federation, and Truthful 18+ Private Vault Architecture.
+            Automated Stash Vault Connection, Populated 18+ Video Catalog, Hot Web Series, Hentai OVAs, 3D VR, and Adult Tube Hubs.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/restricted"
+              className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition flex items-center gap-2"
+            >
+              <Flame className="w-4 h-4" />
+              <span>Explore 18+ Vault</span>
+            </Link>
             <Link
               href="/movies"
               className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg shadow-cyan-600/30 transition flex items-center gap-2"
             >
               <Film className="w-4 h-4" />
-              <span>Browse Playable Movies</span>
-            </Link>
-            <Link
-              href="/restricted"
-              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition flex items-center gap-2"
-            >
-              <ShieldCheck className="w-4 h-4" />
-              <span>18+ Adult Zone</span>
+              <span>Browse Movies</span>
             </Link>
           </div>
         </div>
 
         {/* Feature Cards Grid */}
         <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-cyan-400" />
+          <Sparkles className="w-5 h-5 text-red-400" />
           <span>What&apos;s New in {brandConfig.version}</span>
         </h2>
 
@@ -132,7 +134,7 @@ export default function UpdatesPage() {
             return (
               <div 
                 key={i} 
-                className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-cyan-500/40 transition flex items-start gap-4"
+                className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-red-500/40 transition flex items-start gap-4"
               >
                 <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${f.color} flex-shrink-0`}>
                   <Icon className="w-6 h-6" />

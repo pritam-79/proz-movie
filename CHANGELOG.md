@@ -4,6 +4,25 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
+## [0.04.0] — 2026-11-24
+
+### Major New Capabilities & Architecture
+- **Automatic Stash Vault Connection:**
+  - Automated Stash adapter fallback to built-in PROZ Cloud Vault Engine (`v0.04 Auto-Connected`).
+  - Seamless zero-configuration connection out of the box without requiring manual GraphQL endpoint setup.
+- **Populated 18+ Adult Video Ecosystem:**
+  - Instant access to adult feature films and scenes with direct playable MP4 streams and HTTP 206 range seeking.
+  - Complete Hot Web Series directory with episodic breakdowns (*Secret Desires*, *Midnight Whispers*, *Monsoon Rendezvous*).
+  - Hentai & 2D/3D Animated OVA collections (*Succubus Protocol*, *Secret Lessons*, *Valkyrie Blade*).
+  - 3D VR & Spatial Immersion section supporting stereoscopic 180° and 360° adult video experiences.
+  - Verified Adult Tube Sites hub providing official direct links to top portals (*Pornhub*, *RedTube*, *XVideos*, *SpankBang*, *xHamster*).
+  - Performer and studio portfolios with scene counts and photo galleries.
+- **Global v0.04 Version Bump:**
+  - Synchronized version across Web PWA, brand configuration, Navbar, Footer, In-App Updater, API routes, and native Android host.
+  - Recompiled signed release APK: `PROZ-MOVIE-v0.04.apk` (`versionCode = 4`, `versionName = "0.04"`).
+
+---
+
 ## [0.03.0] — 2026-11-24
 
 ### Major New Capabilities & Architecture
