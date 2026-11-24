@@ -4,6 +4,37 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
+## [0.06.0] — 2026-11-24
+
+### Reference Analysis, Playback Engine Repair & API/DRM Integration
+- **Centralized Video Player Repair:**
+  - Resolved infinite "Buffering stream..." spinner and 00:00 duration freeze caused by missing `onLoadedMetadata`, `onCanPlay`, and paused video states.
+  - Added autoplay initialization with graceful failure handling for browser autoplay policies.
+  - Implemented prominent interactive Play Button overlay when video is paused, preventing confusion.
+  - Enabled responsive duration tracking that immediately displays actual runtime once stream metadata is received.
+- **Movie & Channel Playback Stream Resolution:**
+  - Diagnosed and repaired 132 broken sample URLs (`commondatastorage.googleapis.com`) returning HTTP 403 Forbidden.
+  - Replaced dead endpoints with high-bitrate adaptive streams: Mux multi-bitrate HLS (`test-streams.mux.dev`), Unified Streaming multi-audio HLS (`demo.unified-streaming.com`), Google Shaka DASH (`storage.googleapis.com/shaka-demo-assets`), and Internet Archive high-speed MP4 (`archive.org`).
+  - Integrated dynamic resolution on Title and Watch pages: clicking any Cine18 channel title (`cine18-`) loads genuine video details, episode lists, and playable CDN streams (`cdn.siincere.com`) instead of defaulting to Deadpool & Wolverine.
+- **Authorized DRM Architecture & Implementation:**
+  - Integrated Google Shaka Player with EME (Encrypted Media Extensions) key system configurations.
+  - Supported Widevine Modular DRM (`com.widevine.alpha`) with configurable license server URI.
+  - Added W3C ClearKey (`org.w3.clearkey`) key management for open-standard DRM testing.
+  - Built automatic DRM license acquisition fallback to direct clear stream if license acquisition is unauthorized or unavailable.
+- **Suppressed Intrusive Update Banners:**
+  - Fixed hardcoded version comparison bug in `src/components/common/InAppUpdater.tsx` where `data.latestVersionCode > 1` caused update banners to re-appear on every page reload.
+  - Connected updater to centralized `brandConfig.version` (`0.06`), ensuring persistent banners are suppressed once on the current build.
+- **Complete Android Manifest Permissions:**
+  - Expanded `android/app/src/main/AndroidManifest.xml` based on reference specifications from Cinema HD and Cine18 APKs: added `ACCESS_WIFI_STATE`, `FOREGROUND_SERVICE`, `READ_MEDIA_VIDEO`, `READ_MEDIA_AUDIO`, `READ_MEDIA_IMAGES`, `POST_NOTIFICATIONS`, and `WAKE_LOCK`.
+- **Global v0.06 Release & Synchronization:**
+  - Updated `package.json` to `0.06.0`.
+  - Updated `brandConfig.version` to `v0.06` (`versionCode: 6`).
+  - Updated `android/app/build.gradle.kts` to `versionCode = 6`, `versionName = "0.06"`.
+  - Updated `api/app/update` endpoint and UI labels to `v0.06`.
+  - Recompiled signed production APK `PROZ-MOVIE-v0.06.apk`.
+
+---
+
 ## [0.05.0] — 2026-11-24
 
 ### Major System Repair & Backend Integration (Audit of bugs.pdf)

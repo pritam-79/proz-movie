@@ -72,10 +72,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         session: { token: sessionToken },
         sessionToken,
-        hlsUrl: null,
-        dashUrl: null,
-        fallbackMp4: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-        drmConfig: null,
+        hlsUrl: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8',
+        dashUrl: 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd',
+        fallbackMp4: 'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4',
+        drmConfig: {
+          keySystems: {
+            'org.w3.clearkey': {
+              clearKeys: {
+                'nrQFDeRLSAKTLAvxUFRUiA': 'K8D899RhTJL6zpdMGHeTurnA'
+              }
+            }
+          }
+        },
         subtitles: [],
         audioTracks: [],
         expiresAt
@@ -179,15 +187,39 @@ export async function POST(req: NextRequest) {
     const sessionToken = `proz_demo_session_${Date.now()}`;
     const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
 
+    const isDash = match.dashUrl || 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
+    const isHls = match.streamUrl?.includes('.m3u8')
+      ? match.streamUrl
+      : 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8';
+    const isMp4 = match.fallbackMp4?.endsWith('.mp4')
+      ? match.fallbackMp4
+      : 'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4';
+
     return NextResponse.json({
       session: { token: sessionToken },
       sessionToken,
-      hlsUrl: match.streamUrl || 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8',
-      dashUrl: match.dashUrl || 'https://dash.akamaized.net/akamai/bbb_30fps/bbb_30fps.mpd',
-      fallbackMp4: match.fallbackMp4 || 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      drmConfig: null,
-      subtitles: match.subtitles || [],
-      audioTracks: match.audioTracks || [],
+      hlsUrl: isHls,
+      dashUrl: isDash,
+      fallbackMp4: isMp4,
+      drmConfig: {
+        keySystems: {
+          'com.widevine.alpha': {
+            licenseServerUri: process.env.WIDEVINE_LICENSE_URL || 'https://cwip-shaka-drm.appspot.com/no_auth'
+          },
+          'org.w3.clearkey': {
+            clearKeys: {
+              'nrQFDeRLSAKTLAvxUFRUiA': 'K8D899RhTJL6zpdMGHeTurnA'
+            }
+          }
+        }
+      },
+      subtitles: match.subtitles || [
+        { label: 'English', language: 'en', src: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-en.vtt' }
+      ],
+      audioTracks: match.audioTracks || [
+        { label: 'English [Original]', language: 'en' },
+        { label: 'Hindi [Dubbed]', language: 'hi' }
+      ],
       expiresAt,
     });
   } catch (err) {

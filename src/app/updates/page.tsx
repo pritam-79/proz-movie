@@ -68,7 +68,7 @@ export default function UpdatesPage() {
       color: "text-emerald-300"
     },
     {
-      title: "Android Native v0.05 APK Release",
+      title: "Android Native v0.06 APK Release",
       desc: "Signed production binary with seamless WebView routing, offline recovery, and in-app update checks.",
       icon: Download,
       color: "text-cyan-300"
@@ -93,7 +93,7 @@ export default function UpdatesPage() {
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              v0.05 Stable
+              v0.06 Stable
             </span>
           </div>
 
@@ -101,7 +101,7 @@ export default function UpdatesPage() {
             PRO2 ENTERTAINMENT {brandConfig.version}
           </h1>
           <p className="text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Complete Bug Fix, Cine18 Live OTT Integration, Channel Content Repair, Broken Image Handling, and UI Overlap Cleanup.
+            Complete Reference Analysis, Playback Engine Repair, Authorized DRM Integration (Widevine/FairPlay/ClearKey), and Channel Stream Recovery.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">

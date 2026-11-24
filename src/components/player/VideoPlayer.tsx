@@ -136,7 +136,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       if (activeStream.endsWith('.mp4') || (!activeStream.includes('.m3u8') && !activeStream.includes('.mpd'))) {
         videoRef.current.src = activeStream;
         videoRef.current.load();
-        setIsBuffering(false);
+        videoRef.current.play().then(() => {
+          setIsPlaying(true);
+          setIsBuffering(false);
+        }).catch(() => {
+          setIsBuffering(false);
+        });
         return;
       }
 
@@ -155,28 +160,72 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
           player.configure({
             abr: { enabled: true, defaultBandwidthEstimate: 5000000 },
-            streaming: { bufferingGoal: 30, rebufferingGoal: 2 }
+            streaming: { bufferingGoal: 30, rebufferingGoal: 2 },
+            drm: {
+              servers: {
+                'com.widevine.alpha': 'https://cwip-shaka-drm.appspot.com/no_auth',
+              },
+              clearKeys: {
+                'nrQFDeRLSAKTLAvxUFRUiA': 'K8D899RhTJL6zpdMGHeTurnA'
+              }
+            }
           });
 
-          player.addEventListener('error', (event: any) => {
-            console.warn('Shaka playback error:', event.detail);
+          player.addEventListener('error', async (event: any) => {
+            console.warn('Shaka playback error, trying direct fallback:', event.detail);
+            const fallback = currentEpisode?.fallbackMp4 || content.fallbackMp4;
+            if (fallback && fallback !== activeStream && videoRef.current) {
+              try {
+                await player.destroy();
+                if (videoRef.current) {
+                  videoRef.current.src = fallback;
+                  videoRef.current.load();
+                  videoRef.current.play().then(() => {
+                    setIsPlaying(true);
+                    setIsBuffering(false);
+                  }).catch(() => setIsBuffering(false));
+                  return;
+                }
+              } catch {
+                // fall through
+              }
+            }
             setHasPlaybackError(true);
-            setErrorMessage('Network or stream manifest error. You can stream directly via official provider below.');
+            setErrorMessage('Stream playback error. You can stream directly via official provider below.');
             setIsBuffering(false);
           });
 
           await player.load(activeStream);
-          setIsBuffering(false);
+          if (videoRef.current) {
+            videoRef.current.play().then(() => {
+              setIsPlaying(true);
+              setIsBuffering(false);
+            }).catch(() => {
+              setIsBuffering(false);
+            });
+          }
         } else if (videoRef.current) {
           videoRef.current.src = activeStream;
           videoRef.current.load();
-          setIsBuffering(false);
+          videoRef.current.play().then(() => {
+            setIsPlaying(true);
+            setIsBuffering(false);
+          }).catch(() => setIsBuffering(false));
         }
       } catch (err: any) {
-        console.warn('Player initialization failed:', err);
-        setHasPlaybackError(true);
-        setErrorMessage(err.message || 'Unable to play direct stream.');
-        setIsBuffering(false);
+        console.warn('Player initialization falling back to native HTML5:', err);
+        if (videoRef.current) {
+          videoRef.current.src = activeStream;
+          videoRef.current.load();
+          videoRef.current.play().then(() => {
+            setIsPlaying(true);
+            setIsBuffering(false);
+          }).catch(() => setIsBuffering(false));
+        } else {
+          setHasPlaybackError(true);
+          setErrorMessage(err.message || 'Unable to play stream.');
+          setIsBuffering(false);
+        }
       }
     };
 
@@ -298,17 +347,36 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           <video
             ref={videoRef}
             playsInline
+            autoPlay
             className="w-full h-full object-contain cursor-pointer"
             onClick={togglePlay}
+            onLoadedMetadata={() => {
+              if (videoRef.current) {
+                const dur = videoRef.current.duration;
+                if (!isNaN(dur) && dur > 0) setDuration(dur);
+              }
+            }}
+            onCanPlay={() => {
+              setIsBuffering(false);
+              if (videoRef.current && (!duration || isNaN(duration))) {
+                const dur = videoRef.current.duration;
+                if (!isNaN(dur) && dur > 0) setDuration(dur);
+              }
+            }}
             onTimeUpdate={() => {
               if (videoRef.current) {
                 const cur = videoRef.current.currentTime;
                 setCurrentTime(cur);
                 saveProgress(content.id, cur, currentEpisode?.id);
+                if ((!duration || isNaN(duration)) && videoRef.current.duration) {
+                  setDuration(videoRef.current.duration);
+                }
               }
             }}
             onDurationChange={() => {
-              if (videoRef.current) setDuration(videoRef.current.duration || 0);
+              if (videoRef.current && !isNaN(videoRef.current.duration)) {
+                setDuration(videoRef.current.duration);
+              }
             }}
             onProgress={() => {
               if (videoRef.current && videoRef.current.buffered.length > 0) {
@@ -333,6 +401,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 pointer-events-none z-20">
               <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
               <p className="text-xs text-zinc-300 font-medium mt-3">Buffering stream...</p>
+            </div>
+          )}
+
+          {/* Big Center Play Overlay (when paused and not buffering) */}
+          {!isPlaying && !isBuffering && (
+            <div 
+              onClick={togglePlay}
+              className="absolute inset-0 flex items-center justify-center bg-black/30 cursor-pointer z-10 transition-opacity hover:bg-black/20"
+            >
+              <div className="w-16 h-16 rounded-full bg-rose-600/90 text-white flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.6)] transform hover:scale-110 transition-all">
+                <Play className="w-8 h-8 fill-white ml-1" />
+              </div>
             </div>
           )}
         </>

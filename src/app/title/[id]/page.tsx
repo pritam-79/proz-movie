@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { 
@@ -29,11 +29,65 @@ export default function TitleDetailPage() {
   
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const allContent = getNormalizedMockContent();
-  const rawContent = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
-  const content = normalizeContentItem(rawContent) as any;
+  const rawContent = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
 
+  const [dynamicContent, setDynamicContent] = useState<any>(null);
+  const [loadingDynamic, setLoadingDynamic] = useState(Boolean(contentId?.startsWith('cine18-')));
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (contentId?.startsWith('cine18-')) {
+      const cleanUid = contentId.replace(/^cine18-/, '');
+      setLoadingDynamic(true);
+      fetch(`/api/library/cine18-stream?uid=${cleanUid}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!active) return;
+          if (data && data.success) {
+            setDynamicContent({
+              id: `cine18-${cleanUid}`,
+              title: data.title,
+              synopsis: data.description || `Watch ${data.title} in high definition on PRO2 ENTERTAINMENT.`,
+              tagline: data.tags ? data.tags.split(',').slice(0, 3).join(' • ') : 'Stream in Ultra HD',
+              releaseYear: 2026,
+              runtimeMinutes: 45,
+              maturityRating: 'A 18+',
+              ratingScore: data.rating || 8.0,
+              posterUrl: data.poster || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
+              backdropUrl: data.backdrop || data.poster || 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop',
+              type: 'series',
+              category: '18+ Exclusive',
+              genres: data.tags ? data.tags.split(',').map((t: string) => t.trim()) : ['Drama', 'Romance', 'Web Series'],
+              seasons: [
+                {
+                  id: `season-1-${cleanUid}`,
+                  seasonNumber: 1,
+                  title: 'Season 1',
+                  episodes: (data.episodes || []).map((ep: any, idx: number) => ({
+                    id: ep.id || `ep-${cleanUid}-${idx + 1}`,
+                    episodeNumber: ep.episodeNumber || idx + 1,
+                    title: ep.title || `Episode ${idx + 1}`,
+                    durationMinutes: 28,
+                    thumbnailUrl: ep.thumbnailUrl || data.poster,
+                    streamUrl: ep.streamUrl
+                  }))
+                }
+              ]
+            });
+          }
+          setLoadingDynamic(false);
+        })
+        .catch(() => {
+          if (active) setLoadingDynamic(false);
+        });
+    }
+    return () => { active = false; };
+  }, [contentId]);
+
+  const activeContent = dynamicContent || (rawContent ? normalizeContentItem(rawContent) : normalizeContentItem(allContent[0])) as any;
+  const content = activeContent;
 
   const inWatchlist = isInWatchlist(content.id);
 

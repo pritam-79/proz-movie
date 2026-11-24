@@ -21,6 +21,7 @@ export const ContentCard: React.FC<ContentCardProps> = ({
   updateStatus
 }) => {
   const [imageError, setImageError] = React.useState(false);
+  const [triedFallback, setTriedFallback] = React.useState(false);
 
   const typeLabel =
     (item.content_type || item.type) === 'movie'
@@ -32,9 +33,12 @@ export const ContentCard: React.FC<ContentCardProps> = ({
       : 'Series';
 
   const isBackdrop = aspectRatio === 'backdrop';
-  const imageUrl = isBackdrop
+  const primaryUrl = isBackdrop
     ? (item.backdrop_url || item.backdropUrl || item.poster_url || item.posterUrl)
     : (item.poster_url || item.posterUrl || item.backdrop_url || item.backdropUrl);
+
+  const backupUrl = item.backdrop_url || item.backdropUrl || item.poster_url || item.posterUrl;
+  const imageUrl = !triedFallback ? primaryUrl : backupUrl;
 
   const score = item.rating_avg ?? item.ratingScore;
   const displayScore = score ? score.toFixed(1) : null;
@@ -59,7 +63,13 @@ export const ContentCard: React.FC<ContentCardProps> = ({
             alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
-            onError={() => setImageError(true)}
+            onError={() => {
+              if (!triedFallback && backupUrl && backupUrl !== primaryUrl) {
+                setTriedFallback(true);
+              } else {
+                setImageError(true);
+              }
+            }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-[#1e1b4b] via-[#0f172a] to-[#030712] flex flex-col items-center justify-center p-3 text-center relative overflow-hidden">

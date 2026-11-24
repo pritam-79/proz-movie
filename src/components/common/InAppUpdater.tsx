@@ -17,6 +17,8 @@ import {
   Info
 } from 'lucide-react';
 
+import { brandConfig } from '@/config/brand.config';
+
 interface UpdateInfo {
   latestVersion: string;
   latestVersionCode: number;
@@ -37,7 +39,8 @@ export default function InAppUpdater() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateProgress, setUpdateProgress] = useState(0);
   const [isAndroidApp, setIsAndroidApp] = useState(false);
-  const [currentVersion, setCurrentVersion] = useState<string>('0.01');
+  const installedVer = brandConfig.version.replace(/^v/, '');
+  const [currentVersion, setCurrentVersion] = useState<string>(installedVer);
   const [hasUpdate, setHasUpdate] = useState(false);
 
   useEffect(() => {
@@ -46,7 +49,7 @@ export default function InAppUpdater() {
       setIsAndroidApp(true);
       try {
         const ver = (window as any).AndroidHost.getAppVersion();
-        if (ver) setCurrentVersion(ver);
+        if (ver) setCurrentVersion(ver.replace(/^v/, ''));
       } catch {
         // Fallback
       }
@@ -58,16 +61,18 @@ export default function InAppUpdater() {
       .then((data: UpdateInfo) => {
         setUpdateInfo(data);
 
-        // Check if user is on an older version or hasn't acknowledged v0.02
+        // Check if there is genuinely a newer version than current
         const acknowledged = localStorage.getItem('proz_acknowledged_version');
-        const isNewVersion = data.latestVersion !== currentVersion || data.latestVersionCode > 1;
+        const isNewer = data.latestVersionCode > 6 || (data.latestVersion !== currentVersion && data.latestVersion !== installedVer);
 
-        if (isNewVersion) {
+        if (isNewer) {
           setHasUpdate(true);
-          // Show non-intrusive banner on load
           if (acknowledged !== data.latestVersion) {
             setShowBanner(true);
           }
+        } else {
+          setHasUpdate(false);
+          setShowBanner(false);
         }
       })
       .catch((err) => {
