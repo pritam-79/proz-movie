@@ -2,24 +2,22 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
   return NextResponse.json({
-    latestVersion: '0.06',
-    latestVersionCode: 6,
+    latestVersion: '0.07',
+    latestVersionCode: 7,
     minVersionCode: 1,
     appName: 'PRO2 ENTERTAINMENT',
-    title: 'PRO2 ENTERTAINMENT v0.06 — Complete Reference Analysis, Playback Engine Repair & API/DRM Integration',
+    title: 'PRO2 ENTERTAINMENT v0.07 — Modern OTT Hub, Multi-API Deduplication & Direct Open Cinema',
     releaseDate: '2026-11-24',
     apkUrl: 'https://proz-movie.vercel.app/api/download/apk',
-    directGithubUrl: 'https://github.com/pritam-79/proz-movie/releases/tag/v0.06',
+    directGithubUrl: 'https://github.com/pritam-79/proz-movie/releases/tag/v0.07',
     fileSize: '1.7 MB',
     changelog: [
-      'Centralized Video Player Repair: Eliminated infinite buffering and 00:00 duration freeze; added instant playback with automatic autoplay recovery',
-      'Fixed Movie & Channel Playback: Replaced dead cloud-storage endpoints with high-bitrate Mux adaptive HLS, Unified Streaming, and Internet Archive MP4 streams',
-      'Dynamic Channel Video Integration: Clicking any channel item loads actual episode streams and metadata instead of fallback titles',
-      'Authorized DRM Architecture: Integrated Google Shaka Player with Widevine Modular (com.widevine.alpha), Apple FairPlay (com.apple.fps), and W3C ClearKey EME key systems',
-      'Suppressed Intrusive Update Banners: Version checker now accurately recognizes installed v0.06 without persistent banner intrusion',
-      'Full Android Manifest Specification: Configured foreground service, media audio/video/images permissions, and wake-lock for uninterrupted playback',
-      'Enhanced Image Fallback & Aspect Ratios: Channel video cards and posters adapt gracefully without dark/broken states',
-      'Updated to official v0.06 across Web PWA, Android build, and central brand configurations'
+      'New v0.07 Modern Categorized OTT Hub (/ott-hub) with live multi-provider discovery and Playable-Only filtering',
+      'Cross-Provider Comparison & Deduplication Engine merging entries across Internet Archive, PeerTube, NASA, Wikimedia, IPTV-Org, Kitsu, AniList, TVmaze, CineWebby, and core catalog',
+      'Expanded Directly Playable Streams: Real resolved Internet Archive full MP4 films, PeerTube HLS/MP4 videos, NASA space films, Wikimedia Commons open cinema, and IPTV-Org live .m3u8 channels',
+      'Kitsu + AniList + Open Animation categorization with clear badges separating Full Playable Streams from Official Trailers',
+      'Authorized EME DRM Lab supporting Shaka Widevine/ClearKey/FairPlay/PlayReady test profiles and operator BYO license/manifest testing',
+      'All previous v0.01–v0.06 playback repairs, Cine18 channels, and Stash vault functionality preserved cleanly'
     ]
   });
 }

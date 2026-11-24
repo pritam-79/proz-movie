@@ -7,8 +7,9 @@ import { usePathname } from 'next/navigation';
 export const SubHeaderNav: React.FC = () => {
   const pathname = usePathname();
 
-  const tabs = [
+  const tabs: Array<{ label: string; href: string; isLive?: boolean; isVault?: boolean; isAdult?: boolean; badge?: string }> = [
     { label: 'Recommend', href: '/' },
+    { label: 'OTT Hub', href: '/ott-hub', badge: 'v0.07' },
     { label: 'Live TV', href: '/live', isLive: true },
     { label: 'Movies', href: '/movies' },
     { label: 'TV Shows', href: '/series' },
@@ -46,6 +47,11 @@ export const SubHeaderNav: React.FC = () => {
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                 )}
                 <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="ml-0.5 text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/35 font-bold">
+                    {tab.badge}
+                  </span>
+                )}
                 {tab.isAdult && (
                   <span className="ml-1 text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
                     ADULT

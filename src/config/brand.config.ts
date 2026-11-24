@@ -70,8 +70,8 @@ export interface BrandConfig {
 
 export const brandConfig: BrandConfig = {
   name: "PROZ Entertainment",
-  version: "v0.06",
-  versionCode: 6,
+  version: "v0.07",
+  versionCode: 7,
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
   websiteTitle: "PROZ Entertainment – Stream Your World",
   description:
@@ -122,6 +122,7 @@ export const brandConfig: BrandConfig = {
   navigation: {
     mainNav: [
       { label: "Home", href: "/" },
+      { label: "OTT Hub", href: "/ott-hub", badge: "v0.07" },
       { label: "Live TV", href: "/live" },
       { label: "Movies", href: "/movies" },
       { label: "TV Shows", href: "/series" },

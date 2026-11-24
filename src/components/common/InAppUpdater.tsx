@@ -63,7 +63,7 @@ export default function InAppUpdater() {
 
         // Check if there is genuinely a newer version than current
         const acknowledged = localStorage.getItem('proz_acknowledged_version');
-        const isNewer = data.latestVersionCode > 6 || (data.latestVersion !== currentVersion && data.latestVersion !== installedVer);
+        const isNewer = data.latestVersionCode > brandConfig.versionCode || (data.latestVersion !== currentVersion && data.latestVersion !== installedVer);
 
         if (isNewer) {
           setHasUpdate(true);

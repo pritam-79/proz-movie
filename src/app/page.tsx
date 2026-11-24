@@ -8,6 +8,7 @@ import GenreGrid from '@/components/home/GenreGrid';
 import SubHeaderNav from '@/components/navigation/SubHeaderNav';
 import PopularChannelsRow from '@/components/content/PopularChannelsRow';
 import ActionButtonPair from '@/components/common/ActionButtonPair';
+import NewCatalogShowcase from '@/components/v07/NewCatalogShowcase';
 import { 
   Flame, 
   TrendingUp, 
@@ -149,6 +150,9 @@ export default function HomePage() {
 
       {/* 2. Popular Channels & Networks Grid Row */}
       <PopularChannelsRow />
+
+      {/* 2b. v0.07 Unified Playable & Deduplicated OTT Showcase */}
+      <NewCatalogShowcase />
 
       {/* 3. Continue Watching (Interactive Client Row) */}
       <ContinueWatchingRow />

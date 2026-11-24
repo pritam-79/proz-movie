@@ -26,6 +26,30 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.07 Modern Categorized OTT Hub (/ott-hub)",
+      desc: "Unified modern hub with master tabs for Full Playable Movies, Anime Universe, TV & Dramas, Live TV (.m3u8), Channels, Space & Open Cinema, and Playable-Only filtering.",
+      icon: Compass,
+      color: "text-cyan-400"
+    },
+    {
+      title: "Cross-Source Deduplication Engine",
+      desc: "Canonical matching merges duplicate entries across Internet Archive, PeerTube, NASA, Wikimedia, IPTV-Org, Kitsu, AniList, TVmaze, CineWebby, and core catalog.",
+      icon: Layers,
+      color: "text-purple-400"
+    },
+    {
+      title: "Expanded Public-Domain & Open-Cinema Playback",
+      desc: "Direct metadata resolution for full-length Internet Archive MP4 feature films, PeerTube HLS/MP4 videos, NASA space films, and Wikimedia Commons video.",
+      icon: Film,
+      color: "text-emerald-400"
+    },
+    {
+      title: "Live TV Free-to-Air HLS + Kitsu Anime & Authorized DRM Lab",
+      desc: "Integrates verified HTTPS .m3u8 channels from IPTV-Org, Kitsu anime API, and standards-based Widevine/ClearKey/FairPlay/PlayReady BYO test bench.",
+      icon: Radio,
+      color: "text-rose-400"
+    },
+    {
       title: "Live Cine18 / CineWebby API Provider",
       desc: "Universal provider adapter integrating 329+ live OTT channels, web series, video cards, and high-speed CDN stream links.",
       icon: Server,
@@ -93,7 +117,7 @@ export default function UpdatesPage() {
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              v0.06 Stable
+              v0.07 Latest
             </span>
           </div>
 
@@ -101,10 +125,17 @@ export default function UpdatesPage() {
             PRO2 ENTERTAINMENT {brandConfig.version}
           </h1>
           <p className="text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Complete Reference Analysis, Playback Engine Repair, Authorized DRM Integration (Widevine/FairPlay/ClearKey), and Channel Stream Recovery.
+            Additive Modern OTT Hub, Multi-Provider Deduplication, Direct Playable Open-Cinema Streams, Live IPTV HLS, and All Previous v0.06 Repairs Preserved.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/ott-hub"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Open v0.07 OTT Hub</span>
+            </Link>
             <Link
               href="/channels"
               className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition flex items-center gap-2"

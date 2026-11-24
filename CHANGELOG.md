@@ -4,6 +4,26 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
+## [0.07.0] — 2026-11-24
+
+### Additive Multi-Provider OTT Hub, Cross-Source Deduplication & Open Media Expansion (All v0.06 Work Preserved)
+- **New Documented Public & Open-Media Adapters (`src/lib/providers/`):**
+  - Added **Kitsu Anime Directory Adapter** (`kitsu.ts`) supporting Anime Movies, TV, OVA/ONA, and trailer extraction.
+  - Added **NASA Public Domain Video Adapter** (`nasa.ts`) with dynamic HTTPS MP4 stream resolution (`images-api.nasa.gov`).
+  - Added **Wikimedia Commons Video Adapter** (`wikimedia.ts`) indexing Creative Commons & Public Domain films.
+  - Added **IPTV-Org Live HLS Adapter** (`iptvLive.ts`) caching and filtering verified HTTPS `.m3u8` public broadcasts across categories.
+  - Added **Expanded Open Cinema Resolver** (`archiveExpanded.ts`) resolving real Archive.org `.mp4` metadata filenames and PeerTube HLS/MP4 videos (`framatube.org`), eliminating trailer-only confusion for open films.
+  - Added **Authorized DRM Configuration Registry** (`drmConfig.ts`) supporting Widevine, ClearKey, FairPlay, and PlayReady standards + official Shaka reference test vectors.
+- **Cross-Provider Comparison & Deduplication (`src/lib/services/catalogDeduplicator.ts`):**
+  - Canonical title/year/stream-URL deduplication merges duplicate entries across providers, retains the highest playability rank (`Full Playable > Live HLS > DRM > Trailer > Catalog`), and surfaces live deduplication stats.
+- **Modern Categorized OTT Hub (`/ott-hub` + `/api/v07/*` + `<NewCatalogShowcase />`):**
+  - Built `/ott-hub` with master category tabs, sub-category chips, **Direct Playable Only** toggle, inline `OttQuickPlayerModal` (Shaka HLS/DASH/DRM + MP4 + YouTube no-cookie), and an authorized BYO stream/license testing panel.
+  - Appended `<NewCatalogShowcase />` cleanly to the homepage and added `OTT Hub (v0.07)` navigation links without altering previous v0.01–v0.06 components or content.
+- **Global v0.07 Release Synchronization:**
+  - Updated `package.json` (`0.07.0`), `brand.config.ts` (`v0.07`, `versionCode: 7`), `android/app/build.gradle.kts` (`versionCode = 7`, `versionName = "0.07"`), updater APIs, APK download route, and release binary `PROZ-MOVIE-v0.07.apk`.
+
+---
+
 ## [0.06.0] — 2026-11-24
 
 ### Reference Analysis, Playback Engine Repair & API/DRM Integration

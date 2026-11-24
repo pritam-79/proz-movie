@@ -1,8 +1,8 @@
-# PRO2 ENTERTAINMENT v0.06 — Implementation Status & Architecture Report
+# PRO2 ENTERTAINMENT v0.07 — Implementation Status & Architecture Report
 
 **Platform Identity:** PRO2 ENTERTAINMENT / PROZ MOVIE  
-**Version:** v0.06  
-**Previous Version:** v0.05  
+**Version:** v0.07  
+**Previous Version:** v0.06  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
 **Design System:** Premium Liquid Glass (Midnight `#080B12`, Deep Navy `#111827`, Electric Purple `#8B5CF6`, Neon Cyan `#22D3EE`, Soft White `#F8FAFC`)  
 **Release Date:** November 2026  
@@ -11,7 +11,17 @@
 
 ---
 
-## 1. Executive Summary
+## 0. v0.07 Additive Enhancements (Zero Breaking Changes to v0.06)
+
+- **Modern Categorized OTT Hub (`/ott-hub`):** Dedicated categorized browser with `All Deduplicated`, `Full Playable Now`, `Movies & Cinema`, `Anime Universe`, `TV & Dramas`, `Live TV (.m3u8)`, `OTT Channels`, `Space & Open Film`, and `DRM & BYO Player` tabs plus a **Direct Playable Only** switch.
+- **Cross-Source Comparison & Deduplication (`src/lib/services/catalogDeduplicator.ts`):** Canonical title/year/URL matching merges multi-provider records and reports live deduplication telemetry.
+- **New Public Media APIs:** Kitsu JSON:API (`kitsu.ts`), NASA Video Archive (`nasa.ts`), Wikimedia Commons Video (`wikimedia.ts`), IPTV-Org Live HLS (`iptvLive.ts`), and Internet Archive / PeerTube MP4/HLS metadata resolution (`archiveExpanded.ts`).
+- **Authorized DRM & BYO Testing (`drmConfig.ts` + `OttQuickPlayerModal.tsx`):** Standards-compliant EME configuration builder for operator-supplied Widevine/FairPlay/PlayReady/ClearKey license URLs and Google Shaka reference test streams.
+- **v0.07 Synchronized Web & Android Release:** Synchronized version `v0.07` / `versionCode = 7` and built `PROZ-MOVIE-v0.07.apk`.
+
+---
+
+## 1. Executive Summary (v0.06 Baseline Preserved Intact)
 
 PRO2 ENTERTAINMENT v0.06 completes the thorough scan and reverse-engineering of all reference materials (Cinema HD v3.0.0, Cine18 v3.3.4, Velvet Aura, Freecine, and MovieBox APKs) and delivers a fully repaired, centralized playback engine with verified live streams, authorized DRM integrations, dynamic channel item routing, and zero-stall buffering.
 
