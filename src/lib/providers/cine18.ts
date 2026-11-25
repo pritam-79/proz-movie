@@ -78,11 +78,41 @@ export interface Cine18VideoDetail extends Cine18RawVideoItem {
   videos?: Cine18EpisodeStream[];
 }
 
+export function normalizeCdnStreamUrl(rawUrl?: string | null): string {
+  if (!rawUrl) return '';
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return '';
+  try {
+    return new URL(trimmed).href;
+  } catch {
+    return encodeURI(trimmed);
+  }
+}
+
 export class Cine18Adapter implements BaseProviderAdapter {
   private readonly baseUrl = 'https://server.cinewebby.com/api';
   private channelsCache: Cine18RawChannel[] | null = null;
   private cacheTimestamp = 0;
   private readonly CACHE_TTL_MS = 15 * 60 * 1000; // 15 mins
+  private channelVideosCache = new Map<string, { data: { channel: Cine18RawChannel | null; videos: Cine18RawVideoItem[]; totalVideos: number }; ts: number }>();
+  private videoDetailCache = new Map<string, { data: Cine18VideoDetail; ts: number }>();
+
+  private async fetchJsonWithRetry(url: string, timeoutMs = 12000): Promise<any> {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await fetch(url, {
+          signal: AbortSignal.timeout(timeoutMs),
+          headers: { 'Accept': 'application/json', 'User-Agent': 'PRO2Entertainment/0.08' },
+          next: { revalidate: 300 }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } catch (err) {
+        if (attempt === 1) throw err;
+        await new Promise((r) => setTimeout(r, 350));
+      }
+    }
+  }
 
   readonly config: ProviderConfig = {
     id: 'cine18',
@@ -153,12 +183,7 @@ export class Cine18Adapter implements BaseProviderAdapter {
       return this.channelsCache;
     }
     try {
-      const res = await fetch(`${this.baseUrl}/user/channel/all`, {
-        signal: AbortSignal.timeout(8000),
-        next: { revalidate: 900 }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const list = await res.json();
+      const list = await this.fetchJsonWithRetry(`${this.baseUrl}/user/channel/all`, 12000);
       if (Array.isArray(list)) {
         this.channelsCache = list;
         this.cacheTimestamp = Date.now();
@@ -174,13 +199,22 @@ export class Cine18Adapter implements BaseProviderAdapter {
   async getChannelByUidOrName(identifier: string): Promise<Cine18RawChannel | null> {
     const channels = await this.getAllChannels();
     const cleanId = identifier.trim().toLowerCase();
+    const stripNorm = (s: string) => s.toLowerCase().replace(/[^a-z]+/g, '');
+    const normId = stripNorm(cleanId);
+
     return (
       channels.find(
         (c) =>
           c.uid.toLowerCase() === cleanId ||
-          c.name.trim().toLowerCase() === cleanId ||
-          c.name.trim().toLowerCase().includes(cleanId)
-      ) || null
+          c.name.trim().toLowerCase() === cleanId
+      ) ||
+      channels.find(
+        (c) =>
+          c.name.trim().toLowerCase().includes(cleanId) ||
+          cleanId.includes(c.name.trim().toLowerCase()) ||
+          (normId.length >= 3 && (stripNorm(c.name) === normId || stripNorm(c.name).includes(normId) || normId.includes(stripNorm(c.name))))
+      ) ||
+      null
     );
   }
 
@@ -189,36 +223,53 @@ export class Cine18Adapter implements BaseProviderAdapter {
     videos: Cine18RawVideoItem[];
     totalVideos: number;
   }> {
+    const cached = this.channelVideosCache.get(channelUid);
+    if (cached && Date.now() - cached.ts < 5 * 60 * 1000) {
+      return cached.data;
+    }
+
     try {
-      const res = await fetch(`${this.baseUrl}/user/channel/${encodeURIComponent(channelUid)}`, {
-        signal: AbortSignal.timeout(8000),
-        next: { revalidate: 300 }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      return {
+      const data = await this.fetchJsonWithRetry(
+        `${this.baseUrl}/user/channel/${encodeURIComponent(channelUid)}`,
+        12000
+      );
+      const parsed = {
         channel: data.channel || null,
         videos: Array.isArray(data.videos) ? data.videos : [],
         totalVideos: typeof data.totalVideos === 'number' ? data.totalVideos : (data.videos?.length || 0),
       };
+      this.channelVideosCache.set(channelUid, { data: parsed, ts: Date.now() });
+      return parsed;
     } catch (err) {
       console.error(`[Cine18Adapter] Failed to fetch channel details for ${channelUid}:`, err);
-      return { channel: null, videos: [], totalVideos: 0 };
+      return cached?.data || { channel: null, videos: [], totalVideos: 0 };
     }
   }
 
   async getVideoDetails(videoUid: string): Promise<Cine18VideoDetail | null> {
+    const cached = this.videoDetailCache.get(videoUid);
+    if (cached && Date.now() - cached.ts < 15 * 60 * 1000) {
+      return cached.data;
+    }
+
     try {
-      const res = await fetch(`${this.baseUrl}/user/video-card/${encodeURIComponent(videoUid)}`, {
-        signal: AbortSignal.timeout(8000),
-        next: { revalidate: 300 }
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const data = await this.fetchJsonWithRetry(
+        `${this.baseUrl}/user/video-card/${encodeURIComponent(videoUid)}`,
+        12000
+      );
+      if (data && Array.isArray(data.videos)) {
+        data.videos = data.videos.map((v: Cine18EpisodeStream) => ({
+          ...v,
+          video_link: normalizeCdnStreamUrl(v.video_link),
+        }));
+      }
+      if (data) {
+        this.videoDetailCache.set(videoUid, { data, ts: Date.now() });
+      }
       return data;
     } catch (err) {
       console.error(`[Cine18Adapter] Failed to fetch video details for ${videoUid}:`, err);
-      return null;
+      return cached?.data || null;
     }
   }
 

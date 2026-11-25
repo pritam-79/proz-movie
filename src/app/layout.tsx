@@ -52,17 +52,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className="bg-proz-midnight text-proz-white min-h-screen flex flex-col font-sans selection:bg-proz-purple selection:text-white relative">
+      <body className="bg-[#06080F] text-proz-white min-h-screen flex flex-col font-sans selection:bg-rose-600 selection:text-white relative overflow-x-hidden">
         <AuthProvider>
           {/* Subtle Ambient Background Mesh Lights */}
-          <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-proz-purple/10 rounded-full blur-[140px] pointer-events-none -z-10" />
-          <div className="fixed top-1/3 right-1/4 w-[500px] h-[500px] bg-proz-cyan/8 rounded-full blur-[140px] pointer-events-none -z-10" />
+          <div className="fixed top-0 left-1/4 w-[420px] h-[420px] bg-rose-600/8 rounded-full blur-[140px] pointer-events-none -z-10" />
+          <div className="fixed top-1/3 right-1/4 w-[420px] h-[420px] bg-proz-purple/10 rounded-full blur-[140px] pointer-events-none -z-10" />
 
           {/* Navigation Bar */}
           <Navbar />
 
           {/* Main Content Area */}
-          <main className="flex-1 w-full pt-16 pb-20 md:pb-8">
+          <main className="flex-1 w-full pt-14 sm:pt-16 pb-24 md:pb-10">
             <ErrorBoundary>
               {children}
             </ErrorBoundary>

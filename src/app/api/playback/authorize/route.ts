@@ -165,6 +165,27 @@ export async function POST(req: NextRequest) {
       console.warn('Supabase playback authorization fell back:', e);
     }
 
+    // Dynamic remote metadata IDs (AniList, Kitsu, TVmaze, TMDB) authorize directly
+    if (
+      contentId.startsWith('anilist-') ||
+      contentId.startsWith('kitsu-') ||
+      contentId.startsWith('tvmaze-') ||
+      contentId.startsWith('tmdb-')
+    ) {
+      const sessionToken = `proz_dynamic_sess_${Date.now()}`;
+      return NextResponse.json({
+        session: { token: sessionToken },
+        sessionToken,
+        hlsUrl: null,
+        dashUrl: null,
+        fallbackMp4: null,
+        drmConfig: null,
+        subtitles: [],
+        audioTracks: [],
+        expiresAt: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+      });
+    }
+
     // Fallback: mock content authorization
     const mockContent = getNormalizedMockContent();
     const match = mockContent.find((c) => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);

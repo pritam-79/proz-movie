@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionName;
             } catch (Exception e) {
-                return "0.02";
+                return "0.08";
             }
         }
 
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionCode;
             } catch (Exception e) {
-                return 2;
+                return 8;
             }
         }
     }
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Set modern mobile User-Agent to avoid web engine compatibility blocks
-        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.02";
+        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.08";
         settings.setUserAgentString(customUa);
 
         // Hardware acceleration
@@ -386,7 +386,7 @@ public class MainActivity extends Activity {
         // Create sleek Progress Dialog
         AlertDialog progressDialog = new AlertDialog.Builder(this)
             .setTitle("Downloading Update")
-            .setMessage("Downloading PROZ MOVIE v0.02 update... 0%")
+            .setMessage("Downloading PROZ MOVIE v0.08 update... 0%")
             .setCancelable(false)
             .create();
 
@@ -397,7 +397,7 @@ public class MainActivity extends Activity {
             try {
                 URL url = new URL(apkUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.02");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.08");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(30000);
                 conn.connect();
@@ -415,7 +415,7 @@ public class MainActivity extends Activity {
                 if (downloadDir == null) {
                     downloadDir = getCacheDir();
                 }
-                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.02.apk");
+                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.08.apk");
                 if (apkFile.exists()) {
                     apkFile.delete();
                 }

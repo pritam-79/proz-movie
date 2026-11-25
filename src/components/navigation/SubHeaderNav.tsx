@@ -7,40 +7,46 @@ import { usePathname } from 'next/navigation';
 export const SubHeaderNav: React.FC = () => {
   const pathname = usePathname();
 
-  const tabs: Array<{ label: string; href: string; isLive?: boolean; isVault?: boolean; isAdult?: boolean; badge?: string }> = [
+  const tabs: Array<{
+    label: string;
+    href: string;
+    isLive?: boolean;
+    isVault?: boolean;
+    isAdult?: boolean;
+    badge?: string;
+  }> = [
     { label: 'Recommend', href: '/' },
-    { label: 'OTT Hub', href: '/ott-hub', badge: 'v0.07' },
-    { label: 'Live TV', href: '/live', isLive: true },
     { label: 'Movies', href: '/movies' },
     { label: 'TV Shows', href: '/series' },
     { label: 'Anime', href: '/anime' },
     { label: 'Asian Dramas', href: '/drama' },
-    { label: 'My Library', href: '/library', isVault: true },
+    { label: 'Live TV', href: '/live', isLive: true },
     { label: 'Channels', href: '/channels' },
+    { label: 'Stash', href: '/library', isVault: true, badge: 'DB' },
     { label: 'Explore', href: '/explore' },
     { label: 'Ranking', href: '/ranking' },
-    { label: '18+', href: '/restricted', isAdult: true },
+    { label: '18+ Vault', href: '/restricted', isAdult: true },
   ];
 
   return (
-    <div className="w-full bg-[#0A0D14]/90 backdrop-blur-md border-b border-zinc-800/60 sticky top-16 z-30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-6 sm:gap-8 overflow-x-auto scrollbar-none no-scrollbar py-2.5 text-xs sm:text-sm">
+    <div className="w-full bg-[#07090F]/92 backdrop-blur-xl border-b border-white/[0.08] sticky top-14 sm:top-16 z-30">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none no-scrollbar py-2.5 text-xs">
           {tabs.map((tab) => {
             const isActive = tab.href === '/' ? pathname === '/' : pathname.startsWith(tab.href);
-            
+
             return (
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`relative py-1 whitespace-nowrap font-medium transition-colors flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? 'text-white font-bold'
+                    ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-lg shadow-rose-600/25'
                     : tab.isAdult
-                    ? 'text-rose-400 hover:text-rose-300'
+                    ? 'bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20'
                     : tab.isVault
-                    ? 'text-purple-400 hover:text-purple-300'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-purple-500/10 text-purple-300 border border-purple-500/25 hover:bg-purple-500/20'
+                    : 'bg-white/[0.04] text-zinc-300 border border-white/[0.07] hover:bg-white/[0.09] hover:text-white'
                 }`}
               >
                 {tab.isLive && (
@@ -48,17 +54,14 @@ export const SubHeaderNav: React.FC = () => {
                 )}
                 <span>{tab.label}</span>
                 {tab.badge && (
-                  <span className="ml-0.5 text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/35 font-bold">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/30 font-bold">
                     {tab.badge}
                   </span>
                 )}
                 {tab.isAdult && (
-                  <span className="ml-1 text-[9px] px-1 py-0.2 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                    ADULT
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/30 text-rose-200 font-bold">
+                    18+
                   </span>
-                )}
-                {isActive && (
-                  <span className="absolute -bottom-2.5 left-0 right-0 h-0.5 bg-rose-500 rounded-full shadow-[0_0_8px_#F43F5E]" />
                 )}
               </Link>
             );

@@ -1,17 +1,27 @@
-# PRO2 ENTERTAINMENT v0.07 — Implementation Status & Architecture Report
+# PRO2 ENTERTAINMENT v0.08 — Implementation Status & Architecture Report
 
 **Platform Identity:** PRO2 ENTERTAINMENT / PROZ MOVIE  
-**Version:** v0.07  
-**Previous Version:** v0.06  
+**Version:** v0.08  
+**Previous Version:** v0.07  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
-**Design System:** Premium Liquid Glass (Midnight `#080B12`, Deep Navy `#111827`, Electric Purple `#8B5CF6`, Neon Cyan `#22D3EE`, Soft White `#F8FAFC`)  
+**Design System:** Obsidian Crimson & Liquid Glass (`#06080F`, `#0D111A`, `#E11D48`, `#8B5CF6`, `#22D3EE`)  
 **Release Date:** November 2026  
 **Repository:** [github.com/pritam-79/proz-movie](https://github.com/pritam-79/proz-movie)  
 **Live Production URL:** [proz-movie.vercel.app](https://proz-movie.vercel.app)
 
 ---
 
-## 0. v0.07 Additive Enhancements (Zero Breaking Changes to v0.06)
+## 0. v0.08 Fixes, StashDB Integration & Modern Redesign
+
+- **Unique Movie/Anime Playback Routing:** Eliminated shared demo-video overrides when a title has its own official YouTube trailer; dynamic `/api/catalog/resolve-title` resolves `anilist-*`, `kitsu-*`, `tvmaze-*`, and `tmdb-*` metadata on Title & Watch pages.
+- **Channel Playback Recovery:** Added `mpegts.js` support for `.ts` CDN streams, `/api/library/stream-proxy` range/CORS fallback, CDN URL encoding, retry caching in `cine18.ts`, and fuzzy channel matching.
+- **StashDB GraphQL & Repaired Stash Streams:** Added `src/lib/providers/stashdb.ts` + `/api/library/stash/stashdb` + `StashDbPanel` inside `/library` & `/restricted` (credentials stored safely in gitignored `.env.local` or runtime settings), and fixed HTTP 403 `commondatastorage` links in `/api/library/stash/proxy-stream`.
+- **Mobile & Desktop Redesign:** Unified `h-14 sm:h-16` header + `SubHeaderNav`, responsive `HeroBanner`, real channel artwork in `PopularChannelsRow`, removed `NewCatalogShowcase` clutter, and auto-launching `v0.08` Update Information Popup.
+- **Android Release:** Built signed `PROZ-MOVIE-v0.08.apk` (`versionCode = 8`, `versionName = "0.08"`).
+
+---
+
+## 0b. v0.07 Baseline Notes
 
 - **Modern Categorized OTT Hub (`/ott-hub`):** Dedicated categorized browser with `All Deduplicated`, `Full Playable Now`, `Movies & Cinema`, `Anime Universe`, `TV & Dramas`, `Live TV (.m3u8)`, `OTT Channels`, `Space & Open Film`, and `DRM & BYO Player` tabs plus a **Direct Playable Only** switch.
 - **Cross-Source Comparison & Deduplication (`src/lib/services/catalogDeduplicator.ts`):** Canonical title/year/URL matching merges multi-provider records and reports live deduplication telemetry.

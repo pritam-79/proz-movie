@@ -27,11 +27,16 @@ export default function ChannelDetailPage() {
   const router = useRouter();
   const channelSlug = params?.id as string;
 
-  const channel = useMemo(() => {
+  const staticChannel = useMemo(() => {
     const raw = getChannelById(channelSlug);
     return raw ? resolveChannelProfile(raw) : undefined;
   }, [channelSlug]);
 
+  const [remoteChannelMeta, setRemoteChannelMeta] = useState<{
+    name: string;
+    logo?: string;
+    totalVideos?: number;
+  } | null>(null);
   const [channelSearch, setChannelSearch] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [activeTab, setActiveTab] = useState<'all' | 'popular' | 'about'>('all');
@@ -40,6 +45,27 @@ export default function ChannelDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [logoError, setLogoError] = useState(false);
 
+  const channel = useMemo(() => {
+    if (staticChannel) return staticChannel;
+    if (remoteChannelMeta) {
+      return {
+        id: channelSlug,
+        slug: channelSlug,
+        name: remoteChannelMeta.name,
+        category: 'OTT Channel',
+        logo: remoteChannelMeta.logo || '',
+        bannerUrl: remoteChannelMeta.logo || '',
+        description: `Official streaming catalog for ${remoteChannelMeta.name}.`,
+        contentCount: remoteChannelMeta.totalVideos || apiVideos.length,
+        subscribers: '1.2M',
+        rating: 4.7,
+        color: '#E11D48',
+        integrationStatus: 'API Connected' as const,
+      } as any;
+    }
+    return undefined;
+  }, [staticChannel, remoteChannelMeta, channelSlug, apiVideos.length]);
+
   useEffect(() => {
     let mounted = true;
     setIsLoading(true);
@@ -47,6 +73,13 @@ export default function ChannelDetailPage() {
       .then((res) => res.json())
       .then((data) => {
         if (!mounted) return;
+        if (data.channelName) {
+          setRemoteChannelMeta({
+            name: data.channelName,
+            logo: data.channelLogo,
+            totalVideos: data.totalVideos,
+          });
+        }
         if (data.videos && Array.isArray(data.videos) && data.videos.length > 0) {
           setApiVideos(data.videos);
         } else {
@@ -116,6 +149,15 @@ export default function ChannelDetailPage() {
     return [];
   }, [apiVideos, channelSearch]);
 
+  if (!channel && isLoading) {
+    return (
+      <div className="min-h-screen bg-[#07090E] text-zinc-100 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 rounded-full border-4 border-zinc-800 border-t-rose-500 animate-spin mb-3" />
+        <p className="text-xs text-zinc-400">Loading channel catalog &amp; live streams...</p>
+      </div>
+    );
+  }
+
   if (!channel) {
     return (
       <div className="min-h-screen bg-[#07090E] text-zinc-100 flex flex-col items-center justify-center p-4">
@@ -134,10 +176,10 @@ export default function ChannelDetailPage() {
     );
   }
 
-  const initials = channel.name
+  const initials = String(channel.name || '')
     .split(' ')
     .slice(0, 2)
-    .map((w) => w[0])
+    .map((w: string) => w[0] || '')
     .join('')
     .toUpperCase();
 
@@ -152,8 +194,8 @@ export default function ChannelDetailPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#07090E] via-[#07090E]/60 to-transparent" />
         
-        {/* Top Back Button */}
-        <div className="absolute top-4 left-4 z-10">
+        {/* Top Back Button with safe clearance */}
+        <div className="absolute top-3 left-4 z-10">
           <button
             onClick={() => router.back()}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-zinc-700/60 text-zinc-200 hover:text-white text-xs font-medium transition-all"

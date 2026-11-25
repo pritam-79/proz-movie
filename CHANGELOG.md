@@ -4,6 +4,27 @@ All notable changes to the PROZ MOVIE OTT platform are documented in this file.
 
 ---
 
+## [0.08.0] — 2026-11-26
+
+### Playback Repairs, Channel .ts Support, StashDB GraphQL Integration & Mobile UI Redesign
+- **Fixed Movie & Anime Single-Trailer & Fallback Bug:**
+  - Updated `VideoPlayer.tsx` so commercial movies & anime with unique official `youtubeId` trailers no longer get overridden by the 3 shared sample loops (`tears-of-steel` / `x36xhzz` / `BigBuckBunny_124`).
+  - Added `/api/catalog/resolve-title` supporting live resolution for dynamic `anilist-*`, `kitsu-*`, `tvmaze-*`, `tmdb-*`, and `cine18-*` IDs inside `/title/[id]` and `/watch/[id]` (fixing the bug where every clicked anime opened *Deadpool & Wolverine*).
+  - Corrected *Solo Leveling: Reawakening* trailer mapping (`HkIKAnwLZCw`).
+- **Repaired All Channel Playback Streams:**
+  - Installed `mpegts.js` and added MPEG-TS (`.ts`) MSE playback support in `VideoPlayer.tsx` plus safe CDN range proxy (`/api/library/stream-proxy`) fallback for cross-origin/special-character URLs.
+  - Added safe URL encoding (`normalizeCdnStreamUrl`), `12s` retry fetches, in-memory detail caches, fuzzy channel name matching, and category partner fallbacks in `cine18.ts` and `/api/channels/[id]/videos`.
+- **Integrated StashDB GraphQL & Fixed Stash Streams:**
+  - Built `src/lib/providers/stashdb.ts` and `/api/library/stash/stashdb` (configured securely via untracked `.env.local` / runtime user settings, never hardcoded in git) plus `StashDbPanel.tsx` integrated in `/library` and `/restricted`.
+  - Replaced dead HTTP 403 `commondatastorage.googleapis.com` links in `/api/library/stash/proxy-stream` with live CineWebby CDN & verified fallback `.mp4` range streaming.
+- **Mobile WebView Layout Fixes & Aesthetic Redesign:**
+  - Fixed sticky `Navbar` / `SubHeaderNav` overlap on narrow Android viewports, normalized top/bottom page clearance, upgraded `HeroBanner` and `PopularChannelsRow` (real channel logos), replaced bottom/sub-nav hub link with `Stash`, and removed the unwanted homepage demo block (`NewCatalogShowcase`).
+- **v0.08 Update Information Popup & Full Version Sync:**
+  - `InAppUpdater.tsx` now pops up an informative "What's New in v0.08" dialog automatically once per release (or immediately for older APK builds) with APK download and changelog details.
+  - Synchronized `v0.08` (`versionCode = 8`) across Next.js, Android `MainActivity.java`, Gradle, updater routes, and `PROZ-MOVIE-v0.08.apk`.
+
+---
+
 ## [0.07.0] — 2026-11-24
 
 ### Additive Multi-Provider OTT Hub, Cross-Source Deduplication & Open Media Expansion (All v0.06 Work Preserved)

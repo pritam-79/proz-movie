@@ -53,21 +53,21 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'bg-proz-midnight/80 backdrop-blur-xl border-b border-proz-border/40 shadow-glass py-3' 
-            : 'bg-gradient-to-b from-proz-midnight/90 via-proz-midnight/40 to-transparent py-5'
+        className={`fixed top-0 left-0 right-0 z-50 h-14 sm:h-16 flex items-center transition-all duration-300 ${
+          isScrolled
+            ? 'bg-[#07090F]/92 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl'
+            : 'bg-gradient-to-b from-[#07090F]/95 via-[#07090F]/75 to-transparent backdrop-blur-md border-b border-white/[0.04]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2">
           
           {/* Logo & Main Nav */}
-          <div className="flex items-center gap-8">
-            <Logo variant="main" size="md" />
+          <div className="flex items-center gap-4 lg:gap-6 min-w-0">
+            <Logo variant="main" size="sm" />
 
             {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1 lg:gap-2">
-              {brandConfig.navigation.mainNav.map((item) => {
+            <nav className="hidden lg:flex items-center gap-1">
+              {brandConfig.navigation.mainNav.slice(0, 8).map((item) => {
                 const isActive = pathname === item.href;
                 const isRestricted = item.href === '/restricted';
 
@@ -256,17 +256,17 @@ export const Navbar: React.FC = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg glass-button-secondary"
+              className="lg:hidden p-2 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white"
               aria-label="Toggle menu"
             >
-              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="md:hidden glass-card border-b border-proz-border/60 px-4 pt-3 pb-6 space-y-2 animate-in fade-in duration-200">
+          <div className="lg:hidden fixed top-14 sm:top-16 left-0 right-0 max-h-[80vh] overflow-y-auto bg-[#0A0D16]/98 backdrop-blur-2xl border-b border-white/10 px-4 pt-3 pb-6 space-y-1.5 shadow-2xl">
             {brandConfig.navigation.mainNav.map((item) => (
               <Link
                 key={item.href}

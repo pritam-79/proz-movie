@@ -41,7 +41,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
   };
 
   return (
-    <div className="relative w-full h-[75vh] min-h-[550px] max-h-[820px] overflow-hidden select-none">
+    <div className="relative w-full h-[58vh] min-h-[420px] sm:h-[70vh] sm:min-h-[540px] max-h-[740px] overflow-hidden select-none">
       
       {/* Background Backdrop Image with cinematic gradients */}
       <div className="absolute inset-0 z-0">
@@ -158,7 +158,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
 
       {/* Carousel Switcher Dots & Arrows */}
       {featuredItems.length > 1 && (
-        <div className="absolute bottom-6 right-6 z-20 flex items-center gap-3">
+        <div className="absolute bottom-5 right-4 sm:bottom-6 sm:right-6 z-20 flex items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-1.5 mr-2">
             {featuredItems.map((_, idx) => (
               <button
@@ -174,14 +174,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
 
           <button
             onClick={() => setCurrentIndex((prev) => (prev === 0 ? featuredItems.length - 1 : prev - 1))}
-            className="p-2 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all"
+            className="hidden sm:flex p-2 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all"
             aria-label="Previous featured"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setCurrentIndex((prev) => (prev + 1) % featuredItems.length)}
-            className="p-2 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all"
+            className="hidden sm:flex p-2 rounded-full glass-card hover:border-proz-cyan/50 text-proz-white transition-all"
             aria-label="Next featured"
           >
             <ChevronRight className="w-4 h-4" />

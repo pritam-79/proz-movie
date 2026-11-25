@@ -23,7 +23,7 @@ function WatchContent() {
   let content: ContentItem;
 
   if (contentId?.startsWith('stash-')) {
-    const rawStashId = contentId.replace('stash-', '');
+    const rawStashId = contentId.replace(/^(stash-)+/, 'stash-');
     const stashSource: VideoSource = {
       id: `src-${rawStashId}`,
       contentId,
@@ -31,8 +31,8 @@ function WatchContent() {
       providerName: 'Stash Vault (Encrypted Proxy)',
       sourceType: 'html5_mp4',
       format: 'mp4',
-      playbackUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
-      officialWatchUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
+      playbackUrl: `/api/library/stash/proxy-stream?id=${encodeURIComponent(rawStashId)}`,
+      officialWatchUrl: `/api/library/stash/proxy-stream?id=${encodeURIComponent(rawStashId)}`,
       pricingType: 'free',
       quality: '1080p',
       country: 'GLOBAL',
@@ -43,14 +43,14 @@ function WatchContent() {
 
     content = {
       id: contentId,
-      title: 'Stash Vault Private Stream',
+      title: 'Stash Vault Stream',
       slug: contentId,
       content_type: 'movie',
       is_adult: true,
       age_rating: 'A 18+',
-      fallbackMp4: `/api/library/stash/proxy-stream?id=${rawStashId}`,
-      streamUrl: `/api/library/stash/proxy-stream?id=${rawStashId}`,
-      description: 'Authorized private playback session served via secure Stash proxy.',
+      fallbackMp4: `/api/library/stash/proxy-stream?id=${encodeURIComponent(rawStashId)}`,
+      streamUrl: `/api/library/stash/proxy-stream?id=${encodeURIComponent(rawStashId)}`,
+      description: 'Authorized private playback session served via Stash proxy.',
       poster_url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop',
       backdrop_url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop',
       video_sources: [stashSource],
@@ -123,7 +123,21 @@ function WatchContent() {
       videoSources: [cineSource]
     };
   } else {
-    content = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId) || allContent[0];
+    const matchedLocal = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
+    if (matchedLocal) {
+      content = matchedLocal;
+    } else {
+      content = {
+        id: contentId || 'unknown',
+        title: 'Loading Title...',
+        slug: contentId || 'unknown',
+        content_type: contentId?.startsWith('anilist-') || contentId?.startsWith('kitsu-') ? 'anime' : 'movie',
+        type: contentId?.startsWith('anilist-') || contentId?.startsWith('kitsu-') ? 'anime' : 'movie',
+        description: 'Resolving title metadata and stream sources...',
+        poster_url: '',
+        backdrop_url: '',
+      };
+    }
   }
 
   const [enrichedContent, setEnrichedContent] = useState<ContentItem>(content);
@@ -134,9 +148,17 @@ function WatchContent() {
 
   useEffect(() => {
     let active = true;
+    const isDynamicRemote = Boolean(
+      contentId &&
+        (contentId.startsWith('anilist-') ||
+          contentId.startsWith('kitsu-') ||
+          contentId.startsWith('tvmaze-') ||
+          contentId.startsWith('tmdb-'))
+    );
+
     if (contentId?.startsWith('cine18-')) {
       const cleanUid = contentId.replace('cine18-', '');
-      fetch(`/api/library/cine18-stream?uid=${cleanUid}`)
+      fetch(`/api/library/cine18-stream?uid=${encodeURIComponent(cleanUid)}`)
         .then(r => r.json())
         .then(data => {
           if (!active || !data.success) return;
@@ -147,13 +169,14 @@ function WatchContent() {
             if (epMatch?.streamUrl) playUrl = epMatch.streamUrl;
           }
 
+          const isHls = typeof playUrl === 'string' && playUrl.toLowerCase().includes('.m3u8');
           const liveSource: VideoSource = {
             id: `src-cine18-${cleanUid}`,
             contentId: `cine18-${cleanUid}`,
             providerId: 'cine18',
             providerName: 'CineWebby Streaming CDN',
-            sourceType: 'html5_mp4',
-            format: 'mp4',
+            sourceType: isHls ? 'direct_hls' : 'html5_mp4',
+            format: isHls ? 'hls' : 'mp4',
             playbackUrl: playUrl,
             officialWatchUrl: `/watch/cine18-${cleanUid}`,
             pricingType: 'free',
@@ -190,6 +213,19 @@ function WatchContent() {
           setEnrichedContent(updated);
         })
         .catch(console.error);
+    } else if (isDynamicRemote && content.title === 'Loading Title...') {
+      fetch(`/api/catalog/resolve-title?id=${encodeURIComponent(contentId!)}`)
+        .then(r => r.json())
+        .then(async (data) => {
+          if (!active) return;
+          const resolved: ContentItem = data?.success && data.item ? data.item : allContent[0];
+          const { discoveryService } = await import('@/lib/services/discoveryService');
+          const enriched = await discoveryService.enrichWithAvailability(resolved);
+          if (active) setEnrichedContent(enriched);
+        })
+        .catch(() => {
+          if (active) setEnrichedContent(allContent[0]);
+        });
     } else {
       import('@/lib/services/discoveryService').then(({ discoveryService }) => {
         discoveryService.enrichWithAvailability(content).then(enriched => {
@@ -198,7 +234,7 @@ function WatchContent() {
       });
     }
     return () => { active = false; };
-  }, [content, contentId]);
+  }, [content, contentId, episodeId]);
 
   useEffect(() => {
     let isMounted = true;

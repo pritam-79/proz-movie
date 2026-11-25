@@ -98,9 +98,53 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const youtubeSource = sources.find(s => s.sourceType === 'youtube_embed');
   const officialWatchSources = sources.filter(s => s.sourceType === 'official_web' || s.sourceType === 'app_deep_link');
 
-  // Fallback stream URLs from content model
-  const activeStream = currentEpisode?.fallbackMp4 || content.fallbackMp4 || currentEpisode?.streamUrl || content.streamUrl || directSource?.playbackUrl;
-  
+  // Normalize & classify stream URLs cleanly
+  const rawActiveStream =
+    currentEpisode?.fallbackMp4 ||
+    content.fallbackMp4 ||
+    currentEpisode?.streamUrl ||
+    content.streamUrl ||
+    directSource?.playbackUrl;
+
+  const normalizeStreamUrl = (url?: string): string | undefined => {
+    if (!url) return undefined;
+    const trimmed = url.trim();
+    if (!trimmed) return undefined;
+    if (trimmed.startsWith('/')) return trimmed;
+    try {
+      return new URL(trimmed).href;
+    } catch {
+      return encodeURI(trimmed);
+    }
+  };
+
+  const activeStream = normalizeStreamUrl(rawActiveStream);
+
+  const isSampleDemoStream = (url?: string): boolean => {
+    if (!url) return false;
+    return (
+      url.includes('unified-streaming.com/k8s/features/stable/video/tears-of-steel') ||
+      url.includes('test-streams.mux.dev/x36xhzz') ||
+      url.includes('archive.org/download/BigBuckBunny_124')
+    );
+  };
+
+  const isPlayableDirectUrl = (url?: string): boolean => {
+    if (!url) return false;
+    const pathPart = url.split('?')[0].toLowerCase();
+    return (
+      pathPart.endsWith('.mp4') ||
+      pathPart.endsWith('.ts') ||
+      pathPart.endsWith('.webm') ||
+      pathPart.endsWith('.mov') ||
+      pathPart.endsWith('.m4v') ||
+      url.toLowerCase().includes('.m3u8') ||
+      url.toLowerCase().includes('.mpd') ||
+      url.startsWith('/api/library/stash/proxy-stream') ||
+      url.startsWith('/api/library/stream-proxy')
+    );
+  };
+
   // YouTube ID fallback
   let ytId = (content as any).youtubeId || (content as any).youtube_id;
   if (!ytId && content.trailerUrl) {
@@ -108,22 +152,35 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (m) ytId = m[1];
   }
 
-  // Determine initial playback mode
+  // Determine initial playback mode:
+  // Avoid playing the same sample demo loop across every movie/anime when a title has its own unique official YouTube trailer.
   useEffect(() => {
-    if (activeStream && (activeStream.endsWith('.mp4') || activeStream.includes('.m3u8') || activeStream.includes('.mpd'))) {
+    if (
+      activeStream &&
+      isPlayableDirectUrl(activeStream) &&
+      (!ytId || !isSampleDemoStream(activeStream))
+    ) {
       setPlaybackMode('direct');
     } else if (ytId) {
       setPlaybackMode('youtube');
+    } else if (activeStream && isPlayableDirectUrl(activeStream)) {
+      setPlaybackMode('direct');
     } else {
       setPlaybackMode('official_hub');
     }
   }, [activeStream, ytId]);
 
-  // Initialize Shaka or native HTML5 video
+  const triedProxyRef = useRef(false);
+  useEffect(() => {
+    triedProxyRef.current = false;
+  }, [activeStream]);
+
+  // Initialize HTML5 / MPEG-TS (.ts) / Shaka Player
   useEffect(() => {
     if (playbackMode !== 'direct' || !activeStream) return;
 
     let shakaInstance: any = null;
+    let mpegtsPlayer: any = null;
     let isCancelled = false;
 
     const initPlayer = async () => {
@@ -132,8 +189,40 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
       if (!videoRef.current) return;
 
-      // Direct MP4
-      if (activeStream.endsWith('.mp4') || (!activeStream.includes('.m3u8') && !activeStream.includes('.mpd'))) {
+      const lowerPath = activeStream.split('?')[0].toLowerCase();
+      const isTsStream = lowerPath.endsWith('.ts');
+      const isAdaptive = activeStream.toLowerCase().includes('.m3u8') || activeStream.toLowerCase().includes('.mpd');
+
+      // MPEG-TS (.ts) live/VOD CDN channel streams via mpegts.js
+      if (isTsStream) {
+        try {
+          const mpegtsModule = await import('mpegts.js');
+          const mpegts: any = mpegtsModule.default || mpegtsModule;
+          if (!isCancelled && videoRef.current && mpegts?.getFeatureList?.()?.mseLivePlayback) {
+            const proxiedTsUrl = activeStream.startsWith('http')
+              ? `/api/library/stream-proxy?url=${encodeURIComponent(activeStream)}`
+              : activeStream;
+            const player = mpegts.createPlayer({
+              type: 'mpegts',
+              isLive: false,
+              url: proxiedTsUrl,
+            });
+            mpegtsPlayer = player;
+            player.attachMediaElement(videoRef.current);
+            player.load();
+            videoRef.current.play().then(() => {
+              setIsPlaying(true);
+              setIsBuffering(false);
+            }).catch(() => setIsBuffering(false));
+            return;
+          }
+        } catch (err) {
+          console.warn('mpegts.js initialization failed, falling back to proxied native:', err);
+        }
+      }
+
+      // Direct MP4 / WebM / Proxy stream
+      if (!isAdaptive) {
         videoRef.current.src = activeStream;
         videoRef.current.load();
         videoRef.current.play().then(() => {
@@ -235,6 +324,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       isCancelled = true;
       if (shakaInstance) {
         shakaInstance.destroy().catch(() => {});
+      }
+      if (mpegtsPlayer) {
+        try {
+          mpegtsPlayer.unload();
+          mpegtsPlayer.detachMediaElement();
+          mpegtsPlayer.destroy();
+        } catch {}
       }
     };
   }, [activeStream, playbackMode]);
@@ -390,6 +486,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }}
             onPause={() => setIsPlaying(false)}
             onError={() => {
+              if (!triedProxyRef.current && activeStream && activeStream.startsWith('http') && videoRef.current) {
+                triedProxyRef.current = true;
+                videoRef.current.src = `/api/library/stream-proxy?url=${encodeURIComponent(activeStream)}`;
+                videoRef.current.load();
+                videoRef.current.play().catch(() => setIsBuffering(false));
+                return;
+              }
               setHasPlaybackError(true);
               setErrorMessage('Stream error on direct playback. Switching to backup provider.');
               setIsBuffering(false);
@@ -499,7 +602,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     <span className="text-[10px] text-zinc-400">Locate theatrical and OTT availability</span>
                   </div>
                   <a
-                    href={`https://www.themoviedb.org/movie/${content.tmdb_id || 533535}/watch`}
+                    href={content.tmdb_id
+                      ? `https://www.themoviedb.org/${content.type === 'series' ? 'tv' : 'movie'}/${content.tmdb_id}/watch`
+                      : `https://www.themoviedb.org/search?query=${encodeURIComponent(content.title || '')}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold"

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cine18Adapter } from '@/lib/providers/cine18';
+import { cine18Adapter, normalizeCdnStreamUrl } from '@/lib/providers/cine18';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +21,14 @@ export async function GET(request: NextRequest) {
     }
 
     const videos = details.videos || [];
-    const firstVideo = videos[0];
+    const playableVideos = videos
+      .map((v) => ({
+        ...v,
+        video_link: normalizeCdnStreamUrl(v.video_link),
+      }))
+      .filter((v) => Boolean(v.video_link));
+
+    const firstVideo = playableVideos[0] || videos[0];
 
     return NextResponse.json({
       success: true,
@@ -35,8 +42,8 @@ export async function GET(request: NextRequest) {
       tags: details.tags,
       cast: details.cast,
       language: details.language,
-      streamUrl: firstVideo?.video_link || '',
-      episodes: videos.map((v, idx) => ({
+      streamUrl: normalizeCdnStreamUrl(firstVideo?.video_link),
+      episodes: playableVideos.map((v, idx) => ({
         id: v.uid,
         episodeNumber: idx + 1,
         title: v.name || `Episode ${idx + 1}`,

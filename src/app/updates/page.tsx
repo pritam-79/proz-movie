@@ -26,6 +26,30 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.08 Distinct Movie & Anime Playback",
+      desc: "Fixed shared demo video loop and Deadpool fallback bug — every movie, anime, and dynamic AniList/Kitsu/TVmaze title now loads its own metadata and official trailer.",
+      icon: Film,
+      color: "text-cyan-400"
+    },
+    {
+      title: "Channel MPEG-TS (.ts) & Stream Proxy Repair",
+      desc: "Added mpegts.js playback for .ts CDN channels, URL space/Unicode encoding, CORS range proxy, and automatic retry caching across all CineWebby channels.",
+      icon: Tv,
+      color: "text-rose-400"
+    },
+    {
+      title: "StashDB GraphQL + Complete Stash Ecosystem",
+      desc: "Integrated live StashDB GraphQL scenes, performers, and studios cleanly into Stash Vault & 18+ Zone, and replaced broken HTTP 403 Stash proxy streams.",
+      icon: FolderLock,
+      color: "text-purple-400"
+    },
+    {
+      title: "Mobile WebView Redesign & v0.08 Update Popup",
+      desc: "Fixed header/sub-nav overlapping on mobile phones, upgraded circular channel artwork, removed cluttered demo showcase, and added an automatic informative release popup.",
+      icon: Sparkles,
+      color: "text-emerald-400"
+    },
+    {
       title: "v0.07 Modern Categorized OTT Hub (/ott-hub)",
       desc: "Unified modern hub with master tabs for Full Playable Movies, Anime Universe, TV & Dramas, Live TV (.m3u8), Channels, Space & Open Cinema, and Playable-Only filtering.",
       icon: Compass,
@@ -100,7 +124,7 @@ export default function UpdatesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-28 pb-28 px-4 md:px-8">
+    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-6 sm:pt-10 pb-24 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
         <Link 
           href="/" 
@@ -110,31 +134,31 @@ export default function UpdatesPage() {
         </Link>
 
         {/* Release Hero Header */}
-        <div className="p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
+        <div className="p-6 sm:p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
           <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
           <div className="flex items-center gap-2 mb-3">
             <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider">
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              v0.07 Latest
+              v0.08 Latest
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
             PRO2 ENTERTAINMENT {brandConfig.version}
           </h1>
-          <p className="text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Additive Modern OTT Hub, Multi-Provider Deduplication, Direct Playable Open-Cinema Streams, Live IPTV HLS, and All Previous v0.06 Repairs Preserved.
+          <p className="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
+            Playback Engine Repair, Channel MPEG-TS &amp; CDN Proxy Fixes, StashDB GraphQL Integration, Modern Mobile Layout Redesign, and Informative Update Popup.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              href="/ott-hub"
+              href="/library"
               className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-2"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>Open v0.07 OTT Hub</span>
+              <FolderLock className="w-4 h-4" />
+              <span>Open Stash Vault</span>
             </Link>
             <Link
               href="/channels"

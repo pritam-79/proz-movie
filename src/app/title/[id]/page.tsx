@@ -30,18 +30,32 @@ export default function TitleDetailPage() {
   const contentId = Array.isArray(params?.id) ? params.id[0] : params?.id;
   const allContent = getNormalizedMockContent();
   const rawContent = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
+  const isDynamicId = Boolean(
+    contentId &&
+      !rawContent &&
+      (contentId.startsWith('cine18-') ||
+        contentId.startsWith('anilist-') ||
+        contentId.startsWith('kitsu-') ||
+        contentId.startsWith('tvmaze-') ||
+        contentId.startsWith('tmdb-'))
+  );
 
   const [dynamicContent, setDynamicContent] = useState<any>(null);
-  const [loadingDynamic, setLoadingDynamic] = useState(Boolean(contentId?.startsWith('cine18-')));
+  const [loadingDynamic, setLoadingDynamic] = useState(isDynamicId);
   const [selectedSeasonNumber, setSelectedSeasonNumber] = useState(1);
   const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     let active = true;
-    if (contentId?.startsWith('cine18-')) {
+    if (!contentId || rawContent) {
+      setLoadingDynamic(false);
+      return;
+    }
+
+    if (contentId.startsWith('cine18-')) {
       const cleanUid = contentId.replace(/^cine18-/, '');
       setLoadingDynamic(true);
-      fetch(`/api/library/cine18-stream?uid=${cleanUid}`)
+      fetch(`/api/library/cine18-stream?uid=${encodeURIComponent(cleanUid)}`)
         .then(res => res.json())
         .then(data => {
           if (!active) return;
@@ -82,9 +96,32 @@ export default function TitleDetailPage() {
         .catch(() => {
           if (active) setLoadingDynamic(false);
         });
+    } else if (isDynamicId) {
+      setLoadingDynamic(true);
+      fetch(`/api/catalog/resolve-title?id=${encodeURIComponent(contentId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!active) return;
+          if (data?.success && data.item) {
+            setDynamicContent(data.item);
+          }
+          setLoadingDynamic(false);
+        })
+        .catch(() => {
+          if (active) setLoadingDynamic(false);
+        });
     }
     return () => { active = false; };
-  }, [contentId]);
+  }, [contentId, rawContent, isDynamicId]);
+
+  if (loadingDynamic && !dynamicContent) {
+    return (
+      <div className="min-h-screen bg-proz-midnight flex flex-col items-center justify-center p-6 text-center space-y-4">
+        <div className="w-12 h-12 rounded-full border-4 border-proz-border/40 border-t-proz-cyan animate-spin" />
+        <p className="text-xs text-proz-grey">Loading title details &amp; stream metadata...</p>
+      </div>
+    );
+  }
 
   const activeContent = dynamicContent || (rawContent ? normalizeContentItem(rawContent) : normalizeContentItem(allContent[0])) as any;
   const content = activeContent;

@@ -64,7 +64,7 @@ export class ContentDiscoveryService {
    * Generates legitimate, verified fallback watch sources (Official providers & verified public domain/creator links)
    */
   private generateVerifiedFallbackSources(item: ContentItem, country: string): VideoSource[] {
-    const tmdbId = item.tmdb_id || 533535;
+    const tmdbId = item.tmdb_id;
     const sources: VideoSource[] = [];
 
     // 1. YouTube official creator stream if youtubeId or trailerUrl exists
@@ -119,15 +119,19 @@ export class ContentDiscoveryService {
       });
     }
 
-    // 3. Official TMDB / Streaming Provider Hub watch link
+    // 3. Official TMDB / Search Provider Hub watch link (never force wrong movie ID)
+    const searchWatchUrl = tmdbId
+      ? `https://www.themoviedb.org/${item.type === 'series' ? 'tv' : 'movie'}/${tmdbId}/watch`
+      : `https://www.themoviedb.org/search?query=${encodeURIComponent(item.title || '')}`;
+
     sources.push({
       id: `tmdb-hub-${item.id}`,
       contentId: item.id,
       providerId: 'tmdb_official',
-      providerName: 'Official Theatrical & Streaming Hub',
+      providerName: tmdbId ? 'Official Theatrical & Streaming Hub' : 'Official Title Search',
       sourceType: 'official_web',
       format: 'external',
-      officialWatchUrl: `https://www.themoviedb.org/movie/${tmdbId}/watch`,
+      officialWatchUrl: searchWatchUrl,
       pricingType: 'subscription',
       quality: '4K',
       country,

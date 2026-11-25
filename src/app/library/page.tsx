@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { StashScene, StashPerformer, StashStudio, MediaViewMode } from '@/types/library';
+import StashDbPanel from '@/components/stash/StashDbPanel';
 
 export default function PersonalLibraryPage() {
   const { user } = useAuth();
@@ -70,7 +71,7 @@ export default function PersonalLibraryPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-5 sm:pt-8 pb-28 px-4 md:px-8">
       {/* Header & Sub-Bar */}
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
@@ -91,10 +92,17 @@ export default function PersonalLibraryPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/restricted"
+              className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 text-xs sm:text-sm font-semibold flex items-center gap-2 transition"
+            >
+              <FolderLock className="w-4 h-4" />
+              <span>18+ Stash Ecosystem</span>
+            </Link>
             <Link
               href="/tv"
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium flex items-center gap-2 transition"
+              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm font-medium flex items-center gap-2 transition"
             >
               <Tv className="w-4 h-4 text-cyan-400" />
               <span>TV Mode</span>
@@ -286,6 +294,11 @@ export default function PersonalLibraryPage() {
             ))}
           </div>
         )}
+
+        {/* Live StashDB GraphQL Catalog */}
+        <div className="mt-10">
+          <StashDbPanel />
+        </div>
       </div>
     </div>
   );

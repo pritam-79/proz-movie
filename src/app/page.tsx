@@ -8,7 +8,6 @@ import GenreGrid from '@/components/home/GenreGrid';
 import SubHeaderNav from '@/components/navigation/SubHeaderNav';
 import PopularChannelsRow from '@/components/content/PopularChannelsRow';
 import ActionButtonPair from '@/components/common/ActionButtonPair';
-import NewCatalogShowcase from '@/components/v07/NewCatalogShowcase';
 import { 
   Flame, 
   TrendingUp, 
@@ -141,8 +140,8 @@ export default function HomePage() {
   const recommendedForYou = [...popularMovies].reverse().slice(0, 10);
 
   return (
-    <div className="pb-16 space-y-8">
-      {/* 0. Sub-Header Horizontal Navigation (Recommend, Movies, TV Shows, 18+, Anime, Channels) */}
+    <div className="pb-24 space-y-6 sm:space-y-9 bg-[#06080F]">
+      {/* 0. Sub-Header Horizontal Navigation */}
       <SubHeaderNav />
 
       {/* 1. Cinematic Hero Banner & Featured Slider */}
@@ -150,9 +149,6 @@ export default function HomePage() {
 
       {/* 2. Popular Channels & Networks Grid Row */}
       <PopularChannelsRow />
-
-      {/* 2b. v0.07 Unified Playable & Deduplicated OTT Showcase */}
-      <NewCatalogShowcase />
 
       {/* 3. Continue Watching (Interactive Client Row) */}
       <ContinueWatchingRow />

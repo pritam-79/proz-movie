@@ -3,16 +3,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Trophy, Compass, Tv, User, FolderLock } from 'lucide-react';
+import { Home, Film, Tv, FolderLock, User } from 'lucide-react';
 
 export const MobileBottomNav: React.FC = () => {
   const pathname = usePathname();
 
   const navItems = [
     { label: 'Home', href: '/', icon: Home },
-    { label: 'Library', href: '/library', icon: FolderLock },
-    { label: 'Explore', href: '/explore', icon: Compass },
+    { label: 'Movies', href: '/movies', icon: Film },
     { label: 'Channels', href: '/channels', icon: Tv },
+    { label: 'Stash', href: '/library', icon: FolderLock },
     { label: 'Me', href: '/account', icon: User },
   ];
 
@@ -22,29 +22,33 @@ export const MobileBottomNav: React.FC = () => {
   }
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0B0609]/95 backdrop-blur-xl border-t border-rose-950/40 shadow-2xl safe-area-bottom">
-      <div className="grid grid-cols-5 h-16 max-w-md mx-auto items-center px-1">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#07090F]/95 backdrop-blur-2xl border-t border-white/[0.08] shadow-[0_-8px_32px_rgba(0,0,0,0.65)] pb-[env(safe-area-inset-bottom)]">
+      <div className="grid grid-cols-5 h-16 max-w-lg mx-auto items-center px-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+          const isActive =
+            item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center justify-center py-1 transition-all duration-200 relative group ${
-                isActive ? 'text-rose-500 font-semibold' : 'text-zinc-400 hover:text-zinc-200'
+              className={`flex flex-col items-center justify-center py-1.5 transition-all duration-200 relative ${
+                isActive ? 'text-rose-400 font-bold' : 'text-zinc-400 hover:text-zinc-200'
               }`}
             >
-              <div className="relative">
-                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'scale-110 stroke-[2.2]' : 'stroke-[1.8]'}`} />
-                {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-rose-500 rounded-full shadow-[0_0_8px_#F43F5E]" />
-                )}
+              <div
+                className={`p-1.5 rounded-xl transition-all ${
+                  isActive ? 'bg-rose-500/15 text-rose-400 shadow-inner' : ''
+                }`}
+              >
+                <Icon
+                  className={`w-4.5 h-4.5 transition-transform duration-200 ${
+                    isActive ? 'scale-105 stroke-[2.3]' : 'stroke-[1.8]'
+                  }`}
+                />
               </div>
-              <span className={`text-[11px] mt-1 tracking-tight ${isActive ? 'text-rose-500' : 'text-zinc-400'}`}>
-                {item.label}
-              </span>
+              <span className="text-[10px] mt-0.5 tracking-tight">{item.label}</span>
             </Link>
           );
         })}

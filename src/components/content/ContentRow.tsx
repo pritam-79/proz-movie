@@ -42,31 +42,31 @@ export const ContentRow: React.FC<ContentRowProps> = ({
   const isBackdrop = aspectRatio === 'backdrop';
 
   return (
-    <section className="relative">
+    <section className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-3.5 gap-2">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2.5">
             {icon ? (
-              <span className="text-[#8B5CF6]">{icon}</span>
+              <span className="text-rose-400 shrink-0">{icon}</span>
             ) : (
-              <div className="w-1 h-6 rounded-full bg-gradient-to-b from-[#8B5CF6] to-[#22D3EE]" />
+              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-rose-500 to-purple-500 shrink-0" />
             )}
-            <h2 className="text-lg font-bold text-[#F8FAFC] tracking-tight">{title}</h2>
+            <h2 className="text-base sm:text-lg font-extrabold text-[#F8FAFC] tracking-tight truncate">{title}</h2>
             {badge && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#8B5CF6]/20 text-[#8B5CF6] border border-[#8B5CF6]/30">
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase bg-rose-500/15 text-rose-300 border border-rose-500/30 shrink-0">
                 {badge}
               </span>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-[#94A3B8] ml-4 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-[#94A3B8] mt-0.5 line-clamp-1">{subtitle}</p>
           )}
         </div>
         {viewAllHref && (
           <Link
             href={viewAllHref}
-            className="flex items-center gap-1 text-xs font-semibold text-[#22D3EE] hover:text-[#F8FAFC] transition-colors"
+            className="flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-white transition-colors shrink-0"
           >
             View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -76,7 +76,7 @@ export const ContentRow: React.FC<ContentRowProps> = ({
       {/* Horizontal scroll */}
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
+        className="flex gap-3 sm:gap-4 overflow-x-auto scrollbar-hide no-scrollbar snap-x snap-mandatory pb-2"
       >
         {loading
           ? Array.from({ length: 8 }).map((_, i) => (

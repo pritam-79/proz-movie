@@ -63,16 +63,22 @@ export default function InAppUpdater() {
 
         // Check if there is genuinely a newer version than current
         const acknowledged = localStorage.getItem('proz_acknowledged_version');
+        const seenPopupVer = localStorage.getItem('proz_whats_new_popup_seen');
         const isNewer = data.latestVersionCode > brandConfig.versionCode || (data.latestVersion !== currentVersion && data.latestVersion !== installedVer);
 
         if (isNewer) {
           setHasUpdate(true);
           if (acknowledged !== data.latestVersion) {
             setShowBanner(true);
+            setIsOpen(true);
           }
         } else {
           setHasUpdate(false);
           setShowBanner(false);
+          // Important: Show informative What's New update popup once per newly installed release
+          if (seenPopupVer !== brandConfig.version) {
+            setIsOpen(true);
+          }
         }
       })
       .catch((err) => {
@@ -121,8 +127,9 @@ export default function InAppUpdater() {
       }
       setUpdateProgress(70);
 
-      // Save acknowledged version
+      // Save acknowledged version & mark popup seen
       localStorage.setItem('proz_acknowledged_version', updateInfo.latestVersion);
+      localStorage.setItem('proz_whats_new_popup_seen', brandConfig.version);
       setUpdateProgress(95);
 
       setTimeout(() => {
@@ -143,6 +150,16 @@ export default function InAppUpdater() {
     }
   };
 
+  const handleCloseModal = () => {
+    setIsOpen(false);
+    try {
+      localStorage.setItem('proz_whats_new_popup_seen', brandConfig.version);
+      if (updateInfo && !hasUpdate) {
+        localStorage.setItem('proz_acknowledged_version', updateInfo.latestVersion);
+      }
+    } catch {}
+  };
+
   if (!updateInfo) return null;
 
   return (
@@ -156,9 +173,9 @@ export default function InAppUpdater() {
                 <Sparkles className="w-4 h-4" />
               </span>
               <div className="truncate">
-                <span className="font-bold text-white">PROZ MOVIE v{updateInfo.latestVersion} Available:</span>{' '}
+                <span className="font-bold text-white">PRO2 ENTERTAINMENT v{updateInfo.latestVersion} Available:</span>{' '}
                 <span className="text-slate-300 hidden sm:inline">
-                  Private Multi-User Library, Stash Vault, and 18+ Ecosystem.
+                  {updateInfo.title}
                 </span>
               </div>
             </div>
@@ -195,8 +212,9 @@ export default function InAppUpdater() {
 
             {/* Close Button */}
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={handleCloseModal}
               className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              aria-label="Close update information"
             >
               <X className="w-5 h-5" />
             </button>
@@ -295,20 +313,28 @@ export default function InAppUpdater() {
               <div className="flex items-center justify-between text-xs pt-1 px-1">
                 <Link
                   href="/updates"
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleCloseModal}
                   className="text-purple-400 hover:text-purple-300 font-semibold"
                 >
-                  Full Architecture Notes →
+                  Full Release Notes →
                 </Link>
 
-                <a
-                  href={updateInfo.apkUrl}
-                  download="PROZ-MOVIE-v0.02.apk"
-                  className="text-slate-400 hover:text-white flex items-center gap-1"
-                >
-                  <span>Direct APK File</span>
-                  <Download className="w-3 h-3" />
-                </a>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleCloseModal}
+                    className="text-slate-300 hover:text-white font-semibold"
+                  >
+                    Continue
+                  </button>
+                  <a
+                    href={updateInfo.apkUrl}
+                    download={`PROZ-MOVIE-v${updateInfo.latestVersion}.apk`}
+                    className="text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
+                  >
+                    <span>Direct APK File</span>
+                    <Download className="w-3 h-3" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>

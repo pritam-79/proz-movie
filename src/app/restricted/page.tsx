@@ -29,7 +29,8 @@ import {
   Check,
   Video,
   Radio,
-  Glasses
+  Glasses,
+  Database
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { StashScene, StashPerformer, StashStudio, StashGallery } from '@/types/library';
@@ -40,9 +41,11 @@ import {
   CURATED_VR_SCENES,
   VERIFIED_ADULT_TUBE_PORTALS
 } from '@/lib/providers/stash';
+import StashDbPanel from '@/components/stash/StashDbPanel';
 
 type AdultCategory = 
   | 'all' 
+  | 'stashdb'
   | 'movies' 
   | 'series' 
   | 'hentai' 
@@ -158,20 +161,21 @@ export default function RestrictedPage() {
   };
 
   const categories: { id: AdultCategory; label: string; icon: any; count?: number }[] = [
-    { id: 'all', label: 'All Adult Media', icon: Layers },
-    { id: 'movies', label: 'Adult Movies & Scenes', icon: Film, count: scenes.length },
-    { id: 'series', label: 'Hot Web Series', icon: Tv, count: CURATED_HOT_WEB_SERIES.length },
-    { id: 'hentai', label: 'Hentai & Anime', icon: Sparkles, count: CURATED_HENTAI_COLLECTIONS.length },
+    { id: 'all', label: 'All Stash & Adult Media', icon: Layers },
+    { id: 'stashdb', label: 'StashDB Live Catalog', icon: Database },
+    { id: 'movies', label: 'Movies & Playable Scenes', icon: Film, count: liveAdultMovies.length + scenes.length },
+    { id: 'series', label: 'Hot Web Series', icon: Tv, count: liveAdultSeries.length + CURATED_HOT_WEB_SERIES.length },
+    { id: 'hentai', label: 'Hentai & 3D Anime', icon: Sparkles, count: CURATED_HENTAI_COLLECTIONS.length },
     { id: 'vr3d', label: '3D VR & Interactive', icon: Zap, count: CURATED_VR_SCENES.length },
-    { id: 'tubes', label: 'Adult Tube Sites', icon: Globe, count: VERIFIED_ADULT_TUBE_PORTALS.length },
-    { id: 'performers', label: 'Performers & Models', icon: Users, count: performers.length || 4 },
-    { id: 'studios', label: 'Adult Studios', icon: Building, count: studios.length || 4 },
-    { id: 'galleries', label: 'Photo Galleries', icon: ImageIcon, count: galleries.length || 3 },
-    { id: 'settings', label: 'Vault Connection', icon: Server }
+    { id: 'tubes', label: 'Tube Hubs', icon: Globe, count: VERIFIED_ADULT_TUBE_PORTALS.length },
+    { id: 'performers', label: 'Performers', icon: Users, count: performers.length || 4 },
+    { id: 'studios', label: 'Studios', icon: Building, count: studios.length || 4 },
+    { id: 'galleries', label: 'Galleries', icon: ImageIcon, count: galleries.length || 3 },
+    { id: 'settings', label: 'Stash Server Settings', icon: Server }
   ];
 
   return (
-    <div className="min-h-screen bg-[#06080F] text-slate-100 pt-28 pb-28 px-4 md:px-8">
+    <div className="min-h-screen bg-[#06080F] text-slate-100 pt-5 sm:pt-8 pb-28 px-4 md:px-8">
       {/* ─── LOCKED STATE: STRICT AGE VERIFICATION GATE (NO PIN REQUIRED) ─── */}
       {!isUnlocked ? (
         <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl text-center">
@@ -255,11 +259,21 @@ export default function RestrictedPage() {
               </div>
             </div>
 
-            {/* Auto-Connected Status Indicator */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Stash Vault Auto-Connected ({stashVersion})</span>
+            {/* Connection Status & Settings */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold border ${
+                connectionStatus === 'connected'
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                  : 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+              }`}>
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  connectionStatus === 'connected' ? 'bg-emerald-400 animate-pulse' : 'bg-purple-400'
+                }`} />
+                <span>
+                  {connectionStatus === 'connected'
+                    ? `Personal Stash Connected (${stashVersion})`
+                    : 'StashDB & Proxy Streams Ready'}
+                </span>
               </div>
               <button
                 onClick={() => setActiveCategory('settings')}
@@ -298,6 +312,11 @@ export default function RestrictedPage() {
           </div>
 
           {/* ─── TAB CONTENT ─── */}
+
+          {/* 0. LIVE STASHDB GRAPHQL ECOSYSTEM */}
+          {(activeCategory === 'all' || activeCategory === 'stashdb') && (
+            <StashDbPanel />
+          )}
 
           {/* 1. ADULT MOVIES & SCENES */}
           {(activeCategory === 'all' || activeCategory === 'movies') && (
