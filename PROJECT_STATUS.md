@@ -1,8 +1,8 @@
-# PRO2 ENTERTAINMENT v0.08 — Implementation Status & Architecture Report
+# PROZ ENTERTAINMENT v0.09 — Implementation Status & Architecture Report
 
-**Platform Identity:** PRO2 ENTERTAINMENT / PROZ MOVIE  
-**Version:** v0.08  
-**Previous Version:** v0.07  
+**Platform Identity:** PROZ ENTERTAINMENT  
+**Version:** v0.09  
+**Previous Version:** v0.08  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
 **Design System:** Obsidian Crimson & Liquid Glass (`#06080F`, `#0D111A`, `#E11D48`, `#8B5CF6`, `#22D3EE`)  
 **Release Date:** November 2026  
@@ -11,7 +11,16 @@
 
 ---
 
-## 0. v0.08 Fixes, StashDB Integration & Modern Redesign
+## 0. v0.09 Fixes, Automated Stash Backend & PRO 18+ Ecosystem
+
+- **Video Player Overlay & Playback Fix:** `AppChrome` suppresses navbar/footer/updater banners on `/watch/*`; `VideoPlayer.tsx` uses a non-overlapping docked top bar with PiP, Shaka audio/quality/subtitle tracks, honest `onPlaying` state, and genuine Demon Slayer trailer/source handling without demo loops or browser redirects.
+- **Centralized Server-Side Stash Backend (`stashService.ts`):** Automatic GraphQL backend integration with TTL caching, deduplication, consenting-adult checks, and strict metadata-only gating for unmatched StashDB scenes; all manual endpoint/key UI forms and `localStorage` overrides removed.
+- **PRO 18+ Ecosystem in Gallery (`/library` & `/restricted`):** Recent Uploads (photos/videos/collections), Studios & Performers profile modals, Tube Hub with limitation tags, 3D VR viewer, Hentai & 3D subcategories, Hot Web Series details, and metadata-based Recommendations.
+- **v0.09 Version Sync & Smart Update Popup:** Synchronized `v0.09` (`versionCode = 9`) across Web/PWA (`manifest.webmanifest`), About, Account, Updates, `/api/app/update`, Android APK (`PROZ-MOVIE-v0.09.apk`), and fixed dismissal persistence in `InAppUpdater.tsx`.
+
+---
+
+## 0a. v0.08 Fixes, StashDB Integration & Modern Redesign
 
 - **Unique Movie/Anime Playback Routing:** Eliminated shared demo-video overrides when a title has its own official YouTube trailer; dynamic `/api/catalog/resolve-title` resolves `anilist-*`, `kitsu-*`, `tvmaze-*`, and `tmdb-*` metadata on Title & Watch pages.
 - **Channel Playback Recovery:** Added `mpegts.js` support for `.ts` CDN streams, `/api/library/stream-proxy` range/CORS fallback, CDN URL encoding, retry caching in `cine18.ts`, and fuzzy channel matching.

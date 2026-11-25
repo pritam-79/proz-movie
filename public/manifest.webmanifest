@@ -1,0 +1,18 @@
+{
+  "name": "PROZ Entertainment",
+  "short_name": "PROZ v0.09",
+  "version": "0.09",
+  "description": "PROZ Entertainment v0.09 — Multi-Platform Streaming & Stash Ecosystem",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06080F",
+  "theme_color": "#080B12",
+  "icons": [
+    {
+      "src": "/brand/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

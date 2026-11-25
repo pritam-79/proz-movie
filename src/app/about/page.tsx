@@ -19,7 +19,7 @@ const values = [
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-[#080B12] pt-24 pb-20">
+    <main className="min-h-screen bg-[#080B12] pt-6 pb-20">
       {/* Hero */}
       <section className="relative overflow-hidden py-20 px-6 text-center">
         <div className="absolute inset-0 bg-gradient-radial from-[#8B5CF6]/10 via-transparent to-transparent pointer-events-none" />
@@ -28,7 +28,7 @@ export default function AboutPage() {
         <div className="relative max-w-4xl mx-auto">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#8B5CF6]/10 border border-[#8B5CF6]/30 text-[#8B5CF6] text-sm font-medium mb-6">
             <Film className="w-4 h-4" />
-            PROZ Entertainment v0.02
+            PROZ Entertainment {brandConfig.version}
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-[#F8FAFC] mb-6 leading-tight">
             YOUR WORLD.{' '}

@@ -1,34 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  getStashDbConfig,
+  getStashDbEnvConfig,
   testStashDbConnection,
   fetchStashDbScenes,
   fetchStashDbPerformers,
   fetchStashDbStudios,
 } from '@/lib/providers/stashdb';
+import { stashService } from '@/lib/services/stashService';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * StashDB GraphQL Bridge (/api/library/stash/stashdb)
- * Uses gitignored .env.local credentials by default or runtime request headers from Vault Settings.
+ * Strictly server-side authentication via backend .env.local credentials.
+ * Never accepts client key overrides or exposes secret keys/endpoints.
+ * Matches StashDB metadata against actual playable Stash media files.
  */
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const mode = sp.get('mode') || 'scenes';
   const query = sp.get('q') || '';
-  const page = parseInt(sp.get('page') || '1', 10);
+  const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
 
-  const overrideEndpoint = req.headers.get('x-stashdb-endpoint');
-  const overrideKey = req.headers.get('x-stashdb-apikey');
-  const cfg = getStashDbConfig(overrideEndpoint, overrideKey);
+  const cfg = getStashDbEnvConfig();
 
   if (!cfg.isConfigured) {
     return NextResponse.json({
       success: false,
       configured: false,
-      endpoint: cfg.endpoint,
-      message: 'StashDB API key not configured. Add your StashDB GraphQL endpoint & API key in Vault Settings.',
+      message: 'Backend StashDB credentials (STASHDB_API_KEY) are missing in server environment.',
       scenes: [],
       performers: [],
       studios: [],
@@ -37,59 +37,40 @@ export async function GET(req: NextRequest) {
 
   try {
     if (mode === 'performers') {
-      const data = await fetchStashDbPerformers({
-        page,
-        perPage: 24,
-        query,
-        endpoint: overrideEndpoint,
-        apiKey: overrideKey,
-      });
+      const data = await fetchStashDbPerformers({ page, perPage: 24, query });
       return NextResponse.json({
         success: true,
         configured: true,
-        endpoint: cfg.endpoint,
         mode,
         ...data,
       });
     }
 
     if (mode === 'studios') {
-      const data = await fetchStashDbStudios({
-        page,
-        perPage: 24,
-        query,
-        endpoint: overrideEndpoint,
-        apiKey: overrideKey,
-      });
+      const data = await fetchStashDbStudios({ page, perPage: 24, query });
       return NextResponse.json({
         success: true,
         configured: true,
-        endpoint: cfg.endpoint,
         mode,
         ...data,
       });
     }
 
-    const data = await fetchStashDbScenes({
-      page,
-      perPage: 24,
-      query,
-      endpoint: overrideEndpoint,
-      apiKey: overrideKey,
-    });
+    const data = await fetchStashDbScenes({ page, perPage: 24, query });
+    const matchedScenes = await stashService.matchStashDbScenes(data.scenes);
+
     return NextResponse.json({
       success: true,
       configured: true,
-      endpoint: cfg.endpoint,
       mode: 'scenes',
-      ...data,
+      count: data.count,
+      scenes: matchedScenes,
     });
   } catch (err: any) {
     return NextResponse.json(
       {
         success: false,
         configured: true,
-        endpoint: cfg.endpoint,
         error: err?.message || 'StashDB query failed',
         scenes: [],
         performers: [],
@@ -100,29 +81,24 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function POST(req: NextRequest) {
+export async function POST() {
   try {
-    const body = await req.json().catch(() => ({}));
-    const endpoint = typeof body.endpoint === 'string' ? body.endpoint.trim() : undefined;
-    const apiKey = typeof body.apiKey === 'string' ? body.apiKey.trim() : undefined;
-
-    const test = await testStashDbConnection(endpoint, apiKey);
+    const test = await testStashDbConnection();
     if (!test.success) {
       return NextResponse.json(
-        { success: false, error: test.error || 'Connection failed' },
-        { status: 400 }
+        { success: false, error: test.error || 'StashDB connection failed' },
+        { status: test.configured ? 502 : 400 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      endpoint: endpoint || getStashDbConfig().endpoint,
       totalIndexedScenes: test.count,
-      message: `Connected to StashDB (${(test.count || 0).toLocaleString()} indexed scenes)`,
+      message: `Connected automatically via backend credentials (${(test.count || 0).toLocaleString()} indexed scenes)`,
     });
   } catch (err: any) {
     return NextResponse.json(
-      { success: false, error: err?.message || 'Invalid StashDB configuration' },
+      { success: false, error: err?.message || 'StashDB connection check failed' },
       { status: 500 }
     );
   }

@@ -13,6 +13,7 @@ import {
   FolderLock
 } from 'lucide-react';
 import { StashScene } from '@/types/library';
+import { toStashWatchPath } from '@/lib/utils/streamUtils';
 
 export default function TimelinePage() {
   const [scenes, setScenes] = useState<StashScene[]>([]);
@@ -69,7 +70,7 @@ export default function TimelinePage() {
                       className="w-full h-full object-cover"
                     />
                     <Link
-                      href={`/watch/stash-${scene.id}`}
+                      href={toStashWatchPath(scene.id)}
                       className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition"
                     >
                       <Play className="w-8 h-8 text-white fill-white" />

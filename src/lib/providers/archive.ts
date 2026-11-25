@@ -344,55 +344,30 @@ export class InternetArchiveAdapter implements BaseProviderAdapter {
   }
 
   async getAvailability(title: string, tmdbId?: number, country: string = 'IN'): Promise<VideoSource[]> {
-    // Check verified list first
+    // Match strictly against verified public-domain Archive films (exact or close word match).
+    // Never guess random Archive.org uploads via unconstrained Lucene title search.
     const clean = title.toLowerCase().trim();
-    const verified = VERIFIED_ARCHIVE_FILMS.find(v => v.title.toLowerCase().includes(clean) || clean.includes(v.title.toLowerCase()));
-    if (verified) {
-      return [{
-        id: `ia-src-${verified.identifier}`,
-        contentId: String(tmdbId || verified.identifier),
-        providerId: 'archive_org',
-        providerName: 'Internet Archive Public Domain',
-        sourceType: 'html5_mp4',
-        format: 'mp4',
-        playbackUrl: `https://archive.org/download/${verified.identifier}/${verified.fileName}`,
-        officialWatchUrl: `https://archive.org/details/${verified.identifier}`,
-        pricingType: 'free',
-        quality: '1080p',
-        country: 'GLOBAL',
-        rightsStatus: 'public_domain',
-        verificationStatus: 'verified',
-        lastChecked: new Date().toISOString()
-      }];
-    }
+    if (!clean) return [];
+    const verified = VERIFIED_ARCHIVE_FILMS.find(
+      (v) => v.title.toLowerCase() === clean || clean.includes(v.title.toLowerCase())
+    );
+    if (!verified) return [];
 
-    try {
-      const url = `${ARCHIVE_SEARCH_API}?q=title%3A%28${encodeURIComponent(title)}%29+AND+mediatype%3A%28movies%29&rows=1&output=json`;
-      const res = await fetch(url, { next: { revalidate: 3600 } });
-      if (!res.ok) return [];
-      const data = await res.json();
-      const doc = data.response?.docs?.[0];
-      if (!doc?.identifier) return [];
-
-      const id = doc.identifier;
-      return [{
-        id: `ia-src-${id}`,
-        contentId: String(tmdbId || id),
-        providerId: 'archive_org',
-        providerName: 'Internet Archive',
-        sourceType: 'html5_mp4',
-        format: 'mp4',
-        playbackUrl: `https://archive.org/download/${id}/${id}.mp4`,
-        officialWatchUrl: `https://archive.org/details/${id}`,
-        pricingType: 'free',
-        quality: '1080p',
-        country: 'GLOBAL',
-        rightsStatus: 'public_domain',
-        verificationStatus: 'verified',
-        lastChecked: new Date().toISOString()
-      }];
-    } catch {
-      return [];
-    }
+    return [{
+      id: `ia-src-${verified.identifier}`,
+      contentId: String(tmdbId || verified.identifier),
+      providerId: 'archive_org',
+      providerName: 'Internet Archive Public Domain',
+      sourceType: 'html5_mp4',
+      format: 'mp4',
+      playbackUrl: `https://archive.org/download/${verified.identifier}/${verified.fileName}`,
+      officialWatchUrl: `https://archive.org/details/${verified.identifier}`,
+      pricingType: 'free',
+      quality: '1080p',
+      country,
+      rightsStatus: 'public_domain',
+      verificationStatus: 'verified',
+      lastChecked: new Date().toISOString()
+    }];
   }
 }

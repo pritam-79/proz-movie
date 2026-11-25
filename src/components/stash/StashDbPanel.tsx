@@ -5,23 +5,35 @@ import Link from 'next/link';
 import {
   Database,
   Search,
-  Play,
-  ExternalLink,
-  Users,
-  Building,
-  Film,
-  KeyRound,
+  RefreshCw,
   CheckCircle2,
   AlertCircle,
-  RefreshCw,
-  Clock,
+  Film,
+  Users,
+  Building,
+  Play,
+  Info,
+  X,
   Tag,
+  Clock,
+  ExternalLink,
 } from 'lucide-react';
-import { StashDbSceneItem, StashDbPerformerItem, StashDbStudioItem } from '@/lib/providers/stashdb';
+import {
+  StashDbSceneItem,
+  StashDbPerformerItem,
+  StashDbStudioItem,
+} from '@/lib/providers/stashdb';
+import { toStashWatchPath } from '@/lib/utils/streamUtils';
 
-const PLAYABLE_PROXY_IDS = ['stash-sc-001', 'stash-sc-002', 'stash-sc-003', 'stash-sc-004'];
+interface StashDbPanelProps {
+  onSelectPerformer?: (id: string) => void;
+  onSelectStudio?: (id: string) => void;
+}
 
-export const StashDbPanel: React.FC = () => {
+export const StashDbPanel: React.FC<StashDbPanelProps> = ({
+  onSelectPerformer,
+  onSelectStudio,
+}) => {
   const [subTab, setSubTab] = useState<'scenes' | 'performers' | 'studios'>('scenes');
   const [searchInput, setSearchInput] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
@@ -32,61 +44,42 @@ export const StashDbPanel: React.FC = () => {
   const [studios, setStudios] = useState<StashDbStudioItem[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [connected, setConnected] = useState<boolean>(false);
-  const [endpointLabel, setEndpointLabel] = useState<string>('https://stashdb.org/graphql');
-  const [statusMessage, setStatusMessage] = useState<string>('Checking StashDB GraphQL connection...');
+  const [statusMessage, setStatusMessage] = useState<string>('Connecting to backend StashDB service...');
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Runtime optional override (stored locally in browser only, never hardcoded in source)
-  const [showConfig, setShowConfig] = useState(false);
-  const [customEndpoint, setCustomEndpoint] = useState('');
-  const [customApiKey, setCustomApiKey] = useState('');
-  const [testingConn, setTestingConn] = useState(false);
-
-  useEffect(() => {
-    try {
-      const savedEp = localStorage.getItem('proz_stashdb_endpoint') || '';
-      const savedKey = localStorage.getItem('proz_stashdb_apikey') || '';
-      if (savedEp) setCustomEndpoint(savedEp);
-      if (savedKey) setCustomApiKey(savedKey);
-    } catch {}
-  }, []);
+  const [selectedScene, setSelectedScene] = useState<StashDbSceneItem | null>(null);
 
   const loadStashDb = useCallback(async () => {
     setLoading(true);
     try {
-      const headers: Record<string, string> = {};
-      if (customEndpoint.trim()) headers['x-stashdb-endpoint'] = customEndpoint.trim();
-      if (customApiKey.trim()) headers['x-stashdb-apikey'] = customApiKey.trim();
-
       const params = new URLSearchParams({
         mode: subTab,
         page: String(page),
       });
       if (activeQuery.trim()) params.set('q', activeQuery.trim());
 
-      const res = await fetch(`/api/library/stash/stashdb?${params.toString()}`, { headers });
+      const res = await fetch(`/api/library/stash/stashdb?${params.toString()}`);
       const data = await res.json();
 
-      if (data.endpoint) setEndpointLabel(data.endpoint);
-
-      if (data.success) {
+      if (data.success && data.configured) {
         setConnected(true);
         setTotalCount(data.count || 0);
-        setStatusMessage(`StashDB Connected • ${(data.count || 0).toLocaleString()} ${subTab}`);
         if (subTab === 'scenes') setScenes(data.scenes || []);
         if (subTab === 'performers') setPerformers(data.performers || []);
         if (subTab === 'studios') setStudios(data.studios || []);
+        setStatusMessage(
+          `Backend StashDB Connected • ${(data.count || 0).toLocaleString()} indexed ${subTab}`
+        );
       } else {
         setConnected(false);
-        setStatusMessage(data.error || data.message || 'StashDB not connected');
+        setStatusMessage(data.error || data.message || 'StashDB backend unavailable');
       }
     } catch (err: any) {
       setConnected(false);
-      setStatusMessage(err?.message || 'Unable to query StashDB GraphQL');
+      setStatusMessage(err?.message || 'Unable to query backend StashDB service');
     } finally {
       setLoading(false);
     }
-  }, [subTab, page, activeQuery, customEndpoint, customApiKey]);
+  }, [subTab, page, activeQuery]);
 
   useEffect(() => {
     loadStashDb();
@@ -98,122 +91,50 @@ export const StashDbPanel: React.FC = () => {
     setActiveQuery(searchInput);
   };
 
-  const handleSaveAndTestConfig = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setTestingConn(true);
-    try {
-      if (customEndpoint.trim()) localStorage.setItem('proz_stashdb_endpoint', customEndpoint.trim());
-      if (customApiKey.trim()) localStorage.setItem('proz_stashdb_apikey', customApiKey.trim());
-
-      const res = await fetch('/api/library/stash/stashdb', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          endpoint: customEndpoint.trim() || undefined,
-          apiKey: customApiKey.trim() || undefined,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setConnected(true);
-        setStatusMessage(data.message);
-        setShowConfig(false);
-        loadStashDb();
-      } else {
-        setStatusMessage(data.error || 'Connection test failed');
-      }
-    } catch {
-      setStatusMessage('Connection test failed');
-    } finally {
-      setTestingConn(false);
-    }
-  };
-
   return (
     <div className="space-y-5 rounded-3xl bg-white/[0.02] border border-purple-500/25 p-4 sm:p-6">
-      {/* Header Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      {/* Header Status Bar — strictly backend-managed (no manual API key inputs) */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/35 text-purple-300 text-[11px] font-bold">
-              <Database className="w-3.5 h-3.5" /> StashDB GraphQL Hub
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-bold uppercase tracking-wider">
+              <Database className="w-3.5 h-3.5" /> StashDB Metadata Catalogue
             </span>
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${
+              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                 connected
-                  ? 'bg-emerald-500/15 border-emerald-500/35 text-emerald-300'
-                  : 'bg-amber-500/15 border-amber-500/35 text-amber-300'
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
               }`}
             >
-              {connected ? (
-                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-              ) : (
-                <AlertCircle className="w-3 h-3 text-amber-400" />
-              )}
-              <span>{statusMessage}</span>
+              {connected ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+              {statusMessage}
             </span>
           </div>
-          <h3 className="text-lg sm:text-xl font-extrabold text-white">
-            Live StashDB Catalog &amp; Instant Playable Stash Library
+          <h3 className="text-lg sm:text-xl font-black text-white">
+            StashDB Community Metadata &amp; File Matcher
           </h3>
           <p className="text-xs text-slate-400">
-            Endpoint: <code className="text-cyan-400">{endpointLabel}</code> • Scenes stream via your connected Stash server or verified proxy streams.
+            Authenticated automatically through PROZ backend. Play actions appear only when a catalog item matches an actual playable media file in your library.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => setShowConfig((v) => !v)}
-            className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-semibold text-slate-200 flex items-center gap-1.5 transition"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-cyan-400" />
-            <span>{showConfig ? 'Hide GraphQL Config' : 'Configure Endpoint / Key'}</span>
-          </button>
-          <button
-            onClick={loadStashDb}
-            className="px-3.5 py-2 rounded-xl bg-purple-600/25 hover:bg-purple-600/40 border border-purple-500/40 text-xs font-semibold text-purple-200 flex items-center gap-1.5 transition"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span>Sync</span>
-          </button>
-        </div>
+        <button
+          onClick={loadStashDb}
+          disabled={loading}
+          className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-200 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition shrink-0 self-start"
+          title="Refresh StashDB"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <span>Sync Catalogue</span>
+        </button>
       </div>
 
-      {/* Optional Runtime GraphQL Override Form */}
-      {showConfig && (
-        <form
-          onSubmit={handleSaveAndTestConfig}
-          className="grid grid-cols-1 md:grid-cols-3 gap-3 p-4 rounded-2xl bg-black/40 border border-white/10"
-        >
-          <input
-            type="url"
-            value={customEndpoint}
-            onChange={(e) => setCustomEndpoint(e.target.value)}
-            placeholder="https://stashdb.org/graphql"
-            className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:border-cyan-400 focus:outline-none"
-          />
-          <input
-            type="password"
-            value={customApiKey}
-            onChange={(e) => setCustomApiKey(e.target.value)}
-            placeholder="Custom StashDB API Key (optional override)"
-            className="px-3.5 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:border-cyan-400 focus:outline-none"
-          />
-          <button
-            type="submit"
-            disabled={testingConn}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold hover:opacity-95 disabled:opacity-50 transition"
-          >
-            {testingConn ? 'Testing Connection...' : 'Save & Test GraphQL'}
-          </button>
-        </form>
-      )}
-
-      {/* Search & Mode Tabs */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+      {/* Subtabs + Search */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           {[
-            { id: 'scenes', label: 'Scenes', icon: Film },
+            { id: 'scenes', label: 'Catalogue Scenes', icon: Film },
             { id: 'performers', label: 'Performers', icon: Users },
             { id: 'studios', label: 'Studios', icon: Building },
           ].map((t) => {
@@ -226,10 +147,10 @@ export const StashDbPanel: React.FC = () => {
                   setSubTab(t.id as any);
                   setPage(1);
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition ${
                   active
-                    ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow'
-                    : 'bg-white/5 text-slate-300 border border-white/10 hover:text-white'
+                    ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-lg'
+                    : 'bg-white/[0.04] text-slate-300 hover:text-white border border-white/10'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -239,100 +160,98 @@ export const StashDbPanel: React.FC = () => {
           })}
         </div>
 
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <div className="relative flex-1 sm:w-64">
+        <form onSubmit={handleSearch} className="flex items-center gap-2 w-full sm:w-80">
+          <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={`Search StashDB ${subTab}...`}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/5 border border-white/15 text-xs text-white focus:border-rose-500 focus:outline-none"
+              className="w-full pl-8 pr-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:border-purple-400 focus:outline-none"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition"
+            className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition"
           >
-            Find
+            Search
           </button>
         </form>
       </div>
 
       {/* Results Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-video rounded-2xl bg-white/5 animate-pulse border border-white/10"
-            />
+            <div key={i} className="aspect-[16/11] rounded-2xl bg-white/[0.04] animate-pulse" />
           ))}
         </div>
       ) : subTab === 'scenes' ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {scenes.map((scene, idx) => {
-            const proxyTarget = PLAYABLE_PROXY_IDS[idx % PLAYABLE_PROXY_IDS.length];
-            const mins = scene.durationSeconds ? Math.round(scene.durationSeconds / 60) : 0;
-
-            return (
+        scenes.length === 0 ? (
+          <div className="text-center py-12 rounded-2xl bg-black/30 border border-white/10 text-xs text-slate-400">
+            No StashDB scenes found matching &ldquo;{activeQuery || 'latest catalog'}&rdquo;.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {scenes.map((scene) => (
               <div
                 key={scene.id}
-                className="group rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-rose-500/50 overflow-hidden transition flex flex-col justify-between"
+                className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition-all flex flex-col justify-between"
               >
-                <div>
+                <div
+                  onClick={() => setSelectedScene(scene)}
+                  className="cursor-pointer"
+                >
                   <div className="relative aspect-video bg-slate-900 overflow-hidden">
-                    {scene.posterUrl ? (
+                    {scene.image ? (
                       <img
-                        src={scene.posterUrl}
+                        src={scene.image}
                         alt={scene.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src =
-                            'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop';
-                        }}
                       />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-rose-950/60 via-slate-900 to-black flex items-center justify-center">
-                        <Film className="w-8 h-8 text-rose-400/70" />
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-950/60 to-slate-950 text-xs text-slate-400 p-3 text-center">
+                        {scene.studioName}
                       </div>
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded bg-black/75 border border-white/15 text-[10px] font-bold text-rose-300">
-                      {scene.studioName}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+                    <span
+                      className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
+                        scene.isPlayable
+                          ? 'bg-emerald-600/90 text-white border-emerald-400/50'
+                          : 'bg-zinc-900/90 text-zinc-300 border-white/15'
+                      }`}
+                    >
+                      {scene.isPlayable ? 'Matched Playable File' : 'Metadata Only'}
                     </span>
-                    {mins > 0 && (
-                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/75 text-[10px] font-semibold text-slate-200 flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5" /> {mins}m
+                    {scene.durationSeconds > 0 && (
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/75 text-[10px] text-slate-200 font-mono">
+                        {Math.floor(scene.durationSeconds / 60)}m
                       </span>
                     )}
-                    <Link
-                      href={`/watch/stash-${proxyTarget}`}
-                      className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40"
-                    >
-                      <div className="w-11 h-11 rounded-full bg-rose-600 text-white flex items-center justify-center shadow-lg">
-                        <Play className="w-5 h-5 fill-white ml-0.5" />
-                      </div>
-                    </Link>
                   </div>
 
-                  <div className="p-3.5 space-y-1.5">
-                    <h4 className="text-sm font-bold text-white line-clamp-1">{scene.title}</h4>
-                    {scene.performers.length > 0 && (
-                      <p className="text-[11px] text-cyan-300 truncate">
-                        {scene.performers.map((p) => p.name).join(', ')}
-                      </p>
-                    )}
-                    <p className="text-[11px] text-slate-400 line-clamp-2">{scene.details}</p>
+                  <div className="p-3 space-y-1.5">
+                    <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-1">
+                      {scene.title}
+                    </h4>
+                    <p className="text-[11px] text-purple-300 truncate">
+                      {scene.studioName}
+                      {scene.performers.length > 0
+                        ? ` • ${scene.performers.map((p) => p.name).slice(0, 2).join(', ')}`
+                        : ''}
+                    </p>
+                    <p className="text-[10px] text-slate-400 line-clamp-2">{scene.details}</p>
                     {scene.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {scene.tags.slice(0, 3).map((tag) => (
+                      <div className="flex flex-wrap gap-1 pt-0.5">
+                        {scene.tags.slice(0, 3).map((t) => (
                           <span
-                            key={tag}
-                            className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-white/5 text-[9px] text-slate-300"
+                            key={t}
+                            className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] text-slate-400"
                           >
-                            <Tag className="w-2.5 h-2.5 text-purple-400" /> {tag}
+                            {t}
                           </span>
                         ))}
                       </div>
@@ -340,70 +259,86 @@ export const StashDbPanel: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="px-3.5 pb-3.5 pt-2 border-t border-white/5 flex items-center justify-between gap-2">
-                  <Link
-                    href={`/watch/stash-${proxyTarget}`}
-                    className="flex-1 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold flex items-center justify-center gap-1 transition"
-                  >
-                    <Play className="w-3 h-3 fill-white" /> Stream Playable
-                  </Link>
-                  {scene.officialUrls[0]?.url && (
-                    <a
-                      href={scene.officialUrls[0].url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] text-slate-300 flex items-center gap-1"
-                      title={scene.officialUrls[0].siteName}
+                {/* Action Footer: NEVER show Play unless isPlayable & matchedSceneId exist */}
+                <div className="px-3 pb-3 pt-1 flex items-center gap-2">
+                  {scene.isPlayable && scene.matchedSceneId ? (
+                    <Link
+                      href={toStashWatchPath(scene.matchedSceneId)}
+                      className="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-purple-600 text-white text-[11px] font-bold flex items-center justify-center gap-1 hover:opacity-95 transition"
                     >
-                      <ExternalLink className="w-3 h-3" /> Source
-                    </a>
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>Play Matched Media</span>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedScene(scene)}
+                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition"
+                    >
+                      <Info className="w-3 h-3 text-cyan-400" />
+                      <span>View Metadata Only</span>
+                    </button>
                   )}
                 </div>
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )
       ) : subTab === 'performers' ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
           {performers.map((p) => (
-            <div
+            <button
               key={p.id}
               onClick={() => {
-                setSubTab('scenes');
-                setSearchInput(p.name);
-                setActiveQuery(p.name);
-                setPage(1);
+                if (onSelectPerformer) {
+                  onSelectPerformer(`stashdb-${p.id}`);
+                } else {
+                  setSubTab('scenes');
+                  setSearchInput(p.name);
+                  setActiveQuery(p.name);
+                  setPage(1);
+                }
               }}
-              className="cursor-pointer rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-rose-500/40 p-3 text-center transition"
+              className="group text-left rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition flex flex-col"
             >
-              <div className="w-20 h-20 mx-auto rounded-full overflow-hidden bg-slate-800 mb-2.5 border border-white/15">
+              <div className="aspect-[3/4] w-full bg-slate-900 overflow-hidden">
                 {p.imageUrl ? (
-                  <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-slate-500" />
+                  <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">
+                    <Users className="w-6 h-6" />
                   </div>
                 )}
               </div>
-              <h4 className="text-xs font-bold text-white truncate">{p.name}</h4>
-              <span className="text-[10px] text-rose-400 font-semibold">
-                {p.sceneCount || 0} Scenes
-              </span>
-            </div>
+              <div className="p-2.5">
+                <h4 className="text-xs font-bold text-white truncate">{p.name}</h4>
+                <p className="text-[10px] text-slate-400 truncate">
+                  {p.country || 'Metadata'} • {(p.sceneCount || 0).toLocaleString()} credits
+                </p>
+              </div>
+            </button>
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {studios.map((s) => (
-            <div
+            <button
               key={s.id}
               onClick={() => {
-                setSubTab('scenes');
-                setSearchInput(s.name);
-                setActiveQuery(s.name);
-                setPage(1);
+                if (onSelectStudio) {
+                  onSelectStudio(`stashdb-${s.id}`);
+                } else {
+                  setSubTab('scenes');
+                  setSearchInput(s.name);
+                  setActiveQuery(s.name);
+                  setPage(1);
+                }
               }}
-              className="cursor-pointer rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-purple-500/40 p-4 flex items-center gap-3 transition"
+              className="text-left rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-purple-500/40 p-4 flex items-center gap-3 transition"
             >
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
                 {s.imageUrl ? (
@@ -414,9 +349,9 @@ export const StashDbPanel: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h4 className="text-sm font-bold text-white truncate">{s.name}</h4>
-                <span className="text-[11px] text-slate-400">Browse StashDB scenes →</span>
+                <span className="text-[11px] text-slate-400">Open Studio Metadata →</span>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
@@ -440,6 +375,110 @@ export const StashDbPanel: React.FC = () => {
           >
             Next
           </button>
+        </div>
+      )}
+
+      {/* Metadata Detail Drawer / Modal */}
+      {selectedScene && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0B0F1A] border border-purple-500/30 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {selectedScene.isPlayable ? 'Playable Media Linked' : 'StashDB Metadata Only — Not a Video File'}
+                </span>
+                <h4 className="text-lg font-black text-white mt-2">{selectedScene.title}</h4>
+              </div>
+              <button
+                onClick={() => setSelectedScene(null)}
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {selectedScene.image && (
+              <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-white/10">
+                <img src={selectedScene.image} alt={selectedScene.title} className="w-full h-full object-cover" />
+              </div>
+            )}
+
+            <p className="text-xs text-slate-300 leading-relaxed">{selectedScene.details}</p>
+
+            <div className="grid grid-cols-2 gap-3 text-xs bg-white/[0.03] border border-white/10 rounded-xl p-3">
+              <div>
+                <span className="text-slate-500 block text-[10px] uppercase">Studio</span>
+                <span className="font-semibold text-white">{selectedScene.studioName}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 block text-[10px] uppercase">Release Date / Duration</span>
+                <span className="font-semibold text-white flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-cyan-400" />
+                  {selectedScene.date || 'N/A'} • {Math.floor((selectedScene.durationSeconds || 0) / 60)}m
+                </span>
+              </div>
+            </div>
+
+            {selectedScene.performers.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-bold text-slate-400 uppercase">Cast / Performers</p>
+                <div className="flex flex-wrap gap-2">
+                  {selectedScene.performers.map((perf) => (
+                    <button
+                      key={perf.id}
+                      onClick={() => {
+                        setSelectedScene(null);
+                        onSelectPerformer?.(`stashdb-${perf.id}`);
+                      }}
+                      className="px-2.5 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-medium hover:bg-rose-500/25"
+                    >
+                      {perf.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {selectedScene.tags.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-1">
+                  <Tag className="w-3 h-3 text-cyan-400" /> Tags
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {selectedScene.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-300"
+                    >
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="pt-2 flex items-center justify-end gap-2">
+              {selectedScene.isPlayable && selectedScene.matchedSceneId ? (
+                <Link
+                  href={toStashWatchPath(selectedScene.matchedSceneId)}
+                  className="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5"
+                >
+                  <Play className="w-3.5 h-3.5 fill-white" />
+                  <span>Play Linked Stream</span>
+                </Link>
+              ) : selectedScene.officialUrls[0]?.url ? (
+                <a
+                  href={selectedScene.officialUrls[0].url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5"
+                >
+                  <span>Reference Record</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              ) : null}
+            </div>
+          </div>
         </div>
       )}
     </div>

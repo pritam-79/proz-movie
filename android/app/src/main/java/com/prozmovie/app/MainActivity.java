@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionName;
             } catch (Exception e) {
-                return "0.08";
+                return "0.09";
             }
         }
 
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionCode;
             } catch (Exception e) {
-                return 8;
+                return 9;
             }
         }
     }
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Set modern mobile User-Agent to avoid web engine compatibility blocks
-        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.08";
+        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.09";
         settings.setUserAgentString(customUa);
 
         // Hardware acceleration

@@ -1,305 +1,487 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { 
-  FolderLock, 
-  Grid, 
-  List, 
-  Clock, 
-  Star, 
-  Heart, 
-  Eye, 
-  Play, 
-  Download, 
-  Plus, 
-  Filter, 
-  Search, 
-  Sparkles, 
-  Server, 
-  Layers, 
-  Tv, 
-  Users, 
-  CheckCircle2, 
-  Share2,
-  Film,
-  Camera,
-  Tag,
-  Shuffle
+import {
+  FolderLock,
+  Grid,
+  List,
+  LayoutGrid,
+  Play,
+  Search,
+  Database,
+  RefreshCw,
+  CheckCircle2,
+  Image as ImageIcon,
+  UploadCloud,
+  Flame,
+  Building,
+  Users,
+  Glasses,
+  Sparkles,
+  Tv,
+  Compass,
+  Globe,
+  AlertCircle,
 } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { StashScene, StashPerformer, StashStudio, MediaViewMode } from '@/types/library';
+import { StashScene, StashPerformer, StashStudio, StashGallery, MediaViewMode } from '@/types/library';
+import { toStashWatchPath } from '@/lib/utils/streamUtils';
 import StashDbPanel from '@/components/stash/StashDbPanel';
+import {
+  PerformerProfileModal,
+  PhotoGalleryModal,
+  StudioDetailModal,
+} from '@/components/restricted/AdultMediaModals';
 
-export default function PersonalLibraryPage() {
-  const { user } = useAuth();
+export default function LibraryPage() {
   const [viewMode, setViewMode] = useState<MediaViewMode>('grid');
-  const [activeTab, setActiveTab] = useState<'all' | 'scenes' | 'performers' | 'studios' | 'playlists'>('all');
   const [scenes, setScenes] = useState<StashScene[]>([]);
+  const [recentUploads, setRecentUploads] = useState<any[]>([]);
+  const [galleries, setGalleries] = useState<StashGallery[]>([]);
   const [performers, setPerformers] = useState<StashPerformer[]>([]);
   const [studios, setStudios] = useState<StashStudio[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [backendStatus, setBackendStatus] = useState<any>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStudio, setSelectedStudio] = useState<string>('all');
 
-  useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-      try {
-        const [scenesRes, perfRes, studiosRes] = await Promise.all([
-          fetch('/api/library/stash/scenes').then(r => r.json()),
-          fetch('/api/library/stash/performers').then(r => r.json()),
-          fetch('/api/library/stash/studios').then(r => r.json())
-        ]);
+  const [selectedPerformerId, setSelectedPerformerId] = useState<string | null>(null);
+  const [selectedStudioId, setSelectedStudioId] = useState<string | null>(null);
+  const [lightboxGallery, setLightboxGallery] = useState<{ title: string; images: string[] } | null>(null);
 
-        if (scenesRes.success) setScenes(scenesRes.scenes);
-        if (perfRes.success) setPerformers(perfRes.performers);
-        if (studiosRes.success) setStudios(studiosRes.studios);
-      } catch (e) {
-        console.error('Failed to load library data', e);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchVaultData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [srvData, scenesData, uploadsData, perfData, studioData, galData] = await Promise.all([
+        fetch('/api/library/servers').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/scenes').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/recent-uploads').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/performers').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/studios').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/galleries').then((r) => r.json()).catch(() => ({})),
+      ]);
+
+      if (srvData?.backendStatus) setBackendStatus(srvData.backendStatus);
+      if (scenesData.success) setScenes(scenesData.scenes || []);
+      if (uploadsData.success) setRecentUploads(uploadsData.uploads || []);
+      if (perfData.success) setPerformers(perfData.performers || []);
+      if (studioData.success) setStudios(studioData.studios || []);
+      if (galData.success) setGalleries(galData.galleries || []);
+    } finally {
+      setLoading(false);
     }
-    loadData();
   }, []);
 
-  const filteredScenes = scenes.filter(s => {
-    if (searchQuery && !s.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    if (selectedStudio !== 'all' && s.studio?.id !== selectedStudio) return false;
-    return true;
+  useEffect(() => {
+    fetchVaultData();
+  }, [fetchVaultData]);
+
+  const handleSyncRefresh = async () => {
+    setSyncing(true);
+    try {
+      await fetch('/api/library/stash/sync', { method: 'POST' });
+      await fetchVaultData();
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const filteredScenes = scenes.filter((s) => {
+    const matchesSearch =
+      !searchQuery ||
+      s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.details?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.performers?.some((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const matchesStudio = selectedStudio === 'all' || s.studio?.id === selectedStudio;
+    return matchesSearch && matchesStudio;
   });
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-5 sm:pt-8 pb-28 px-4 md:px-8">
-      {/* Header & Sub-Bar */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
-                <FolderLock className="w-7 h-7" />
+    <div className="min-h-screen bg-[#06080F] text-white pb-20">
+      {/* Header Banner */}
+      <div className="border-b border-white/10 bg-gradient-to-r from-[#0A0F1D] via-[#06080F] to-purple-950/20 py-8 sm:py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold mb-2">
+                <FolderLock className="w-3.5 h-3.5" />
+                <span>Gallery &amp; Automated Stash Hub</span>
               </div>
-              <div>
-                <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-purple-400 bg-clip-text text-transparent">
-                  My Private Library
-                </h1>
-                <p className="text-sm text-slate-400 mt-0.5">
-                  Multi-server federated vault powered by Stash GraphQL engine & Liquid Glass precision.
-                </p>
-              </div>
+              <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
+                Gallery, Recent Uploads &amp; StashDB
+              </h1>
+              <p className="text-slate-400 text-xs sm:text-sm max-w-2xl mt-1">
+                Unified photo galleries, Recent Uploads synced automatically from Stash, PRO 18+ ecosystem sections, and metadata-only StashDB catalogue.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button
+                onClick={handleSyncRefresh}
+                disabled={syncing}
+                className="px-4 py-2 rounded-xl bg-purple-600/25 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-xs font-bold flex items-center gap-1.5 transition"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+                <span>{syncing ? 'Syncing...' : 'Sync Stash Backend'}</span>
+              </button>
+              <Link
+                href="/restricted"
+                className="px-4 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/35 border border-rose-500/40 text-rose-200 text-xs font-bold flex items-center gap-1.5 transition"
+              >
+                <Flame className="w-3.5 h-3.5 text-rose-400" />
+                <span>Open Full PRO 18+ Ecosystem</span>
+              </Link>
             </div>
           </div>
 
-          {/* Quick Actions */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/restricted"
-              className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-rose-300 text-xs sm:text-sm font-semibold flex items-center gap-2 transition"
-            >
-              <FolderLock className="w-4 h-4" />
-              <span>18+ Stash Ecosystem</span>
-            </Link>
-            <Link
-              href="/tv"
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs sm:text-sm font-medium flex items-center gap-2 transition"
-            >
-              <Tv className="w-4 h-4 text-cyan-400" />
-              <span>TV Mode</span>
-            </Link>
-            <Link
-              href="/library/playlists"
-              className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium flex items-center gap-2 transition"
-            >
-              <Layers className="w-4 h-4 text-purple-400" />
-              <span>Playlists</span>
-            </Link>
-            <Link
-              href="/library/downloads"
-              className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 text-sm font-medium flex items-center gap-2 transition"
-            >
-              <Download className="w-4 h-4" />
-              <span>Downloads</span>
-            </Link>
+          {/* Automatic Backend Connection Indicators */}
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              {backendStatus?.stashdb?.connected
+                ? `StashDB Auto-Connected (${backendStatus.stashdb.indexedScenesCount.toLocaleString()} scenes)`
+                : 'StashDB Backend Ready'}
+            </span>
+            {backendStatus?.personalStash && !backendStatus.personalStash.configured && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-300 font-semibold">
+                <AlertCircle className="w-3.5 h-3.5" />
+                Personal Stash Server: STASH_SERVER_URL unset in backend
+              </span>
+            )}
+          </div>
+
+          {/* Complete PRO 18+ Category Quick Navigation */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+            {[
+              { label: 'Recent Uploads', tab: 'recent_uploads', icon: UploadCloud },
+              { label: 'Studios', tab: 'studios', icon: Building },
+              { label: 'Performers', tab: 'performers', icon: Users },
+              { label: 'Tube Hub', tab: 'tubes', icon: Globe },
+              { label: '3D VR', tab: 'vr', icon: Glasses },
+              { label: 'Hentai & 3D', tab: 'hentai', icon: Sparkles },
+              { label: 'Hot Series', tab: 'series', icon: Tv },
+              { label: 'Recommended', tab: 'recommendations', icon: Compass },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.tab}
+                  href={`/restricted?tab=${item.tab}`}
+                  className="p-2.5 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-400/40 flex items-center gap-2 text-xs font-semibold text-slate-200 transition"
+                >
+                  <Icon className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </div>
+      </div>
 
-        {/* Navigation Tabs & View Mode Toggles */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-            {(['all', 'scenes', 'performers', 'studios', 'playlists'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition ${
-                  activeTab === tab
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                    : 'bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/5'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-12">
+        {/* Recent Uploads Carousel (Photos + Videos) */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-black text-white flex items-center gap-2">
+                <UploadCloud className="w-5 h-5 text-cyan-400" />
+                <span>Recent Uploads</span>
+              </h2>
+              <p className="text-xs text-slate-400">
+                Recently uploaded photos, galleries, collections, and synced Stash videos.
+              </p>
+            </div>
+            <Link
+              href="/restricted?tab=recent_uploads"
+              className="text-xs font-bold text-cyan-400 hover:text-cyan-300"
+            >
+              View All Recent Uploads →
+            </Link>
           </div>
 
-          {/* View Toggles & Search */}
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search vault..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500/60 w-48 transition"
-              />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {recentUploads.slice(0, 8).map((u) => (
+              <div
+                key={`lib-up-${u.kind}-${u.id}`}
+                className="rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-500/40 transition flex flex-col justify-between"
+              >
+                <div className="aspect-video bg-slate-900 relative overflow-hidden">
+                  {u.thumbnail && (
+                    <img src={u.thumbnail} alt={u.title} className="w-full h-full object-cover" loading="lazy" />
+                  )}
+                  <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-black/80 text-[10px] font-bold text-cyan-300 uppercase">
+                    {u.kind === 'photo_gallery' ? 'Photos' : u.kind === 'collection' ? 'Collection' : 'Video'}
+                  </span>
+                </div>
+                <div className="p-3 space-y-2">
+                  <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-1">{u.title}</h4>
+                  <p className="text-[11px] text-slate-400 truncate">
+                    {u.uploadedAt} • {u.durationOrCount}
+                  </p>
+                  {u.galleryImages ? (
+                    <button
+                      onClick={() => setLightboxGallery({ title: u.title, images: u.galleryImages })}
+                      className="w-full py-1.5 rounded-lg bg-cyan-600/20 text-cyan-200 border border-cyan-500/30 text-xs font-bold"
+                    >
+                      Open Gallery
+                    </button>
+                  ) : (
+                    <Link
+                      href={u.watchHref || toStashWatchPath(u.id)}
+                      className="w-full py-1.5 rounded-lg bg-rose-600 text-white text-xs font-bold flex items-center justify-center gap-1"
+                    >
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>Play Video</span>
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Adult Photo Galleries Grid */}
+        {galleries.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-xl font-black text-white flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-rose-400" />
+              <span>Photo Galleries ({galleries.length})</span>
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {galleries.map((gal) => (
+                <button
+                  key={gal.id}
+                  onClick={() => setLightboxGallery({ title: gal.title, images: gal.images || (gal.coverPath ? [gal.coverPath] : []) })}
+                  className="text-left rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-400/50 transition"
+                >
+                  <div className="aspect-video bg-slate-900 relative">
+                    <img src={gal.coverPath || ''} alt={gal.title} className="w-full h-full object-cover" loading="lazy" />
+                    <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300">
+                      {gal.imageCount} Photos
+                    </span>
+                  </div>
+                  <div className="p-3">
+                    <h4 className="text-sm font-bold text-white truncate">{gal.title}</h4>
+                    <p className="text-[11px] text-slate-400 truncate">
+                      {gal.studio?.name || 'Gallery'} • {gal.date}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Search + Filter Controls for Playable Stash Library */}
+        <section className="space-y-5">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search scenes, performers, tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
+                />
+              </div>
+
+              <select
+                value={selectedStudio}
+                onChange={(e) => setSelectedStudio(e.target.value)}
+                className="bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-300 focus:border-purple-500 focus:outline-none"
+              >
+                <option value="all">All Studios ({studios.length})</option>
+                {studios.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <div className="flex items-center bg-white/5 p-1 rounded-xl border border-white/10">
+            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10 self-start">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-lg transition ${viewMode === 'grid' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                title="Grid View"
               >
-                <Grid className="w-4 h-4" />
+                <LayoutGrid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('compact')}
                 className={`p-1.5 rounded-lg transition ${viewMode === 'compact' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                title="Compact Grid"
               >
-                <Layers className="w-4 h-4" />
+                <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded-lg transition ${viewMode === 'list' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                title="List View"
               >
                 <List className="w-4 h-4" />
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto">
-        {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-24 text-slate-400">
-            <div className="w-10 h-10 border-2 border-purple-500 border-t-transparent rounded-full animate-spin mb-4" />
-            <p className="text-sm">Synchronizing with connected Stash servers...</p>
-          </div>
-        ) : filteredScenes.length === 0 ? (
-          <div className="text-center py-20 bg-white/[0.02] border border-white/10 rounded-2xl p-8">
-            <FolderLock className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-lg font-bold text-slate-300">No scenes found</h3>
-            <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
-              Check your filters or trigger a synchronization with your Stash server in the Admin Hub.
-            </p>
-          </div>
-        ) : (
-          <div className={
-            viewMode === 'grid' 
-              ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-              : viewMode === 'compact'
-              ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"
-              : "flex flex-col gap-3"
-          }>
-            {filteredScenes.map(scene => (
-              <div
-                key={scene.id}
-                className="group relative bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-purple-500/50 rounded-2xl overflow-hidden transition-all duration-300 shadow-xl flex flex-col"
-              >
-                {/* Media Thumbnail & Hover Preview */}
-                <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
-                  <img
-                    src={scene.paths.screenshot || scene.paths.webp}
-                    alt={scene.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" />
-                  
-                  {/* Rating / O-Counter Badges */}
-                  <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-                    {scene.rating && (
-                      <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-amber-400 flex items-center gap-1">
-                        <Star className="w-2.5 h-2.5 fill-amber-400" />
-                        {scene.rating}
-                      </span>
-                    )}
-                    {scene.oCounter ? (
-                      <span className="px-2 py-0.5 rounded-md bg-purple-500/80 backdrop-blur-md text-[10px] font-bold text-white">
-                        {scene.oCounter}x
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Play Overlay */}
-                  <Link
-                    href={`/watch/stash-${scene.id}`}
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 backdrop-blur-xs"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center shadow-lg shadow-purple-600/50 transform group-hover:scale-110 transition">
-                      <Play className="w-5 h-5 fill-white ml-0.5" />
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="aspect-video rounded-2xl bg-white/[0.04] animate-pulse" />
+              ))}
+            </div>
+          ) : filteredScenes.length === 0 ? (
+            <div className="text-center py-14 bg-white/[0.02] border border-white/10 rounded-2xl p-8">
+              <Database className="w-10 h-10 text-slate-500 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-white mb-1">No Matching Library Scenes</h3>
+              <p className="text-xs text-slate-400">Try clearing your search or studio filter.</p>
+            </div>
+          ) : viewMode === 'list' ? (
+            <div className="space-y-2.5">
+              {filteredScenes.map((scene) => (
+                <div
+                  key={scene.id}
+                  className="bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 rounded-2xl p-4 flex items-center justify-between gap-4 transition"
+                >
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="w-28 aspect-video rounded-xl overflow-hidden bg-slate-900 shrink-0 relative">
+                      {scene.paths?.screenshot && (
+                        <img src={scene.paths.screenshot} alt={scene.title} className="w-full h-full object-cover" />
+                      )}
                     </div>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-white truncate">{scene.title}</h3>
+                      <p className="text-xs text-slate-400">
+                        {scene.studio?.name || 'Stash Vault'} • {Math.floor((scene.files?.[0]?.duration || 0) / 60)}m
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    href={toStashWatchPath(scene.id)}
+                    className="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5 shrink-0"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-white" /> Play
                   </Link>
                 </div>
-
-                {/* Details */}
-                <div className="p-4 flex-1 flex flex-col justify-between">
+              ))}
+            </div>
+          ) : (
+            <div
+              className={`grid gap-4 ${
+                viewMode === 'compact'
+                  ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'
+                  : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              }`}
+            >
+              {filteredScenes.map((scene) => (
+                <Link
+                  key={scene.id}
+                  href={toStashWatchPath(scene.id)}
+                  className="group bg-white/[0.03] hover:bg-white/[0.06] border border-white/10 hover:border-purple-500/40 rounded-2xl overflow-hidden transition flex flex-col justify-between"
+                >
                   <div>
-                    <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                      <span>{scene.studio?.name || 'Independent Studio'}</span>
-                      <span>{scene.date}</span>
+                    <div className="aspect-video bg-slate-900 relative overflow-hidden">
+                      {scene.paths?.screenshot && (
+                        <img
+                          src={scene.paths.screenshot}
+                          alt={scene.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <Play className="w-9 h-9 text-white fill-white" />
+                      </div>
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-mono text-white">
+                        {scene.files?.[0]?.height ? `${scene.files[0].height}p` : 'HD'}
+                      </span>
                     </div>
-                    <h4 className="text-sm font-semibold text-slate-200 line-clamp-1 group-hover:text-purple-300 transition">
-                      {scene.title}
-                    </h4>
-                    {scene.performers && scene.performers.length > 0 && (
-                      <p className="text-xs text-purple-400/90 mt-1 line-clamp-1">
-                        {scene.performers.map(p => p.name).join(', ')}
+                    <div className="p-3.5 space-y-1.5">
+                      <h3 className="font-bold text-white text-sm line-clamp-1">{scene.title}</h3>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {scene.studio?.name || 'Stash Vault'} • {(scene.performers || []).map((p) => p.name).join(', ')}
                       </p>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* Featured Performers Quick Directory */}
+        {performers.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-black text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-rose-400" />
+                <span>Featured Performers ({performers.length})</span>
+              </h2>
+              <Link
+                href="/restricted?tab=performers"
+                className="text-xs font-bold text-cyan-400 hover:text-cyan-300"
+              >
+                Full Performers Directory →
+              </Link>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
+              {performers.slice(0, 12).map((p: any) => (
+                <button
+                  key={p.id}
+                  onClick={() => setSelectedPerformerId(p.id)}
+                  className="w-32 shrink-0 rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-rose-500/40 transition text-left"
+                >
+                  <div className="aspect-[3/4] bg-slate-900">
+                    {(p.image || p.imagePath) && (
+                      <img src={p.image || p.imagePath} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
                     )}
                   </div>
-
-                  {/* Footer Action Icons */}
-                  <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/5 text-slate-400 text-xs">
-                    <span className="flex items-center gap-1 text-[11px]">
-                      <Eye className="w-3.5 h-3.5 text-slate-500" />
-                      {scene.playCount || 0} views
+                  <div className="p-2">
+                    <p className="text-xs font-bold text-white truncate">{p.name}</p>
+                    <span className="text-[10px] text-slate-400 truncate block">
+                      {p.sceneCount || 0} credits
                     </span>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        className="hover:text-red-400 transition"
-                        title="Add to Favourites"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </button>
-                      <button 
-                        className="hover:text-cyan-400 transition"
-                        title="Add to Playlist"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </button>
-                      <button 
-                        className="hover:text-purple-400 transition"
-                        title="Download Scene"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                </button>
+              ))}
+            </div>
+          </section>
         )}
 
-        {/* Live StashDB GraphQL Catalog */}
-        <div className="mt-10">
-          <StashDbPanel />
-        </div>
+        {/* Live StashDB GraphQL Metadata Catalogue */}
+        <StashDbPanel
+          onSelectPerformer={(id) => setSelectedPerformerId(id)}
+          onSelectStudio={(id) => setSelectedStudioId(id)}
+        />
       </div>
+
+      {selectedPerformerId && (
+        <PerformerProfileModal
+          performerId={selectedPerformerId}
+          favorites={[]}
+          onToggleFavorite={() => {}}
+          onSelectStudio={(sid) => setSelectedStudioId(sid)}
+          onOpenPhotos={(title, images) => setLightboxGallery({ title, images })}
+          onClose={() => setSelectedPerformerId(null)}
+        />
+      )}
+
+      {selectedStudioId && (
+        <StudioDetailModal
+          studioId={selectedStudioId}
+          onSelectPerformer={(pid) => setSelectedPerformerId(pid)}
+          onClose={() => setSelectedStudioId(null)}
+        />
+      )}
+
+      {lightboxGallery && (
+        <PhotoGalleryModal
+          title={lightboxGallery.title}
+          images={lightboxGallery.images}
+          onClose={() => setLightboxGallery(null)}
+        />
+      )}
     </div>
   );
 }

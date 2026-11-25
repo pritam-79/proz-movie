@@ -1,33 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stashAdapter } from '@/lib/providers/stash';
-import { MediaBrowsingFilters } from '@/types/library';
+import { stashService } from '@/lib/services/stashService';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const searchQuery = searchParams.get('q') || undefined;
-    const studioId = searchParams.get('studio') || undefined;
-    const performerId = searchParams.get('performer') || undefined;
-    const sortBy = (searchParams.get('sort') as MediaBrowsingFilters['sortBy']) || 'date';
-    const isFavorite = searchParams.has('favorite') ? searchParams.get('favorite') === 'true' : undefined;
-    const isWatched = searchParams.has('watched') ? searchParams.get('watched') === 'true' : undefined;
+    const searchQuery = searchParams.get('q')?.trim().toLowerCase() || '';
+    const studioFilter = searchParams.get('studio')?.trim().toLowerCase() || '';
+    const performerFilter = searchParams.get('performer')?.trim().toLowerCase() || '';
+    const tagFilter = searchParams.get('tag')?.trim().toLowerCase() || '';
+    const resolutionFilter = searchParams.get('resolution')?.trim().toLowerCase() || '';
+    const sortBy = searchParams.get('sort') || 'date';
 
-    const filters: MediaBrowsingFilters = {
-      searchQuery,
-      studioId,
-      performerId,
-      sortBy,
-      isFavorite,
-      isWatched
-    };
+    let scenes = await stashService.getAllPlayableScenes();
 
-    const data = await stashAdapter.findScenes(filters);
+    if (searchQuery) {
+      scenes = scenes.filter(
+        (s) =>
+          s.title.toLowerCase().includes(searchQuery) ||
+          (s.details || '').toLowerCase().includes(searchQuery) ||
+          (s.studio?.name || '').toLowerCase().includes(searchQuery) ||
+          (s.performers || []).some((p) => p.name.toLowerCase().includes(searchQuery)) ||
+          (s.tags || []).some((t) => t.name.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    if (studioFilter) {
+      scenes = scenes.filter(
+        (s) =>
+          s.studio?.id.toLowerCase() === studioFilter ||
+          (s.studio?.name || '').toLowerCase().includes(studioFilter)
+      );
+    }
+
+    if (performerFilter) {
+      scenes = scenes.filter((s) =>
+        (s.performers || []).some(
+          (p) => p.id.toLowerCase() === performerFilter || p.name.toLowerCase().includes(performerFilter)
+        )
+      );
+    }
+
+    if (tagFilter) {
+      scenes = scenes.filter((s) =>
+        (s.tags || []).some((t) => t.name.toLowerCase().includes(tagFilter))
+      );
+    }
+
+    if (resolutionFilter && resolutionFilter !== 'all') {
+      scenes = scenes.filter((s) => {
+        const h = s.files?.[0]?.height || 1080;
+        if (resolutionFilter === '4k') return h >= 2160;
+        if (resolutionFilter === '1080p') return h >= 1080;
+        if (resolutionFilter === '720p') return h >= 720 && h < 1080;
+        return true;
+      });
+    }
+
+    if (sortBy === 'popular') {
+      scenes.sort((a, b) => (b.oCounter || 0) - (a.oCounter || 0));
+    } else if (sortBy === 'rating') {
+      scenes.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    } else if (sortBy === 'title') {
+      scenes.sort((a, b) => a.title.localeCompare(b.title));
+    } else {
+      scenes.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    }
 
     return NextResponse.json({
       success: true,
-      total: data.count,
-      scenes: data.scenes,
-      timestamp: new Date().toISOString()
+      total: scenes.length,
+      scenes,
+      timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
     return NextResponse.json(

@@ -1,68 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { stashAdapter } from '@/lib/providers/stash';
+import { NextResponse } from 'next/server';
+import { stashService } from '@/lib/services/stashService';
 
-export async function POST(req: NextRequest) {
+export const dynamic = 'force-dynamic';
+
+export async function POST() {
   try {
-    const body = await req.json().catch(() => ({}));
-    const { serverId = 'stash-srv-primary', syncType = 'incremental', serverUrl, apiKey } = body;
-
-    if (serverUrl) {
-      stashAdapter.updateServer({
-        id: serverId,
-        serverUrl,
-        apiKey
-      });
-    }
-
-    const test = await stashAdapter.testConnection(serverId);
-    if (!test.success) {
-      return NextResponse.json({
-        success: false,
-        status: 'disconnected',
-        error: test.error || 'Stash server is not reachable. Connect a valid private media library to sync.',
-        completedAt: new Date().toISOString()
-      }, { status: 400 });
-    }
-
-    const scenesData = await stashAdapter.findScenes();
-    const performers = await stashAdapter.findPerformers();
-    const studios = await stashAdapter.findStudios();
-    const galleries = await stashAdapter.findGalleries();
+    const cache = await stashService.syncLibrary(true);
+    const status = await stashService.getBackendStatus();
 
     return NextResponse.json({
       success: true,
       jobId: `sync-${Date.now()}`,
-      serverId,
-      syncType,
       status: 'completed',
-      version: test.version,
+      version: status.personalStash.version || 'v0.09 Backend Sync',
       summary: {
-        scenesScanned: scenesData.count,
-        scenesUpdated: scenesData.scenes.length,
-        performersUpdated: performers.length,
-        studiosUpdated: studios.length,
-        galleriesUpdated: galleries.length,
-        duplicatesResolved: 0,
-        failedRecords: 0
+        scenesScanned: status.syncState.totalPlayableScenes,
+        scenesUpdated: status.syncState.totalPlayableScenes,
+        performersUpdated: status.syncState.totalPerformers,
+        studiosUpdated: status.syncState.totalStudios,
+        galleriesUpdated: status.syncState.totalGalleries,
+        duplicatesResolved: cache.duplicatesRemoved,
+        stashDbIndexed: status.stashdb.indexedScenesCount,
       },
-      completedAt: new Date().toISOString()
+      backendStatus: status,
+      completedAt: new Date().toISOString(),
     });
   } catch (error: any) {
     return NextResponse.json(
-      { success: false, error: error.message || 'Sync execution failed' },
+      { success: false, error: error.message || 'Backend sync failed' },
       { status: 500 }
     );
   }
 }
 
 export async function GET() {
-  const servers = stashAdapter.getServers();
-  const test = await stashAdapter.testConnection();
-  return NextResponse.json({
-    success: true,
-    connected: test.success,
-    version: test.version,
-    error: test.error,
-    servers
-  });
+  try {
+    const status = await stashService.getBackendStatus();
+    return NextResponse.json({
+      success: true,
+      connected: status.stashdb.connected || status.personalStash.connected,
+      status,
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      { success: false, error: error.message || 'Status lookup failed' },
+      { status: 500 }
+    );
+  }
 }

@@ -24,10 +24,14 @@ const STASH_SCENE_CHANNEL_SEED: Record<string, string> = {
   'stash-sc-004': 'r33w', // Alt Balaji
 };
 
-async function resolvePlayableStashTarget(sceneId: string): Promise<string> {
-  // 1. Check user-configured personal Stash server if present
-  const servers = stashAdapter.getServers();
-  const activeSrv = servers.find((s) => s.isEnabled && s.serverUrl);
+async function resolvePlayableStashTarget(sceneId: string): Promise<string | null> {
+  // 0. Never invent playable proxies for metadata-only StashDB catalog entries unless linked on Stash server
+  const activeSrv = stashAdapter.getInternalPrimaryServer();
+  if (sceneId.startsWith('stashdb-') && !activeSrv?.serverUrl) {
+    return null;
+  }
+
+  // 1. Check backend-configured personal Stash server if present
   if (activeSrv?.serverUrl && !sceneId.startsWith('stash-sc-')) {
     const cleanBase = activeSrv.serverUrl.replace(/\/graphql\/?$/, '');
     const cleanId = sceneId.replace(/^(stash-|stashdb-)+/, '');
@@ -69,9 +73,19 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const rawId = searchParams.get('id') || 'stash-sc-001';
-    const sceneId = rawId.replace(/^stash-stash-/, 'stash-');
+    const bare = rawId.replace(/^(stash-)+/i, '');
+    const sceneId =
+      bare.startsWith('stashdb-') || bare.startsWith('srv-') || bare.startsWith('cine18-')
+        ? bare
+        : `stash-${bare}`;
 
     const targetUrl = await resolvePlayableStashTarget(sceneId);
+    if (!targetUrl) {
+      return NextResponse.json(
+        { success: false, error: 'StashDB catalog entry is metadata-only and not matched to a connected Stash server media file.' },
+        { status: 404 }
+      );
+    }
 
     const range = req.headers.get('range');
     const headers: HeadersInit = {

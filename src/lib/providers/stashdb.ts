@@ -1,7 +1,7 @@
 /**
- * PRO2 ENTERTAINMENT v0.08 — StashDB GraphQL Metadata Adapter
- * Connects securely to https://stashdb.org/graphql (via .env.local or runtime user config).
- * Never hardcodes or exposes API keys to browser clients.
+ * PROZ Entertainment v0.09 — Server-Side StashDB GraphQL Metadata Adapter
+ * Connects automatically using backend environment variables (STASHDB_ENDPOINT & STASHDB_API_KEY).
+ * Never exposes API keys or internal credentials to client code or API responses.
  */
 
 export interface StashDbSceneItem {
@@ -10,27 +10,49 @@ export interface StashDbSceneItem {
   details: string;
   date: string | null;
   durationSeconds: number;
-  posterUrl: string;
+  image: string;
+  images: string[];
   studioName: string;
   studioId: string;
-  performers: Array<{ id: string; name: string; imageUrl?: string }>;
+  performers: Array<{ id: string; name: string; imageUrl?: string; gender?: string }>;
   tags: string[];
   officialUrls: Array<{ url: string; siteName: string }>;
+  isPlayable?: boolean;
+  matchedSceneId?: string | null;
 }
 
 export interface StashDbPerformerItem {
   id: string;
   name: string;
+  disambiguation?: string;
+  aliases?: string[];
+  gender?: string;
   country?: string;
+  ethnicity?: string;
+  hairColor?: string;
+  eyeColor?: string;
+  heightCm?: number;
+  measurements?: string;
+  careerStartYear?: number;
+  careerEndYear?: number;
+  tattoos?: string;
+  piercings?: string;
   sceneCount?: number;
   imageUrl?: string;
+  images?: string[];
+  studios?: Array<{ id: string; name: string; sceneCount?: number; imageUrl?: string }>;
 }
 
 export interface StashDbStudioItem {
   id: string;
   name: string;
+  aliases?: string[];
+  parentName?: string;
+  parentId?: string;
+  urls?: Array<{ url: string; siteName?: string }>;
   sceneCount?: number;
   imageUrl?: string;
+  images?: string[];
 }
 
 const DEFAULT_STASHDB_ENDPOINT = 'https://stashdb.org/graphql';
@@ -43,86 +65,161 @@ interface CacheEntry<T> {
 const stashDbCache = new Map<string, CacheEntry<any>>();
 const CACHE_TTL_MS = 10 * 60 * 1000;
 
-export function getStashDbConfig(overrideEndpoint?: string | null, overrideKey?: string | null) {
-  const endpoint = (overrideEndpoint || process.env.STASHDB_ENDPOINT || DEFAULT_STASHDB_ENDPOINT).trim();
-  const apiKey = (overrideKey || process.env.STASHDB_API_KEY || '').trim();
+// Strict consenting-adult content safeguard
+const BLOCKED_SAFETY_TERMS = ['underage', 'minor', 'child', 'teenager', 'loli', 'shota'];
+export function isConsentingAdultSafe(text?: string | null, tags?: string[]): boolean {
+  const combined = `${text || ''} ${(tags || []).join(' ')}`.toLowerCase();
+  return !BLOCKED_SAFETY_TERMS.some((term) => combined.includes(term));
+}
+
+export function getStashDbEnvConfig() {
+  const endpoint = (process.env.STASHDB_ENDPOINT || DEFAULT_STASHDB_ENDPOINT).trim();
+  const apiKey = (process.env.STASHDB_API_KEY || '').trim();
   return {
+    endpointConfigured: Boolean(process.env.STASHDB_ENDPOINT),
+    isConfigured: Boolean(endpoint && apiKey),
     endpoint,
     apiKey,
-    isConfigured: Boolean(endpoint && apiKey),
   };
 }
 
 async function runStashDbGraphQL<T = any>(
   query: string,
-  variables: Record<string, any> = {},
-  overrideEndpoint?: string | null,
-  overrideKey?: string | null
+  variables: Record<string, any> = {}
 ): Promise<T> {
-  const { endpoint, apiKey } = getStashDbConfig(overrideEndpoint, overrideKey);
+  const { endpoint, apiKey } = getStashDbEnvConfig();
   if (!apiKey) {
-    throw new Error('StashDB API key is not configured. Provide one in STASHDB_API_KEY or Vault Settings.');
+    throw new Error('Backend STASHDB_API_KEY is missing in server environment.');
   }
 
-  const res = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'ApiKey': apiKey,
-      'User-Agent': 'PRO2Entertainment/0.08',
-    },
-    body: JSON.stringify({ query, variables }),
-    signal: AbortSignal.timeout(10000),
-  });
+  let lastErr: Error | null = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          ApiKey: apiKey,
+        },
+        body: JSON.stringify({ query, variables }),
+        signal: AbortSignal.timeout(12000),
+      });
 
-  if (!res.ok) {
-    throw new Error(`StashDB GraphQL returned HTTP ${res.status}`);
+      if (!res.ok) {
+        if (res.status >= 500 && attempt === 0) {
+          await new Promise((r) => setTimeout(r, 400));
+          continue;
+        }
+        throw new Error(`StashDB GraphQL returned HTTP ${res.status}`);
+      }
+
+      const json = await res.json();
+      if (json.errors && Array.isArray(json.errors) && json.errors.length > 0) {
+        throw new Error(json.errors[0]?.message || 'StashDB GraphQL query error');
+      }
+      return json.data as T;
+    } catch (err: any) {
+      lastErr = err instanceof Error ? err : new Error(String(err));
+      if (attempt === 0) {
+        await new Promise((r) => setTimeout(r, 350));
+      }
+    }
   }
 
-  const json = await res.json();
-  if (json.errors && json.errors.length > 0) {
-    throw new Error(json.errors[0]?.message || 'StashDB GraphQL error');
-  }
-  return json.data;
+  throw lastErr || new Error('Unable to reach StashDB GraphQL endpoint');
 }
 
-export async function testStashDbConnection(
-  overrideEndpoint?: string | null,
-  overrideKey?: string | null
-): Promise<{ success: boolean; count?: number; error?: string }> {
-  try {
-    const data = await runStashDbGraphQL(
-      `query TestStashDB { queryScenes(input: { page: 1, per_page: 1 }) { count } }`,
-      {},
-      overrideEndpoint,
-      overrideKey
-    );
+export async function testStashDbConnection(): Promise<{
+  success: boolean;
+  configured: boolean;
+  count?: number;
+  error?: string;
+}> {
+  const cfg = getStashDbEnvConfig();
+  if (!cfg.isConfigured) {
     return {
+      success: false,
+      configured: false,
+      error: 'Missing STASHDB_API_KEY in server environment.',
+    };
+  }
+
+  const cached = stashDbCache.get('health:test');
+  if (cached && Date.now() - cached.ts < 60_000) {
+    return cached.data;
+  }
+
+  try {
+    const data = await runStashDbGraphQL<{ queryScenes: { count: number } }>(
+      `query TestStashDB { queryScenes(input: { page: 1, per_page: 1 }) { count } }`
+    );
+    const result = {
       success: true,
+      configured: true,
       count: data?.queryScenes?.count || 0,
     };
+    stashDbCache.set('health:test', { data: result, ts: Date.now() });
+    return result;
   } catch (err: any) {
     return {
       success: false,
-      error: err?.message || 'Unable to connect to StashDB GraphQL endpoint',
+      configured: true,
+      error: err?.message || 'Unable to connect to StashDB GraphQL backend.',
     };
   }
+}
+
+function mapRawScene(s: any): StashDbSceneItem {
+  const images = Array.isArray(s.images) ? s.images.map((i: any) => i.url).filter(Boolean) : [];
+  const perfImages = (s.performers || [])
+    .map((p: any) => p.performer?.images?.[0]?.url)
+    .filter(Boolean);
+
+  return {
+    id: `stashdb-${s.id}`,
+    title: s.title || 'Untitled StashDB Entry',
+    details: s.details || 'Indexed metadata record from StashDB catalog.',
+    date: s.release_date || s.date || null,
+    durationSeconds: s.duration || 0,
+    image: images[0] || perfImages[0] || '',
+    images,
+    studioName: s.studio?.name || 'Independent Studio',
+    studioId: s.studio?.id || '',
+    performers: (s.performers || [])
+      .filter((p: any) => p.performer?.name)
+      .map((p: any) => ({
+        id: p.performer.id,
+        name: p.performer.name,
+        gender: p.performer.gender,
+        imageUrl: p.performer.images?.[0]?.url,
+      })),
+    tags: (s.tags || []).map((t: any) => t.name).filter(Boolean),
+    officialUrls: (s.urls || []).map((u: any) => ({
+      url: u.url,
+      siteName: u.site?.name || 'Source',
+    })),
+    isPlayable: false,
+    matchedSceneId: null,
+  };
 }
 
 export async function fetchStashDbScenes(options: {
   page?: number;
   perPage?: number;
   query?: string;
-  endpoint?: string | null;
-  apiKey?: string | null;
+  studioId?: string;
+  performerId?: string;
+  sort?: 'DATE' | 'CREATED_AT' | 'TRENDING';
 } = {}): Promise<{ count: number; scenes: StashDbSceneItem[] }> {
   const page = options.page || 1;
   const perPage = Math.min(options.perPage || 24, 40);
   const text = options.query?.trim() || '';
+  const sort = options.sort || 'DATE';
 
-  const cacheKey = `scenes:${page}:${perPage}:${text}:${options.endpoint || 'default'}`;
+  const cacheKey = `scenes:${page}:${perPage}:${text}:${options.studioId || ''}:${options.performerId || ''}:${sort}`;
   const hit = stashDbCache.get(cacheKey);
-  if (hit && Date.now() - hit.ts < CACHE_TTL_MS && !options.apiKey) {
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
     return hit.data;
   }
 
@@ -134,7 +231,7 @@ export async function fetchStashDbScenes(options: {
           id
           title
           details
-          date
+          release_date
           duration
           urls { url site { name } }
           images { id url width height }
@@ -149,48 +246,24 @@ export async function fetchStashDbScenes(options: {
   const input: Record<string, any> = {
     page,
     per_page: perPage,
-    sort: 'TRENDING',
+    sort,
     direction: 'DESC',
   };
-  if (text) {
-    input.text = text;
-    input.sort = 'DATE';
-  }
+  if (text) input.text = text;
+  if (options.studioId) input.studios = { value: [options.studioId], modifier: 'INCLUDES' };
+  if (options.performerId) input.performers = { value: [options.performerId], modifier: 'INCLUDES' };
 
-  const data = await runStashDbGraphQL(gql, { input }, options.endpoint, options.apiKey);
+  const data = await runStashDbGraphQL(gql, { input });
   const rawScenes: any[] = data?.queryScenes?.scenes || [];
-
-  const scenes: StashDbSceneItem[] = rawScenes.map((s) => ({
-    id: `stashdb-${s.id}`,
-    title: s.title || 'Untitled StashDB Scene',
-    details: s.details || 'Indexed via StashDB GraphQL community catalog.',
-    date: s.date || null,
-    durationSeconds: s.duration || 0,
-    posterUrl:
-      s.images?.[0]?.url ||
-      s.performers?.[0]?.performer?.images?.[0]?.url ||
-      '',
-    studioName: s.studio?.name || 'Independent Studio',
-    studioId: s.studio?.id || '',
-    performers: (s.performers || []).map((p: any) => ({
-      id: p?.performer?.id || '',
-      name: p?.performer?.name || 'Performer',
-      imageUrl: p?.performer?.images?.[0]?.url || '',
-    })),
-    tags: (s.tags || []).slice(0, 6).map((t: any) => t.name).filter(Boolean),
-    officialUrls: (s.urls || []).map((u: any) => ({
-      url: u.url,
-      siteName: u.site?.name || 'Official Site',
-    })),
-  }));
+  const scenes = rawScenes
+    .map(mapRawScene)
+    .filter((sc) => isConsentingAdultSafe(`${sc.title} ${sc.details}`, sc.tags));
 
   const payload = {
     count: data?.queryScenes?.count || scenes.length,
     scenes,
   };
-  if (!options.apiKey) {
-    stashDbCache.set(cacheKey, { data: payload, ts: Date.now() });
-  }
+  stashDbCache.set(cacheKey, { data: payload, ts: Date.now() });
   return payload;
 }
 
@@ -198,12 +271,17 @@ export async function fetchStashDbPerformers(options: {
   page?: number;
   perPage?: number;
   query?: string;
-  endpoint?: string | null;
-  apiKey?: string | null;
+  studioId?: string;
 } = {}): Promise<{ count: number; performers: StashDbPerformerItem[] }> {
   const page = options.page || 1;
   const perPage = Math.min(options.perPage || 24, 40);
-  const text = options.query?.trim() || '';
+  const q = options.query?.trim() || '';
+
+  const cacheKey = `performers:${page}:${perPage}:${q}:${options.studioId || ''}`;
+  const hit = stashDbCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    return hit.data;
+  }
 
   const gql = `
     query QueryPerformers($input: PerformerQueryInput!) {
@@ -212,7 +290,16 @@ export async function fetchStashDbPerformers(options: {
         performers {
           id
           name
+          disambiguation
+          aliases
+          gender
           country
+          ethnicity
+          hair_color
+          eye_color
+          height
+          career_start_year
+          career_end_year
           scene_count
           images { url }
         }
@@ -226,32 +313,136 @@ export async function fetchStashDbPerformers(options: {
     sort: 'SCENE_COUNT',
     direction: 'DESC',
   };
-  if (text) input.names = text;
+  if (q) input.names = q;
+  if (options.studioId) input.studio_id = options.studioId;
 
-  const data = await runStashDbGraphQL(gql, { input }, options.endpoint, options.apiKey);
+  const data = await runStashDbGraphQL(gql, { input });
   const raw: any[] = data?.queryPerformers?.performers || [];
 
-  return {
+  const payload = {
     count: data?.queryPerformers?.count || raw.length,
-    performers: raw.map((p) => ({
+    performers: raw
+      .filter((p) => isConsentingAdultSafe(p.name))
+      .map((p) => ({
+        id: p.id,
+        name: p.name,
+        disambiguation: p.disambiguation || undefined,
+        aliases: Array.isArray(p.aliases) ? p.aliases : [],
+        gender: p.gender || undefined,
+        country: p.country || undefined,
+        ethnicity: p.ethnicity || undefined,
+        hairColor: p.hair_color || undefined,
+        eyeColor: p.eye_color || undefined,
+        heightCm: p.height || undefined,
+        careerStartYear: p.career_start_year || undefined,
+        careerEndYear: p.career_end_year || undefined,
+        sceneCount: p.scene_count || 0,
+        imageUrl: p.images?.[0]?.url || '',
+        images: (p.images || []).map((img: any) => img.url).filter(Boolean),
+      })),
+  };
+  stashDbCache.set(cacheKey, { data: payload, ts: Date.now() });
+  return payload;
+}
+
+export async function fetchStashDbPerformerById(
+  id: string
+): Promise<{ performer: StashDbPerformerItem | null; scenes: StashDbSceneItem[] }> {
+  const cleanId = id.replace(/^stashdb-/, '');
+  const cacheKey = `performer:${cleanId}`;
+  const hit = stashDbCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    return hit.data;
+  }
+
+  const gql = `
+    query FindPerformer($id: ID!) {
+      findPerformer(id: $id) {
+        id
+        name
+        disambiguation
+        aliases
+        gender
+        country
+        ethnicity
+        hair_color
+        eye_color
+        height
+        career_start_year
+        career_end_year
+        tattoos { location description }
+        piercings { location description }
+        scene_count
+        images { url }
+        studios {
+          scene_count
+          studio { id name images { url } }
+        }
+      }
+    }
+  `;
+
+  const [perfData, scenesData] = await Promise.all([
+    runStashDbGraphQL<{ findPerformer: any }>(gql, { id: cleanId }),
+    fetchStashDbScenes({ performerId: cleanId, page: 1, perPage: 24 }).catch(() => ({ count: 0, scenes: [] })),
+  ]);
+
+  const p = perfData?.findPerformer;
+  if (!p) return { performer: null, scenes: [] };
+
+  const formatMods = (mods: any) =>
+    Array.isArray(mods) && mods.length > 0
+      ? mods.map((m: any) => [m.location, m.description].filter(Boolean).join(': ')).join('; ')
+      : undefined;
+
+  const result = {
+    performer: {
       id: p.id,
       name: p.name,
-      country: p.country || 'GLOBAL',
-      sceneCount: p.scene_count || 0,
+      disambiguation: p.disambiguation || undefined,
+      aliases: Array.isArray(p.aliases) ? p.aliases : [],
+      gender: p.gender || undefined,
+      country: p.country || undefined,
+      ethnicity: p.ethnicity || undefined,
+      hairColor: p.hair_color || undefined,
+      eyeColor: p.eye_color || undefined,
+      heightCm: p.height || undefined,
+      careerStartYear: p.career_start_year || undefined,
+      careerEndYear: p.career_end_year || undefined,
+      tattoos: formatMods(p.tattoos),
+      piercings: formatMods(p.piercings),
+      sceneCount: p.scene_count || scenesData.count || 0,
       imageUrl: p.images?.[0]?.url || '',
-    })),
+      images: (p.images || []).map((img: any) => img.url).filter(Boolean),
+      studios: (p.studios || [])
+        .filter((s: any) => s.studio?.name)
+        .map((s: any) => ({
+          id: s.studio.id,
+          name: s.studio.name,
+          sceneCount: s.scene_count || 0,
+          imageUrl: s.studio.images?.[0]?.url || '',
+        })),
+    },
+    scenes: scenesData.scenes,
   };
+  stashDbCache.set(cacheKey, { data: result, ts: Date.now() });
+  return result;
 }
 
 export async function fetchStashDbStudios(options: {
   page?: number;
   perPage?: number;
   query?: string;
-  endpoint?: string | null;
-  apiKey?: string | null;
 } = {}): Promise<{ count: number; studios: StashDbStudioItem[] }> {
   const page = options.page || 1;
   const perPage = Math.min(options.perPage || 24, 40);
+  const q = options.query?.trim() || '';
+
+  const cacheKey = `studios:${page}:${perPage}:${q}`;
+  const hit = stashDbCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    return hit.data;
+  }
 
   const gql = `
     query QueryStudios($input: StudioQueryInput!) {
@@ -260,6 +451,9 @@ export async function fetchStashDbStudios(options: {
         studios {
           id
           name
+          aliases
+          parent { id name }
+          urls { url site { name } }
           images { url }
         }
       }
@@ -272,17 +466,75 @@ export async function fetchStashDbStudios(options: {
     sort: 'NAME',
     direction: 'ASC',
   };
-  if (options.query?.trim()) input.name = options.query.trim();
+  if (q) input.name = q;
 
-  const data = await runStashDbGraphQL(gql, { input }, options.endpoint, options.apiKey);
+  const data = await runStashDbGraphQL(gql, { input });
   const raw: any[] = data?.queryStudios?.studios || [];
 
-  return {
+  const payload = {
     count: data?.queryStudios?.count || raw.length,
     studios: raw.map((s) => ({
       id: s.id,
       name: s.name,
+      aliases: Array.isArray(s.aliases) ? s.aliases : [],
+      parentName: s.parent?.name,
+      parentId: s.parent?.id,
+      urls: (s.urls || []).map((u: any) => ({ url: u.url, siteName: u.site?.name })),
       imageUrl: s.images?.[0]?.url || '',
+      images: (s.images || []).map((img: any) => img.url).filter(Boolean),
     })),
   };
+  stashDbCache.set(cacheKey, { data: payload, ts: Date.now() });
+  return payload;
+}
+
+export async function fetchStashDbStudioById(
+  id: string
+): Promise<{ studio: StashDbStudioItem | null; scenes: StashDbSceneItem[]; performers: StashDbPerformerItem[] }> {
+  const cleanId = id.replace(/^stashdb-/, '');
+  const cacheKey = `studio:${cleanId}`;
+  const hit = stashDbCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL_MS) {
+    return hit.data;
+  }
+
+  const gql = `
+    query FindStudio($id: ID!) {
+      findStudio(id: $id) {
+        id
+        name
+        aliases
+        parent { id name }
+        urls { url site { name } }
+        images { url }
+      }
+    }
+  `;
+
+  const [studioData, scenesData, perfData] = await Promise.all([
+    runStashDbGraphQL<{ findStudio: any }>(gql, { id: cleanId }),
+    fetchStashDbScenes({ studioId: cleanId, page: 1, perPage: 24 }).catch(() => ({ count: 0, scenes: [] })),
+    fetchStashDbPerformers({ studioId: cleanId, page: 1, perPage: 12 }).catch(() => ({ count: 0, performers: [] })),
+  ]);
+
+  const s = studioData?.findStudio;
+  if (!s) return { studio: null, scenes: [], performers: [] };
+
+  const result = {
+    studio: {
+      id: s.id,
+      name: s.name,
+      aliases: Array.isArray(s.aliases) ? s.aliases : [],
+      parentName: s.parent?.name,
+      parentId: s.parent?.id,
+      urls: (s.urls || []).map((u: any) => ({ url: u.url, siteName: u.site?.name })),
+      sceneCount: scenesData.count || scenesData.scenes.length,
+      imageUrl: s.images?.[0]?.url || '',
+      images: (s.images || []).map((img: any) => img.url).filter(Boolean),
+    },
+    scenes: scenesData.scenes,
+    performers: perfData.performers,
+  };
+  stashDbCache.set(cacheKey, { data: result, ts: Date.now() });
+  return result;
 }

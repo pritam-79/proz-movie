@@ -1,12 +1,15 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { brandConfig } from '@/config/brand.config';
 import { AuthProvider } from '@/context/AuthContext';
-import Navbar from '@/components/navigation/Navbar';
-import MobileBottomNav from '@/components/navigation/MobileBottomNav';
-import Footer from '@/components/navigation/Footer';
-import ErrorBoundary from '@/components/common/ErrorBoundary';
-import InAppUpdater from '@/components/common/InAppUpdater';
+import AppChrome from '@/components/layout/AppChrome';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#06080F',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
@@ -27,6 +30,7 @@ export const metadata: Metadata = {
     icon: brandConfig.logos.favicon,
     apple: brandConfig.logos.appIcon,
   },
+  manifest: '/manifest.webmanifest',
   openGraph: {
     title: brandConfig.websiteTitle,
     description: brandConfig.tagline,
@@ -58,24 +62,7 @@ export default function RootLayout({
           <div className="fixed top-0 left-1/4 w-[420px] h-[420px] bg-rose-600/8 rounded-full blur-[140px] pointer-events-none -z-10" />
           <div className="fixed top-1/3 right-1/4 w-[420px] h-[420px] bg-proz-purple/10 rounded-full blur-[140px] pointer-events-none -z-10" />
 
-          {/* Navigation Bar */}
-          <Navbar />
-
-          {/* Main Content Area */}
-          <main className="flex-1 w-full pt-14 sm:pt-16 pb-24 md:pb-10">
-            <ErrorBoundary>
-              {children}
-            </ErrorBoundary>
-          </main>
-
-          {/* Site Footer */}
-          <Footer />
-
-          {/* Mobile Bottom Navigation */}
-          <MobileBottomNav />
-
-          {/* In-App Updater (Web & Android) */}
-          <InAppUpdater />
+          <AppChrome>{children}</AppChrome>
         </AuthProvider>
       </body>
     </html>

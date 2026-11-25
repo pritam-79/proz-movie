@@ -15,6 +15,7 @@ import {
   Star
 } from 'lucide-react';
 import { StashScene } from '@/types/library';
+import { toStashWatchPath } from '@/lib/utils/streamUtils';
 
 export default function TVModePage() {
   const [scenes, setScenes] = useState<StashScene[]>([]);
@@ -98,7 +99,7 @@ export default function TVModePage() {
 
           <div className="flex items-center gap-4">
             <Link
-              href={`/watch/stash-${activeScene.id}`}
+              href={toStashWatchPath(activeScene.id)}
               className="px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-lg flex items-center gap-3 shadow-2xl shadow-purple-600/50 transform hover:scale-105 transition"
             >
               <Play className="w-6 h-6 fill-white" />

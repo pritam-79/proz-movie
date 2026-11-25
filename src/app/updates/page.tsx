@@ -26,6 +26,36 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.09 Video Player Overlay Fix & Playback Engine",
+      desc: "Eliminated colliding upper navbars/update banners and duplicated overlays on /watch/*, aligned docked responsive player headers, added Picture-in-Picture, real resolution detection, Shaka audio/quality/subtitle tracks, and strict playback state accuracy.",
+      icon: Film,
+      color: "text-cyan-400"
+    },
+    {
+      title: "v0.09 Demon Slayer & Catalog Source Repair",
+      desc: "Stripped mismatched Blender demo streams from unrelated catalog entries so Demon Slayer and commercial movies/anime never play unrelated placeholder clips and stay cleanly inside PROZ.",
+      icon: Tv,
+      color: "text-rose-400"
+    },
+    {
+      title: "v0.09 Automated Backend Stash & StashDB Architecture",
+      desc: "Moved all Stash/StashDB credentials strictly server-side, removed manual configuration UI and browser storage key overrides, added retry/dedup caching, and enforced strict Play gating unless a catalog entry matches a real playable file.",
+      icon: FolderLock,
+      color: "text-purple-400"
+    },
+    {
+      title: "v0.09 Complete PRO 18+ Ecosystem & Gallery Hub",
+      desc: "Added Recent Uploads (photos/videos/collections), Studios & Performers profile modals, Tube Hub with explicit limitation notices, 3D VR SBS/360° viewer, Hentai & 3D subcategories, Hot Web Series details, and metadata-driven recommendations.",
+      icon: Sparkles,
+      color: "text-emerald-400"
+    },
+    {
+      title: "v0.09 Smart Persistent Update Notification",
+      desc: "Shows update popups strictly when a newer release exists, distinguishes installed vs available versions, and permanently remembers dismissed alerts across restarts.",
+      icon: Zap,
+      color: "text-cyan-400"
+    },
+    {
       title: "v0.08 Distinct Movie & Anime Playback",
       desc: "Fixed shared demo video loop and Deadpool fallback bug — every movie, anime, and dynamic AniList/Kitsu/TVmaze title now loads its own metadata and official trailer.",
       icon: Film,
@@ -141,15 +171,15 @@ export default function UpdatesPage() {
               Release Notes
             </span>
             <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
-              v0.08 Latest
+              {brandConfig.version} Latest
             </span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-            PRO2 ENTERTAINMENT {brandConfig.version}
+            PROZ ENTERTAINMENT {brandConfig.version}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Playback Engine Repair, Channel MPEG-TS &amp; CDN Proxy Fixes, StashDB GraphQL Integration, Modern Mobile Layout Redesign, and Informative Update Popup.
+            Video Player Overlay &amp; PiP Fixes, Demon Slayer Catalog Repair, Automated Stash &amp; StashDB Backend Service, Organized PRO 18+ Ecosystem in Gallery, and Persistent Smart Update Checks across Android, iOS, Windows, macOS, Linux, and Web.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">

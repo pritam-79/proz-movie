@@ -147,6 +147,7 @@ export interface StashGallery {
   rating?: number;
   imageCount: number;
   coverPath?: string;
+  images?: string[];
   studio?: StashStudio;
   performers?: StashPerformer[];
   tags?: StashTag[];

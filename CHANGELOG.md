@@ -1,6 +1,24 @@
-# CHANGELOG — PROZ MOVIE
+# CHANGELOG — PROZ ENTERTAINMENT
 
-All notable changes to the PROZ MOVIE OTT platform are documented in this file.
+All notable changes to the PROZ Entertainment OTT & Stash platform are documented in this file.
+
+---
+
+## [0.09.0] — 2026-11-26
+
+### Critical Player Overlay Fix, Auto Stash Backend, PRO 18+ Ecosystem & Persistent Updater
+- **Fixed Critical Video Player UI Overlap:**
+  - Isolated `/watch/*` inside `AppChrome` so global `Navbar`, `Footer`, `MobileBottomNav`, and `InAppUpdater` top banners never overlap active video playback.
+  - Refactored `VideoPlayer.tsx` to use a clean docked top header above the `16:9` viewport (`safe-area-inset-top`/`bottom`), fixed mobile collisions, eliminated duplicated overlays on embeds, removed mock Cast TV dialogs, added Picture-in-Picture (`PiP`), real stream resolution detection, Shaka audio/quality/subtitle track controls, optional VR pan/gyroscope mode (only when item metadata marks VR), and strict `onPlaying`-only playing state.
+  - Cleared mismatched demo placeholder streams (`tears-of-steel` / `x36xhzz` / `BigBuckBunny_124`) from unrelated catalog entries including *Demon Slayer* (`proz-ani-016`), keeping trailer/provider playback cleanly in-app without external redirects.
+- **Automatic Stash & StashDB Backend Service (`stashService.ts`):**
+  - Consolidated StashDB GraphQL, personal Stash GraphQL, and authorized Cine18 channels behind automatic server-side environment auth (`STASHDB_ENDPOINT`, `STASHDB_API_KEY`, optional `STASH_SERVER_URL`).
+  - Removed all manual GraphQL endpoint/key settings forms and browser `localStorage` credential storage; strictly enforces `isPlayable` media file matching before showing Play actions on StashDB entries.
+- **Organized PRO 18+ Ecosystem Inside Gallery & Restricted Zone (`/library` & `/restricted`):**
+  - Added Recent Uploads (adult photo galleries, videos, collections), Studio & Performer profile modals, Tube Hub with explicit limitation notices, 3D VR SBS/360° viewer, Hentai & 3D subcategories, Hot Web Series details with season/episode progress, Continue Watching/Favorites, and metadata-driven Recommendations.
+- **Consistent v0.09 Versioning & Fixed Update Popup:**
+  - Updated `package.json`, `brand.config.ts`, `/about`, `/account`, `/updates`, `/api/app/update`, `/api/download/apk`, `manifest.webmanifest`, Android Gradle (`versionCode = 9`, `versionName = "0.09"`), and `MainActivity.java`.
+  - Fixed `InAppUpdater.tsx` so popups appear only when a genuinely newer version exists and dismissed alerts stay dismissed across restarts.
 
 ---
 

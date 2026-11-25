@@ -1409,7 +1409,7 @@ function AdminStashServersManager() {
             <div className="space-y-1.5 text-xs text-zinc-400">
               <div className="flex justify-between">
                 <span>Endpoint:</span>
-                <span className="font-mono text-zinc-300">{srv.serverUrl}</span>
+                <span className="font-mono text-zinc-300">{srv.serverUrl || 'Backend Environment (.env.local)'}</span>
               </div>
               <div className="flex justify-between">
                 <span>Version:</span>

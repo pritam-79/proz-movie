@@ -2,6 +2,7 @@ import { ContentItem } from '@/types/content';
 import { VideoSource } from '@/types/provider';
 import { MOCK_CONTENT } from '@/lib/data/mockContent';
 import { providerRegistry } from '@/lib/providers/registry';
+import { isMismatchedPlaceholderStream } from '@/lib/utils/streamUtils';
 
 export interface DynamicCollectionParams {
   category?: string;
@@ -98,9 +99,10 @@ export class ContentDiscoveryService {
       });
     }
 
-    // 2. Direct authorized HTML5 MP4 stream if item has fallbackMp4 / streamUrl
-    if (item.fallbackMp4 || item.streamUrl) {
-      const url = item.fallbackMp4 || item.streamUrl || '';
+    // 2. Direct authorized HTML5 MP4 stream only if item has a genuine stream (never mismatched demo clip)
+    const candidateDirect = item.fallbackMp4 || item.streamUrl || '';
+    if (candidateDirect && !isMismatchedPlaceholderStream(candidateDirect, item.title)) {
+      const url = candidateDirect;
       sources.push({
         id: `direct-src-${item.id}`,
         contentId: item.id,

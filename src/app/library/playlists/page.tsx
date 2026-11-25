@@ -17,6 +17,7 @@ import {
   ListMusic
 } from 'lucide-react';
 import { PrivatePlaylist } from '@/types/library';
+import { toStashWatchPath } from '@/lib/utils/streamUtils';
 
 export default function PlaylistsPage() {
   const [playlists, setPlaylists] = useState<PrivatePlaylist[]>([]);
@@ -164,7 +165,7 @@ export default function PlaylistsPage() {
 
               <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
                 <Link
-                  href={`/watch/stash-${pl.items[0]?.mediaId || 'stash-sc-001'}`}
+                  href={toStashWatchPath(pl.items[0]?.mediaId || 'stash-sc-001')}
                   className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold flex items-center gap-1.5 transition"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />

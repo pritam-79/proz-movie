@@ -200,11 +200,11 @@ export default function AccountPage() {
                 <span>In-App Version & Updates</span>
               </h4>
               <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-mono font-bold">
-                v0.02
+                {brandConfig.version}
               </span>
             </div>
             <p className="text-xs text-proz-grey leading-relaxed">
-              PROZ MOVIE v0.02 is the current release featuring Private Stash Vaults, multi-user permissions, and 18+ ecosystem.
+              PROZ Entertainment {brandConfig.version} is installed with automatic Stash backend sync, repaired player overlay layout, Picture-in-Picture, and PRO 18+ ecosystem.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button

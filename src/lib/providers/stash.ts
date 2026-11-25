@@ -16,22 +16,26 @@ import {
 } from '@/types/library';
 
 // In-memory server registry: default empty unless configured by user
-export const DEFAULT_STASH_SERVERS: StashServerConfig[] = process.env.STASH_SERVER_URL
+const RAW_STASH_SERVER_URL = (process.env.STASH_SERVER_URL || process.env.STASH_GRAPHQL_URL || '').trim();
+const RAW_STASH_API_KEY = (process.env.STASH_API_KEY || process.env.STASH_APIKEY || '').trim();
+
+export const DEFAULT_STASH_SERVERS: StashServerConfig[] = RAW_STASH_SERVER_URL
   ? [
       {
         id: 'stash-srv-configured',
-        name: 'Configured Stash Vault',
-        serverUrl: process.env.STASH_SERVER_URL,
+        name: 'Automated Stash Backend Vault',
+        serverUrl: RAW_STASH_SERVER_URL,
+        apiKey: RAW_STASH_API_KEY || undefined,
         connectionStatus: 'connected',
         lastSyncAt: new Date().toISOString(),
         syncSchedule: 'hourly',
         isEnabled: true,
-        libraryIdentifier: 'vault-custom-01',
-        version: 'v0.05',
-        sceneCount: 36,
-        performerCount: 18,
-        studioCount: 12,
-        galleryCount: 8
+        libraryIdentifier: 'vault-backend-env',
+        version: 'v0.09',
+        sceneCount: 0,
+        performerCount: 0,
+        studioCount: 0,
+        galleryCount: 0
       }
     ]
   : [];
@@ -399,13 +403,21 @@ export class StashProviderAdapter {
   }
 
   /**
-   * Get all registered Stash servers (credentials stripped)
+   * Get all registered Stash servers with credentials & internal URLs safely redacted
    */
   public getServers(): StashServerConfig[] {
     return this.servers.map(s => ({
       ...s,
-      apiKey: s.apiKey ? '••••••••' : undefined
+      serverUrl: s.serverUrl ? 'Backend Environment (.env.local)' : '',
+      apiKey: undefined
     }));
+  }
+
+  /**
+   * Internal server-side resolution only — never expose raw server objects to clients
+   */
+  public getInternalPrimaryServer(): StashServerConfig | undefined {
+    return this.servers.find(s => s.isEnabled && s.serverUrl);
   }
 
   /**
@@ -448,13 +460,13 @@ export class StashProviderAdapter {
     } else if (serverOrId) {
       server = serverOrId;
     } else {
-      server = this.servers[0];
+      server = this.getInternalPrimaryServer();
     }
 
     if (!server || !server.serverUrl) {
       return {
         success: false,
-        error: 'Not Connected — Connect a Stash Server to Use This Feature'
+        error: 'Not Connected — STASH_SERVER_URL not set in server environment'
       };
     }
 
@@ -578,27 +590,42 @@ export class StashProviderAdapter {
         id: 'gal-001',
         title: 'Neon Velvet Exclusive Photo Session',
         details: 'High-resolution photo shoot captured in Tokyo studio penthouse.',
+        date: '2026-11-18',
         imageCount: 48,
         rating: 5,
         coverPath: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop',
+        images: [
+          'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'
+        ],
         studio: { id: 'std-cyber', name: 'CyberVelvet Studios' }
       },
       {
         id: 'gal-002',
         title: 'Midnight Noir Backstage Portraits',
         details: 'Atmospheric monochrome and deep burgundy backstage captures.',
+        date: '2026-11-14',
         imageCount: 64,
         rating: 4.8,
         coverPath: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop',
+        images: [
+          'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=1000&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop'
+        ],
         studio: { id: 'std-noir', name: 'Noir Intimate Cinema' }
       },
       {
         id: 'gal-003',
         title: 'Crimson Velvet High-Fashion Glamour',
         details: 'Exclusive behind-the-scenes gallery from the crimson session.',
+        date: '2026-11-10',
         imageCount: 52,
         rating: 4.9,
         coverPath: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop',
+        images: [
+          'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop',
+          'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1000&auto=format&fit=crop'
+        ],
         studio: { id: 'std-crimson', name: 'Crimson Passion Productions' }
       }
     ];

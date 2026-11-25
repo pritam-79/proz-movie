@@ -1,4 +1,5 @@
 import { ContentItem } from '@/types/content';
+import { isMismatchedPlaceholderStream } from '@/lib/utils/streamUtils';
 
 export const MOCK_CONTENT: ContentItem[] = [
   {
@@ -3229,15 +3230,18 @@ export function normalizeContentItem(item: ContentItem): ContentItem {
     expiryDate: '2030-12-31',
   };
   const languages = (item.languages && item.languages.length > 0) ? item.languages : ['English (Original)', 'Hindi', 'Spanish'];
-  const subtitles = (item.subtitles && item.subtitles.length > 0) ? item.subtitles : [
-    { id: 'sub-en', label: 'English [CC]', lang: 'en', url: '/subtitles/default-en.vtt', isDefault: true }
-  ];
+  const subtitles = (item.subtitles && item.subtitles.length > 0) ? item.subtitles : [];
   const audioTracks = (item.audioTracks && item.audioTracks.length > 0) ? item.audioTracks : [
     { id: 'aud-en', label: 'English [Atmos 5.1]', lang: 'en', codec: 'AAC', isDefault: true }
   ];
 
+  const rawStreamUrl = isMismatchedPlaceholderStream(item.streamUrl, item.title) ? undefined : item.streamUrl;
+  const rawFallbackMp4 = isMismatchedPlaceholderStream(item.fallbackMp4, item.title) ? undefined : item.fallbackMp4;
+
   return {
     ...item,
+    streamUrl: rawStreamUrl,
+    fallbackMp4: rawFallbackMp4,
     content_type,
     type,
     category: item.category || 'hollywood',
