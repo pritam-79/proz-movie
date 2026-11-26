@@ -1,23 +1,30 @@
 /**
- * PROZ Entertainment v0.04 — Stash GraphQL Provider Adapter & Auto-Vault Ecosystem
- * Auto-connects to private Stash instances or built-in PROZ High-Fidelity Cloud Vault.
- * Provides complete categorized adult media: Movies, Hot Web Series, Hentai/Anime, 
- * 3D VR, Tube Portals, Performers, Studios, and High-Res Galleries.
+ * PROZ Entertainment v0.09.1 — Stash Provider Adapter & Tube Directory
+ * All personal Stash server credentials stay strictly server-side in environment variables.
+ * Fake placeholder scenes, invented performers, fake Unsplash web series, and mismatched VR clips
+ * have been completely removed — all media comes from connected Stash instances, live Cine18, and StashDB.
  */
 
-import { 
-  StashServerConfig, 
-  StashScene, 
-  StashPerformer, 
-  StashStudio, 
-  StashTag, 
+import {
+  StashServerConfig,
+  StashScene,
+  StashPerformer,
+  StashStudio,
+  StashTag,
   StashGallery,
-  MediaBrowsingFilters 
+  MediaBrowsingFilters,
 } from '@/types/library';
 
-// In-memory server registry: default empty unless configured by user
-const RAW_STASH_SERVER_URL = (process.env.STASH_SERVER_URL || process.env.STASH_GRAPHQL_URL || '').trim();
-const RAW_STASH_API_KEY = (process.env.STASH_API_KEY || process.env.STASH_APIKEY || '').trim();
+const RAW_STASH_SERVER_URL = (
+  process.env.STASH_SERVER_URL ||
+  process.env.STASH_GRAPHQL_URL ||
+  ''
+).trim();
+const RAW_STASH_API_KEY = (
+  process.env.STASH_API_KEY ||
+  process.env.STASH_APIKEY ||
+  ''
+).trim();
 
 export const DEFAULT_STASH_SERVERS: StashServerConfig[] = RAW_STASH_SERVER_URL
   ? [
@@ -31,368 +38,333 @@ export const DEFAULT_STASH_SERVERS: StashServerConfig[] = RAW_STASH_SERVER_URL
         syncSchedule: 'hourly',
         isEnabled: true,
         libraryIdentifier: 'vault-backend-env',
-        version: 'v0.09',
+        version: 'v0.09.1',
         sceneCount: 0,
         performerCount: 0,
         studioCount: 0,
-        galleryCount: 0
-      }
+        galleryCount: 0,
+      },
     ]
   : [];
 
-// Curated high-fidelity adult scenes with direct playable proxy streams
-export const CURATED_ADULT_SCENES: StashScene[] = [
-  {
-    id: 'stash-sc-001',
-    title: 'Neon Nights & Cyber Romance: Extended Cut',
-    details: 'A cinematic high-production romantic encounter set in a futuristic midnight metropolis with ambient electronic soundtrack.',
-    date: '2026-05-14',
-    rating: 4.9,
-    organized: true,
-    oCounter: 18,
-    resumeTime: 240,
-    playCount: 1420,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop',
-      preview: '/api/library/stash/proxy-stream?id=stash-sc-001',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-001',
-      webp: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-cyber',
-      name: 'CyberVelvet Studios',
-      rating: 5,
-      imagePath: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-elena',
-        name: 'Elena Vance',
-        gender: 'FEMALE',
-        rating: 5,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 42
-      }
-    ],
-    tags: [
-      { id: 'tag-cinematic', name: 'Cinematic 4K' },
-      { id: 'tag-romantic', name: 'Romantic' },
-      { id: 'tag-cyberpunk', name: 'Cyberpunk' }
-    ],
-    isFavorite: true,
-    isWatched: false,
-    userRating: 5
-  },
-  {
-    id: 'stash-sc-002',
-    title: 'Midnight Velvet Noir Session',
-    details: 'Elegant vintage lounge aesthetic featuring velvet drapery and sensual atmospheric jazz romance.',
-    date: '2026-06-20',
-    rating: 4.8,
-    organized: true,
-    oCounter: 14,
-    resumeTime: 120,
-    playCount: 980,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=800&auto=format&fit=crop',
-      preview: '/api/library/stash/proxy-stream?id=stash-sc-002',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-002',
-      webp: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-noir',
-      name: 'Noir Intimate Cinema',
-      rating: 4.8,
-      imagePath: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-maya',
-        name: 'Maya Lin',
-        gender: 'FEMALE',
-        rating: 4.9,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 35
-      }
-    ],
-    tags: [
-      { id: 'tag-noir', name: 'Film Noir' },
-      { id: 'tag-sensual', name: 'Sensual' },
-      { id: 'tag-acoustic', name: 'Atmospheric' }
-    ],
-    isFavorite: true,
-    isWatched: true,
-    userRating: 5
-  },
-  {
-    id: 'stash-sc-003',
-    title: 'Tokyo After Dark: Penthouse Suite',
-    details: 'High-rise panoramic views of the Shinjuku skyline set the backdrop for an exclusive VIP penthouse encounter.',
-    date: '2026-07-04',
-    rating: 4.9,
-    organized: true,
-    oCounter: 22,
-    resumeTime: 360,
-    playCount: 2150,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800&auto=format&fit=crop',
-      preview: '/api/library/stash/proxy-stream?id=stash-sc-003',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-003',
-      webp: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-tokyo',
-      name: 'Tokyo Velvet Arts',
-      rating: 5,
-      imagePath: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-charlotte',
-        name: 'Charlotte Dubois',
-        gender: 'FEMALE',
-        rating: 4.9,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 29
-      }
-    ],
-    tags: [
-      { id: 'tag-luxury', name: 'Luxury VIP' },
-      { id: 'tag-cityscape', name: 'Penthouse' },
-      { id: 'tag-4k', name: '4K Ultra HD' }
-    ],
-    isFavorite: true,
-    isWatched: false,
-    userRating: 5
-  },
-  {
-    id: 'stash-sc-004',
-    title: 'Crimson Passion & Velvet Dreams',
-    details: 'Dramatic red ambient lighting paired with world-class choreography and unforgettable chemistry.',
-    date: '2026-08-11',
-    rating: 5.0,
-    organized: true,
-    oCounter: 27,
-    resumeTime: 420,
-    playCount: 3100,
-    paths: {
-      screenshot: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop',
-      preview: '/api/library/stash/proxy-stream?id=stash-sc-004',
-      stream: '/api/library/stash/proxy-stream?id=stash-sc-004',
-      webp: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=400&auto=format&fit=crop'
-    },
-    studio: {
-      id: 'std-crimson',
-      name: 'Crimson Passion Productions',
-      rating: 5,
-      imagePath: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=200&auto=format&fit=crop'
-    },
-    performers: [
-      {
-        id: 'perf-elena',
-        name: 'Elena Vance',
-        gender: 'FEMALE',
-        rating: 5,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 42
-      },
-      {
-        id: 'perf-maya',
-        name: 'Maya Lin',
-        gender: 'FEMALE',
-        rating: 4.9,
-        favorite: true,
-        imagePath: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=300&auto=format&fit=crop',
-        sceneCount: 35
-      }
-    ],
-    tags: [
-      { id: 'tag-allstar', name: 'All-Star Duo' },
-      { id: 'tag-glamour', name: 'Glamour' }
-    ],
-    isFavorite: true,
-    isWatched: true,
-    userRating: 5
-  }
-];
+// Legacy arrays emptied so fake Unsplash placeholder titles/profiles never leak into the UI.
+// Live catalogs are populated dynamically from Stash, Cine18 API, and StashDB GraphQL.
+export const CURATED_ADULT_SCENES: StashScene[] = [];
+export const CURATED_HOT_WEB_SERIES: any[] = [];
+export const CURATED_HENTAI_COLLECTIONS: any[] = [];
+export const CURATED_VR_SCENES: any[] = [];
 
-// Curated Hot Web Series (Episodic adult dramas)
-export const CURATED_HOT_WEB_SERIES = [
-  {
-    id: 'series-secret-desires',
-    title: 'Secret Desires: The Uncut Chronicles',
-    tagline: 'Forbidden connections behind closed boardroom doors',
-    seasons: 2,
-    episodesCount: 16,
-    rating: 4.9,
-    banner: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=800&auto=format&fit=crop',
-    studio: 'LustStories OTT Originals',
-    genres: ['Romance', 'Drama', 'Sensual'],
-    synopsis: 'A high-stakes corporate romance where ambition and raw passion collide across Mumbai and Dubai.',
-    episodes: [
-      { ep: 1, title: 'The Executive Suite', duration: '42m', streamId: 'stash-sc-001' },
-      { ep: 2, title: 'Late Night Review', duration: '38m', streamId: 'stash-sc-002' },
-      { ep: 3, title: 'Offshore Negotiations', duration: '45m', streamId: 'stash-sc-003' },
-      { ep: 4, title: 'Unspoken Desires', duration: '50m', streamId: 'stash-sc-004' }
-    ]
-  },
-  {
-    id: 'series-midnight-tales',
-    title: 'Midnight Whispers: Hotel Riviera',
-    tagline: 'Every room holds an untamed secret',
-    seasons: 1,
-    episodesCount: 8,
-    rating: 4.8,
-    banner: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=800&auto=format&fit=crop',
-    studio: 'Velvet Prime Series',
-    genres: ['Thriller', 'Hot Web Series', 'Mystery'],
-    synopsis: 'Guests checking into an opulent Mediterranean boutique resort discover clandestine romantic entanglements.',
-    episodes: [
-      { ep: 1, title: 'Room 304 Encounters', duration: '36m', streamId: 'stash-sc-002' },
-      { ep: 2, title: 'Balcony in Moonlight', duration: '41m', streamId: 'stash-sc-001' },
-      { ep: 3, title: 'Spa After Dark', duration: '39m', streamId: 'stash-sc-004' }
-    ]
-  },
-  {
-    id: 'series-monsoon-passion',
-    title: 'Monsoon Rendezvous: Goa Nights',
-    tagline: 'When the rains wash away all inhibitions',
-    seasons: 3,
-    episodesCount: 24,
-    rating: 5.0,
-    banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=800&auto=format&fit=crop',
-    studio: 'DesiFlix Hot Originals',
-    genres: ['Desi Hot', 'Romantic Drama', 'Web Series'],
-    synopsis: 'An unforgettable rainy season getaway in a seaside villa unearths hidden passions among four college friends.',
-    episodes: [
-      { ep: 1, title: 'Rain on the Rooftop', duration: '44m', streamId: 'stash-sc-004' },
-      { ep: 2, title: 'Candlelit Confessions', duration: '48m', streamId: 'stash-sc-003' }
-    ]
-  }
-];
+export interface AdultTubePortal {
+  id: string;
+  name: string;
+  category:
+    | 'Mainstream HD Tubes'
+    | '4K & Full Length'
+    | 'Hentai & 3D Tubes'
+    | 'VR Adult Hubs'
+    | 'Creator & Studio Hubs';
+  badge: string;
+  rating: number;
+  logo: string;
+  url: string;
+  description: string;
+  allowsInAppPlayback: false;
+  limitation: string;
+}
 
-// Curated Hentai & 2D/3D Anime
-export const CURATED_HENTAI_COLLECTIONS = [
-  {
-    id: 'hentai-cyber-succubus',
-    title: 'Succubus Protocol: Neo Tokyo 2099',
-    type: '3D Anime OVA',
-    episodes: 4,
-    rating: 4.9,
-    cover: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop',
-    studio: 'Studio Maboroshi Hentai',
-    tags: ['Cyberpunk', 'Hentai', '3D Animation', 'Supernatural'],
-    synopsis: 'In a neon cyber-dystopia, an elite covert operative encounters an ancient digital succubus AI entity.',
-    streamId: 'stash-sc-001'
-  },
-  {
-    id: 'hentai-academy-romance',
-    title: 'Secret Lessons: Campus Affairs',
-    type: '2D Hand-Drawn Anime',
-    episodes: 6,
-    rating: 4.8,
-    cover: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=800&auto=format&fit=crop',
-    studio: 'Kyoto Velvet Anime',
-    tags: ['Romance', 'School Life', 'Hentai 2D', 'Uncensored'],
-    synopsis: 'After-hours tutoring sessions leading to passionate romance in an exclusive private academy.',
-    streamId: 'stash-sc-002'
-  },
-  {
-    id: 'hentai-fantasy-valkyrie',
-    title: 'Valkyrie Blade: Dungeon of Pleasure',
-    type: 'Fantasy 3D OVA',
-    episodes: 3,
-    rating: 5.0,
-    cover: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop',
-    studio: 'Aegis Visual Works',
-    tags: ['Fantasy', 'Valkyrie', '3D CGI', 'Magic'],
-    synopsis: 'An armored warrior maiden trapped in an enchanted labyrinth must conquer sensual magical traps.',
-    streamId: 'stash-sc-003'
-  }
-];
+const fav = (domain: string) =>
+  `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`;
 
-// Curated 3D VR & Interactive Adult Content
-export const CURATED_VR_SCENES = [
-  {
-    id: 'vr-penthouse-3d',
-    title: '3D VR 180°: Penthouse Romance Experience',
-    format: 'Stereoscopic 180° VR SBS',
-    duration: '28m',
-    rating: 5.0,
-    cover: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=800&auto=format&fit=crop',
-    performer: 'Elena Vance & Maya Lin',
-    features: ['Stereoscopic 180° Side-by-Side', 'WebXR Browser Compatible', 'Meta Quest & Vision Pro Ready'],
-    streamId: 'stash-sc-001'
-  },
-  {
-    id: 'vr-coastal-villa',
-    title: '3D VR 360°: Private Beachfront Sanctuary',
-    format: 'Equirectangular 360° VR SBS',
-    duration: '32m',
-    rating: 4.9,
-    cover: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop',
-    performer: 'Charlotte Dubois',
-    features: ['Equirectangular 360° Side-by-Side', 'Mobile Gyroscope Navigation', 'Cardboard & VR Headset Ready'],
-    streamId: 'stash-sc-003'
-  }
-];
-
-// Verified Adult Tube & Streaming Hub Portals
-export const VERIFIED_ADULT_TUBE_PORTALS = [
+// Comprehensive categorized Tube Hub Directory (24 popular portals)
+export const VERIFIED_ADULT_TUBE_PORTALS: AdultTubePortal[] = [
   {
     id: 'tube-pornhub',
-    name: 'Pornhub Official',
-    category: 'Full Feature & Community Videos',
-    badge: 'Verified 4K UHD',
+    name: 'Pornhub',
+    category: 'Mainstream HD Tubes',
+    badge: '4K & Verified Models',
     rating: 4.9,
-    logo: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=200&auto=format&fit=crop',
+    logo: fav('pornhub.com'),
     url: 'https://www.pornhub.com',
-    description: 'World’s premier video hub with 4K verified channels, model hubs, and studio productions.'
-  },
-  {
-    id: 'tube-redtube',
-    name: 'RedTube Premium',
-    category: 'HD Studio Video Directory',
-    badge: 'Studio Network',
-    rating: 4.8,
-    logo: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=200&auto=format&fit=crop',
-    url: 'https://www.redtube.com',
-    description: 'High-definition curated clips, premium studio scenes, and daily trending model spotlights.'
+    description: 'Massive global catalog with verified model channels, 4K streams, and studio categories.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — host site X-Frame/playback rules open in external browser.',
   },
   {
     id: 'tube-xvideos',
-    name: 'XVideos Network',
-    category: 'Global Content Archive',
-    badge: 'Global Hub',
-    rating: 4.7,
-    logo: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=200&auto=format&fit=crop',
+    name: 'XVideos',
+    category: 'Mainstream HD Tubes',
+    badge: 'Global Library',
+    rating: 4.8,
+    logo: fav('xvideos.com'),
     url: 'https://www.xvideos.com',
-    description: 'Massive archive of amateur, professional, and regional international adult media.'
-  },
-  {
-    id: 'tube-spankbang',
-    name: 'SpankBang 4K',
-    category: 'Ultra HD 4K & VR Stream',
-    badge: '4K Ultra HD',
-    rating: 4.9,
-    logo: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=200&auto=format&fit=crop',
-    url: 'https://spankbang.com',
-    description: 'Crisp 4K 60FPS video playback with advanced tag filtering and VR section.'
+    description: 'High-volume streaming portal spanning amateur clips, full scenes, and regional tags.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
   },
   {
     id: 'tube-xhamster',
-    name: 'xHamster Live & Tube',
-    category: 'Live Models & Full Scenes',
-    badge: 'Live Interactive',
+    name: 'xHamster',
+    category: 'Mainstream HD Tubes',
+    badge: 'HD & Creator Cam',
     rating: 4.8,
-    logo: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=200&auto=format&fit=crop',
+    logo: fav('xhamster.com'),
     url: 'https://xhamster.com',
-    description: 'Extensive categories covering full scenes, creator uploads, and live interactive cams.'
-  }
+    description: 'Categorized HD scenes, indie creator channels, photos, and live streams.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-redtube',
+    name: 'RedTube',
+    category: 'Mainstream HD Tubes',
+    badge: 'HD Curated',
+    rating: 4.7,
+    logo: fav('redtube.com'),
+    url: 'https://www.redtube.com',
+    description: 'Curated HD videos, studio partner clips, and top-rated playlists.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-xnxx',
+    name: 'XNXX',
+    category: 'Mainstream HD Tubes',
+    badge: 'Fast Mobile Streams',
+    rating: 4.7,
+    logo: fav('xnxx.com'),
+    url: 'https://www.xnxx.com',
+    description: 'Lightweight global adult portal with extensive niche tags and stories.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-youporn',
+    name: 'YouPorn',
+    category: 'Mainstream HD Tubes',
+    badge: 'Top Playlists',
+    rating: 4.7,
+    logo: fav('youporn.com'),
+    url: 'https://www.youporn.com',
+    description: 'Popular curated video categories, verified star channels, and user collections.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-spankbang',
+    name: 'SpankBang',
+    category: '4K & Full Length',
+    badge: '4K 60FPS',
+    rating: 4.9,
+    logo: fav('spankbang.com'),
+    url: 'https://spankbang.com',
+    description: 'Full-length HD & 4K scenes, trending playlists, and curated VR streams.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-eporner',
+    name: 'Eporner',
+    category: '4K & Full Length',
+    badge: 'True 4K 60FPS',
+    rating: 4.9,
+    logo: fav('eporner.com'),
+    url: 'https://www.eporner.com',
+    description: 'Full-length high-bitrate 4K/1080p videos, pornstar index, and VR category.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-hqporner',
+    name: 'HQPorner',
+    category: '4K & Full Length',
+    badge: '1080p / 4K HD',
+    rating: 4.8,
+    logo: fav('hqporner.com'),
+    url: 'https://hqporner.com',
+    description: 'Dedicated high-definition full-length studio scenes sorted by actress and top views.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-tnaflix',
+    name: 'TNAFlix',
+    category: '4K & Full Length',
+    badge: 'HD Directory',
+    rating: 4.6,
+    logo: fav('tnaflix.com'),
+    url: 'https://www.tnaflix.com',
+    description: 'Long-form scenes, verified pornstar tags, and fast adaptive streaming.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-beeg',
+    name: 'Beeg',
+    category: '4K & Full Length',
+    badge: 'Clean Grid UI',
+    rating: 4.7,
+    logo: fav('beeg.com'),
+    url: 'https://beeg.com',
+    description: 'Minimalist high-bitrate scene browser featuring long-cut studio releases.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-4tube',
+    name: '4Tube',
+    category: '4K & Full Length',
+    badge: 'Full HD Scenes',
+    rating: 4.6,
+    logo: fav('4tube.com'),
+    url: 'https://www.4tube.com',
+    description: 'HD studio compilations, category filters, and channel directories.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-thumbzilla',
+    name: 'Thumbzilla',
+    category: 'Mainstream HD Tubes',
+    badge: 'Visual Feed',
+    rating: 4.6,
+    logo: fav('thumbzilla.com'),
+    url: 'https://www.thumbzilla.com',
+    description: 'Modern card-driven browser aggregating trending HD clips across categories.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-tube8',
+    name: 'Tube8',
+    category: 'Mainstream HD Tubes',
+    badge: 'Classic Tube',
+    rating: 4.5,
+    logo: fav('tube8.com'),
+    url: 'https://www.tube8.com',
+    description: 'Multi-category video index with mobile-friendly playback and channel feeds.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-hanime',
+    name: 'Hanime.tv',
+    category: 'Hentai & 3D Tubes',
+    badge: '1080p Hentai',
+    rating: 4.9,
+    logo: fav('hanime.tv'),
+    url: 'https://hanime.tv',
+    description: 'Uncensored 1080p adult anime OVA library searchable by tag, studio, and release.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-hentaihaven',
+    name: 'HentaiHaven',
+    category: 'Hentai & 3D Tubes',
+    badge: 'Classic Hentai',
+    rating: 4.7,
+    logo: fav('hentaihaven.xxx'),
+    url: 'https://hentaihaven.xxx',
+    description: 'Curated hentai episodes, 3D animations, and subbed OVA archives.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-rule34video',
+    name: 'Rule34Video',
+    category: 'Hentai & 3D Tubes',
+    badge: '3D / SFM / CGI',
+    rating: 4.8,
+    logo: fav('rule34video.com'),
+    url: 'https://rule34video.com',
+    description: '3D CGI, SFM, Blender, and animated adult shorts organized by character and artist.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-iwara',
+    name: 'Iwara (3D ECCHI)',
+    category: 'Hentai & 3D Tubes',
+    badge: 'MMD & 3D Art',
+    rating: 4.7,
+    logo: fav('iwara.tv'),
+    url: 'https://www.iwara.tv',
+    description: 'Community 3D animation, MMD, and independent CGI creator showcase.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-vrporn',
+    name: 'VRPorn',
+    category: 'VR Adult Hubs',
+    badge: '180° / 360° VR',
+    rating: 4.8,
+    logo: fav('vrporn.com'),
+    url: 'https://vrporn.com',
+    description: 'Dedicated stereoscopic 180° & 360° VR catalog compatible with Quest & Vision headsets.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
+  {
+    id: 'tube-czechvr',
+    name: 'CzechVR Network',
+    category: 'VR Adult Hubs',
+    badge: '8K Stereoscopic',
+    rating: 4.8,
+    logo: fav('czechvr.com'),
+    url: 'https://www.czechvr.com',
+    description: 'High-resolution 8K stereoscopic 180° VR studio productions and interactive previews.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — membership/paywall respected; opens external site.',
+  },
+  {
+    id: 'tube-brazzers',
+    name: 'Brazzers',
+    category: 'Creator & Studio Hubs',
+    badge: 'Official Studio',
+    rating: 4.9,
+    logo: fav('brazzers.com'),
+    url: 'https://www.brazzers.com',
+    description: 'Major studio network featuring flagship stars and high-production releases.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory (playable scenes also indexed inside Studios & Scenes tab).',
+  },
+  {
+    id: 'tube-vixen',
+    name: 'Vixen',
+    category: 'Creator & Studio Hubs',
+    badge: '4K Cinema Studio',
+    rating: 4.9,
+    logo: fav('vixen.com'),
+    url: 'https://www.vixen.com',
+    description: 'Cinematic 4K luxury adult productions with award-winning art direction.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory (playable Vixen scenes available in Studios tab).',
+  },
+  {
+    id: 'tube-onlyfans',
+    name: 'Fansly / Creator Directories',
+    category: 'Creator & Studio Hubs',
+    badge: 'Verified Creators',
+    rating: 4.7,
+    logo: fav('fansly.com'),
+    url: 'https://fansly.com',
+    description: 'Direct-to-creator independent adult subscription and media showcase platform.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — respects creator paywalls & authentication.',
+  },
+  {
+    id: 'tube-redgifs',
+    name: 'RedGIFs',
+    category: 'Creator & Studio Hubs',
+    badge: 'Short HD Loops',
+    rating: 4.8,
+    logo: fav('redgifs.com'),
+    url: 'https://www.redgifs.com',
+    description: 'Creator-driven short HD video loops, trending niches, and verified profiles.',
+    allowsInAppPlayback: false,
+    limitation: 'External site directory — opens directly on partner site.',
+  },
 ];
 
 export class StashProviderAdapter {
@@ -402,61 +374,24 @@ export class StashProviderAdapter {
     this.servers = [...DEFAULT_STASH_SERVERS];
   }
 
-  /**
-   * Get all registered Stash servers with credentials & internal URLs safely redacted
-   */
   public getServers(): StashServerConfig[] {
-    return this.servers.map(s => ({
+    return this.servers.map((s) => ({
       ...s,
       serverUrl: s.serverUrl ? 'Backend Environment (.env.local)' : '',
-      apiKey: undefined
+      apiKey: undefined,
     }));
   }
 
-  /**
-   * Internal server-side resolution only — never expose raw server objects to clients
-   */
   public getInternalPrimaryServer(): StashServerConfig | undefined {
-    return this.servers.find(s => s.isEnabled && s.serverUrl);
+    return this.servers.find((s) => s.isEnabled && s.serverUrl);
   }
 
-  /**
-   * Add or update a server config
-   */
-  public updateServer(config: Partial<StashServerConfig> & { id: string }): StashServerConfig {
-    const idx = this.servers.findIndex(s => s.id === config.id);
-    if (idx >= 0) {
-      this.servers[idx] = { ...this.servers[idx], ...config };
-      return this.servers[idx];
-    } else {
-      const newServer: StashServerConfig = {
-        id: config.id,
-        name: config.name || 'Custom Stash Server',
-        serverUrl: config.serverUrl || '',
-        apiKey: config.apiKey,
-        connectionStatus: 'connected',
-        lastSyncAt: new Date().toISOString(),
-        syncSchedule: config.syncSchedule || 'manual',
-        isEnabled: config.isEnabled ?? true,
-        libraryIdentifier: config.libraryIdentifier || `vault-${Date.now()}`,
-        sceneCount: CURATED_ADULT_SCENES.length,
-        performerCount: 18,
-        studioCount: 12,
-        galleryCount: 8
-      };
-      this.servers.push(newServer);
-      return newServer;
-    }
-  }
-
-  /**
-   * Test connection to a Stash server via official GraphQL version query
-   * Auto-connects to built-in Cloud Vault if local server is offline
-   */
-  public async testConnection(serverOrId?: StashServerConfig | string): Promise<{ success: boolean; version?: string; error?: string }> {
+  public async testConnection(
+    serverOrId?: StashServerConfig | string
+  ): Promise<{ success: boolean; version?: string; error?: string }> {
     let server: StashServerConfig | undefined;
     if (typeof serverOrId === 'string') {
-      server = this.servers.find(s => s.id === serverOrId);
+      server = this.servers.find((s) => s.id === serverOrId);
     } else if (serverOrId) {
       server = serverOrId;
     } else {
@@ -466,174 +401,65 @@ export class StashProviderAdapter {
     if (!server || !server.serverUrl) {
       return {
         success: false,
-        error: 'Not Connected — STASH_SERVER_URL not set in server environment'
+        error: 'Not Connected — STASH_SERVER_URL not set in server environment',
       };
     }
 
-    // Attempt real GraphQL query if an explicit remote URL is set
     try {
       const query = `query Version { version { version build_time } }`;
       const response = await fetch(server.serverUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(server.apiKey ? { 'ApiKey': server.apiKey } : {})
+          ...(server.apiKey ? { ApiKey: server.apiKey } : {}),
         },
         body: JSON.stringify({ query }),
-        signal: AbortSignal.timeout(4000)
+        signal: AbortSignal.timeout(5000),
       });
 
       if (response.ok) {
         const json = await response.json();
-        const version = json.data?.version?.version || 'Stash GraphQL v0.27+';
+        const version = json.data?.version?.version || 'Stash GraphQL';
         server.connectionStatus = 'connected';
         server.version = version;
         server.lastSyncAt = new Date().toISOString();
         return { success: true, version };
-      } else {
-        server.connectionStatus = 'error';
-        return {
-          success: false,
-          error: `Stash server returned HTTP ${response.status}. Check endpoint URL and API key.`
-        };
       }
-    } catch (err: any) {
-      server.connectionStatus = 'disconnected';
+
+      server.connectionStatus = 'error';
       return {
         success: false,
-        error: `Could not reach Stash server at ${server.serverUrl}. Make sure your local or remote Stash instance is running.`
+        error: `Stash server returned HTTP ${response.status}`,
+      };
+    } catch {
+      server.connectionStatus = 'error';
+      return {
+        success: false,
+        error: 'Configured STASH_SERVER_URL is unreachable.',
       };
     }
   }
 
-  /**
-   * Query scenes using Stash GraphQL schema or curated vault
-   */
-  public async findScenes(filters?: MediaBrowsingFilters): Promise<{ count: number; scenes: StashScene[] }> {
-    let result = [...CURATED_ADULT_SCENES];
-
-    if (filters?.searchQuery) {
-      const q = filters.searchQuery.toLowerCase();
-      result = result.filter(s => 
-        s.title.toLowerCase().includes(q) || 
-        s.details?.toLowerCase().includes(q) ||
-        s.performers?.some(p => p.name.toLowerCase().includes(q)) ||
-        s.tags?.some(t => t.name.toLowerCase().includes(q))
-      );
-    }
-
-    if (filters?.studioId) {
-      result = result.filter(s => s.studio?.id === filters.studioId);
-    }
-
-    if (filters?.performerId) {
-      result = result.filter(s => s.performers?.some(p => p.id === filters.performerId));
-    }
-
-    if (filters?.sortBy === 'rating') {
-      result.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-    } else if (filters?.sortBy === 'date') {
-      result.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
-    }
-
-    return {
-      count: result.length,
-      scenes: result
-    };
+  public async findScenes(_filters?: MediaBrowsingFilters): Promise<{ count: number; scenes: StashScene[] }> {
+    return { count: 0, scenes: [] };
   }
 
-  /**
-   * Query performers
-   */
   public async findPerformers(): Promise<StashPerformer[]> {
-    const map = new Map<string, StashPerformer>();
-    CURATED_ADULT_SCENES.forEach(s => {
-      s.performers?.forEach(p => {
-        if (!map.has(p.id)) map.set(p.id, p);
-      });
-    });
-    return Array.from(map.values());
+    return [];
   }
 
-  /**
-   * Query studios
-   */
   public async findStudios(): Promise<StashStudio[]> {
-    const map = new Map<string, StashStudio>();
-    CURATED_ADULT_SCENES.forEach(s => {
-      if (s.studio && !map.has(s.studio.id)) {
-        map.set(s.studio.id, s.studio);
-      }
-    });
-    return Array.from(map.values());
+    return [];
   }
 
-  /**
-   * Query tags
-   */
   public async findTags(): Promise<StashTag[]> {
-    const map = new Map<string, StashTag>();
-    CURATED_ADULT_SCENES.forEach(s => {
-      s.tags?.forEach(t => {
-        if (!map.has(t.id)) map.set(t.id, t);
-      });
-    });
-    return Array.from(map.values());
+    return [];
   }
 
-  /**
-   * Query galleries
-   */
   public async findGalleries(): Promise<StashGallery[]> {
-    return [
-      {
-        id: 'gal-001',
-        title: 'Neon Velvet Exclusive Photo Session',
-        details: 'High-resolution photo shoot captured in Tokyo studio penthouse.',
-        date: '2026-11-18',
-        imageCount: 48,
-        rating: 5,
-        coverPath: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop',
-        images: [
-          'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1000&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop'
-        ],
-        studio: { id: 'std-cyber', name: 'CyberVelvet Studios' }
-      },
-      {
-        id: 'gal-002',
-        title: 'Midnight Noir Backstage Portraits',
-        details: 'Atmospheric monochrome and deep burgundy backstage captures.',
-        date: '2026-11-14',
-        imageCount: 64,
-        rating: 4.8,
-        coverPath: 'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=600&auto=format&fit=crop',
-        images: [
-          'https://images.unsplash.com/photo-1509281373149-e957c6296406?q=80&w=1000&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop'
-        ],
-        studio: { id: 'std-noir', name: 'Noir Intimate Cinema' }
-      },
-      {
-        id: 'gal-003',
-        title: 'Crimson Velvet High-Fashion Glamour',
-        details: 'Exclusive behind-the-scenes gallery from the crimson session.',
-        date: '2026-11-10',
-        imageCount: 52,
-        rating: 4.9,
-        coverPath: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600&auto=format&fit=crop',
-        images: [
-          'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop',
-          'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?q=80&w=1000&auto=format&fit=crop'
-        ],
-        studio: { id: 'std-crimson', name: 'Crimson Passion Productions' }
-      }
-    ];
+    return [];
   }
 
-  /**
-   * Retrieve secure playback stream URL for a given scene
-   */
   public getSceneStreamUrl(sceneId: string): string {
     return `/api/library/stash/proxy-stream?id=${sceneId}`;
   }

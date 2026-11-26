@@ -5,6 +5,7 @@ import {
   fetchStashDbScenes,
   fetchStashDbPerformers,
   fetchStashDbStudios,
+  STASHDB_TAG_IDS,
 } from '@/lib/providers/stashdb';
 import { stashService } from '@/lib/services/stashService';
 
@@ -20,6 +21,8 @@ export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const mode = sp.get('mode') || 'scenes';
   const query = sp.get('q') || '';
+  const tag = (sp.get('tag') || '').toLowerCase();
+  const genderParam = (sp.get('gender') || 'FEMALE').toUpperCase();
   const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
 
   const cfg = getStashDbEnvConfig();
@@ -37,17 +40,23 @@ export async function GET(req: NextRequest) {
 
   try {
     if (mode === 'performers') {
-      const data = await fetchStashDbPerformers({ page, perPage: 24, query });
+      const gender = (
+        ['FEMALE', 'MALE', 'TRANSGENDER_FEMALE', 'TRANSGENDER_MALE', 'ALL'].includes(genderParam)
+          ? genderParam
+          : 'FEMALE'
+      ) as 'FEMALE' | 'MALE' | 'TRANSGENDER_FEMALE' | 'TRANSGENDER_MALE' | 'ALL';
+      const data = await fetchStashDbPerformers({ page, perPage: 36, query, gender });
       return NextResponse.json({
         success: true,
         configured: true,
         mode,
+        gender,
         ...data,
       });
     }
 
     if (mode === 'studios') {
-      const data = await fetchStashDbStudios({ page, perPage: 24, query });
+      const data = await fetchStashDbStudios({ page, perPage: 36, query });
       return NextResponse.json({
         success: true,
         configured: true,
@@ -56,13 +65,25 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const data = await fetchStashDbScenes({ page, perPage: 24, query });
+    const tagIds: string[] = [];
+    if (tag === 'vr') tagIds.push(STASHDB_TAG_IDS.VR);
+    else if (tag === '3d') tagIds.push(STASHDB_TAG_IDS.THREE_D);
+    else if (tag === 'hentai') tagIds.push(STASHDB_TAG_IDS.HENTAI);
+
+    const data = await fetchStashDbScenes({
+      page,
+      perPage: 24,
+      query,
+      tagIds: tagIds.length > 0 ? tagIds : undefined,
+      sort: 'DATE',
+    });
     const matchedScenes = await stashService.matchStashDbScenes(data.scenes);
 
     return NextResponse.json({
       success: true,
       configured: true,
       mode: 'scenes',
+      tag: tag || 'all',
       count: data.count,
       scenes: matchedScenes,
     });

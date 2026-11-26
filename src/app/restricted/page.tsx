@@ -34,10 +34,6 @@ import { useAuth } from '@/context/AuthContext';
 import { normalizeStashId, toStashWatchPath } from '@/lib/utils/streamUtils';
 import { StashScene, StashGallery } from '@/types/library';
 import {
-  CURATED_ADULT_SCENES,
-  CURATED_HOT_WEB_SERIES,
-  CURATED_HENTAI_COLLECTIONS,
-  CURATED_VR_SCENES,
   VERIFIED_ADULT_TUBE_PORTALS,
 } from '@/lib/providers/stash';
 import StashDbPanel from '@/components/stash/StashDbPanel';
@@ -84,6 +80,15 @@ function RestrictedContent() {
   const [hentaiSubcat, setHentaiSubcat] = useState<string>('All');
   const [seriesSubcat, setSeriesSubcat] = useState<string>('All');
   const [tubeCatFilter, setTubeCatFilter] = useState<string>('All');
+  const [galleryCatFilter, setGalleryCatFilter] = useState<string>('All');
+  const [perfGender, setPerfGender] = useState<'FEMALE' | 'MALE' | 'TRANSGENDER_FEMALE' | 'ALL'>('FEMALE');
+  const [perfPlayableOnly, setPerfPlayableOnly] = useState<boolean>(false);
+  const [perfPage, setPerfPage] = useState<number>(1);
+  const [loadingMorePerfs, setLoadingMorePerfs] = useState<boolean>(false);
+  const [studioIncludeMeta, setStudioIncludeMeta] = useState<boolean>(false);
+  const [vrFormatFilter, setVrFormatFilter] = useState<string>('All');
+  const [vrPage, setVrPage] = useState<number>(1);
+  const [hentaiPage, setHentaiPage] = useState<number>(1);
   const [pageLimit, setPageLimit] = useState(24);
 
   // Sync URL query param (?tab=...)
@@ -130,10 +135,15 @@ function RestrictedContent() {
   const [syncing, setSyncing] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
 
-  const [scenes, setScenes] = useState<StashScene[]>(CURATED_ADULT_SCENES);
+  const [scenes, setScenes] = useState<StashScene[]>([]);
   const [recentUploads, setRecentUploads] = useState<any[]>([]);
   const [performers, setPerformers] = useState<any[]>([]);
   const [studios, setStudios] = useState<any[]>([]);
+  const [seriesItems, setSeriesItems] = useState<any[]>([]);
+  const [vrItems, setVrItems] = useState<any[]>([]);
+  const [vrTotalCount, setVrTotalCount] = useState<number>(0);
+  const [hentaiItems, setHentaiItems] = useState<any[]>([]);
+  const [hentaiTotalCount, setHentaiTotalCount] = useState<number>(0);
   const [galleries, setGalleries] = useState<StashGallery[]>([]);
   const [recommendations, setRecommendations] = useState<any>(null);
 
@@ -141,50 +151,189 @@ function RestrictedContent() {
   const [selectedPerformerId, setSelectedPerformerId] = useState<string | null>(null);
   const [selectedStudioId, setSelectedStudioId] = useState<string | null>(null);
   const [selectedSeries, setSelectedSeries] = useState<any | null>(null);
+  const [selectedVrMeta, setSelectedVrMeta] = useState<any | null>(null);
   const [lightboxGallery, setLightboxGallery] = useState<{ title: string; images: string[] } | null>(null);
 
   const loadAllEcosystemData = useCallback(async () => {
     setLoadingData(true);
     try {
-      const watchedIds = watchHistory.map((h) => h.contentId).join(',');
-      const favIds = favorites.join(',');
-
-      const [srvRes, scenesRes, uploadsRes, perfsRes, studiosRes, galRes, recRes] =
-        await Promise.all([
-          fetch('/api/library/servers').then((r) => r.json()).catch(() => ({})),
-          fetch('/api/library/stash/scenes').then((r) => r.json()).catch(() => ({})),
-          fetch('/api/library/stash/recent-uploads').then((r) => r.json()).catch(() => ({})),
-          fetch('/api/library/stash/performers').then((r) => r.json()).catch(() => ({})),
-          fetch('/api/library/stash/studios').then((r) => r.json()).catch(() => ({})),
-          fetch('/api/library/stash/galleries').then((r) => r.json()).catch(() => ({})),
-          fetch(
-            `/api/library/stash/recommendations?watched=${encodeURIComponent(
-              watchedIds
-            )}&favorites=${encodeURIComponent(favIds)}`
-          )
-            .then((r) => r.json())
-            .catch(() => ({})),
-        ]);
+      const [
+        srvRes,
+        scenesRes,
+        uploadsRes,
+        perfsRes,
+        studiosRes,
+        galRes,
+        seriesRes,
+        vrRes,
+        hentaiRes,
+      ] = await Promise.all([
+        fetch('/api/library/servers').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/scenes').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/recent-uploads').then((r) => r.json()).catch(() => ({})),
+        fetch(`/api/library/stash/performers?gender=${perfGender}&page=1`).then((r) => r.json()).catch(() => ({})),
+        fetch(`/api/library/stash/studios?includeMetadata=${studioIncludeMeta}`).then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/galleries').then((r) => r.json()).catch(() => ({})),
+        fetch('/api/library/stash/series').then((r) => r.json()).catch(() => ({})),
+        fetch(`/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=1`).then((r) => r.json()).catch(() => ({})),
+        fetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&page=1`).then((r) => r.json()).catch(() => ({})),
+      ]);
 
       if (srvRes?.backendStatus) setBackendStatus(srvRes.backendStatus);
-      if (Array.isArray(scenesRes?.scenes) && scenesRes.scenes.length > 0) {
-        setScenes(scenesRes.scenes);
-      }
+      if (Array.isArray(scenesRes?.scenes)) setScenes(scenesRes.scenes);
       if (Array.isArray(uploadsRes?.uploads)) setRecentUploads(uploadsRes.uploads);
-      if (Array.isArray(perfsRes?.performers)) setPerformers(perfsRes.performers);
+      if (Array.isArray(perfsRes?.performers)) {
+        setPerformers(perfsRes.performers);
+        setPerfPage(1);
+      }
       if (Array.isArray(studiosRes?.studios)) setStudios(studiosRes.studios);
       if (Array.isArray(galRes?.galleries)) setGalleries(galRes.galleries);
-      if (recRes?.recommendations) setRecommendations(recRes.recommendations);
+      if (Array.isArray(seriesRes?.series)) setSeriesItems(seriesRes.series);
+      if (Array.isArray(vrRes?.scenes)) {
+        setVrItems(vrRes.scenes);
+        setVrTotalCount(vrRes.totalCount || vrRes.scenes.length);
+        setVrPage(1);
+      }
+      if (Array.isArray(hentaiRes?.items)) {
+        setHentaiItems(hentaiRes.items);
+        setHentaiTotalCount(hentaiRes.totalCount || hentaiRes.items.length);
+        setHentaiPage(1);
+      }
     } finally {
       setLoadingData(false);
     }
-  }, [favorites, watchHistory]);
+    // Initial full load; individual filter toggles below update only their own slice without page flicker
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (isUnlocked) {
       loadAllEcosystemData();
     }
   }, [isUnlocked, loadAllEcosystemData]);
+
+  // Smooth per-section filter updates (no full-page loading flash)
+  useEffect(() => {
+    if (!isUnlocked) return;
+    fetch(`/api/library/stash/performers?gender=${perfGender}&page=1`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.performers)) {
+          setPerformers(res.performers);
+          setPerfPage(1);
+        }
+      })
+      .catch(() => {});
+  }, [isUnlocked, perfGender]);
+
+  useEffect(() => {
+    if (!isUnlocked) return;
+    fetch(`/api/library/stash/studios?includeMetadata=${studioIncludeMeta}`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.studios)) setStudios(res.studios);
+      })
+      .catch(() => {});
+  }, [isUnlocked, studioIncludeMeta]);
+
+  useEffect(() => {
+    if (!isUnlocked) return;
+    fetch(`/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=1`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.scenes)) {
+          setVrItems(res.scenes);
+          setVrTotalCount(res.totalCount || res.scenes.length);
+          setVrPage(1);
+        }
+      })
+      .catch(() => {});
+  }, [isUnlocked, vrFormatFilter]);
+
+  useEffect(() => {
+    if (!isUnlocked) return;
+    fetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&page=1`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.items)) {
+          setHentaiItems(res.items);
+          setHentaiTotalCount(res.totalCount || res.items.length);
+          setHentaiPage(1);
+        }
+      })
+      .catch(() => {});
+  }, [isUnlocked, hentaiSubcat]);
+
+  // Separate lightweight recommendation refresh (prevents re-fetching whole library on favorite/progress tick)
+  useEffect(() => {
+    if (!isUnlocked) return;
+    const watchedIds = watchHistory.slice(0, 20).map((h) => h.contentId).join(',');
+    const favIds = favorites.slice(0, 20).join(',');
+    fetch(
+      `/api/library/stash/recommendations?watched=${encodeURIComponent(
+        watchedIds
+      )}&favorites=${encodeURIComponent(favIds)}`
+    )
+      .then((r) => r.json())
+      .then((recRes) => {
+        if (recRes?.recommendations) setRecommendations(recRes.recommendations);
+      })
+      .catch(() => {});
+  }, [isUnlocked, favorites, watchHistory]);
+
+  const handleLoadMorePerformers = async () => {
+    const nextPage = perfPage + 1;
+    setLoadingMorePerfs(true);
+    try {
+      const res = await fetch(
+        `/api/library/stash/performers?gender=${perfGender}&page=${nextPage}${
+          searchQuery.trim() ? `&q=${encodeURIComponent(searchQuery.trim())}` : ''
+        }`
+      ).then((r) => r.json());
+      if (Array.isArray(res?.performers) && res.performers.length > 0) {
+        setPerformers((prev) => {
+          const existing = new Set(prev.map((p) => p.id));
+          const additions = res.performers.filter((p: any) => !existing.has(p.id));
+          return [...prev, ...additions];
+        });
+        setPerfPage(nextPage);
+      }
+    } finally {
+      setLoadingMorePerfs(false);
+    }
+  };
+
+  const handleLoadMoreVr = async () => {
+    const nextPage = vrPage + 1;
+    const res = await fetch(
+      `/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=${nextPage}`
+    )
+      .then((r) => r.json())
+      .catch(() => ({}));
+    if (Array.isArray(res?.scenes) && res.scenes.length > 0) {
+      setVrItems((prev) => {
+        const seen = new Set(prev.map((x) => x.id));
+        return [...prev, ...res.scenes.filter((x: any) => !seen.has(x.id))];
+      });
+      setVrPage(nextPage);
+    }
+  };
+
+  const handleLoadMoreHentai = async () => {
+    const nextPage = hentaiPage + 1;
+    const res = await fetch(
+      `/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&page=${nextPage}`
+    )
+      .then((r) => r.json())
+      .catch(() => ({}));
+    if (Array.isArray(res?.items) && res.items.length > 0) {
+      setHentaiItems((prev) => {
+        const seen = new Set(prev.map((x) => x.id));
+        return [...prev, ...res.items.filter((x: any) => !seen.has(x.id))];
+      });
+      setHentaiPage(nextPage);
+    }
+  };
 
   const handleManualRefreshSync = async () => {
     setSyncing(true);
@@ -212,26 +361,28 @@ function RestrictedContent() {
     verify18Plus(`${birthYear}-01-01`);
   };
 
-  // Derived Enriched Lists
-  const vrItems = useMemo(
-    () =>
-      CURATED_VR_SCENES.map((vr, i) => ({
-        ...vr,
-        isVr: true,
-        vrFormat: i % 2 === 0 ? 'Stereoscopic 180° SBS' : '360° Interactive WebXR',
-      })),
-    []
-  );
-
+  // Derived Enriched Lists (Strictly from real synced catalogs — zero hardcoded mock placeholders)
   const safeTubes = useMemo(
     () =>
       VERIFIED_ADULT_TUBE_PORTALS.map((t) => ({
         ...t,
         allowsInAppPlayback: false,
-        limitation: 'External Site Directory — Direct in-app streaming not permitted by host site.',
+        limitation: t.limitation || 'External Site Directory — Opens safely in your browser.',
       })),
     []
   );
+
+  const filteredVr = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return q
+      ? vrItems.filter(
+          (vr) =>
+            vr.title.toLowerCase().includes(q) ||
+            (vr.studioName || '').toLowerCase().includes(q) ||
+            (vr.performers || []).some((p: string) => p.toLowerCase().includes(q))
+        )
+      : vrItems;
+  }, [vrItems, searchQuery]);
 
   const filteredScenes = useMemo(() => {
     let list = [...scenes];
@@ -284,15 +435,20 @@ function RestrictedContent() {
   }, [recentUploads, uploadKindFilter, searchQuery, sortOrder]);
 
   const filteredPerformers = useMemo(() => {
+    let list = [...performers];
+    if (perfPlayableOnly) {
+      list = list.filter((p) => p.hasPlayableScenes || p.source === 'cine18');
+    }
     const q = searchQuery.trim().toLowerCase();
     return q
-      ? performers.filter(
+      ? list.filter(
           (p) =>
             p.name.toLowerCase().includes(q) ||
-            (p.country || '').toLowerCase().includes(q)
+            (p.country || '').toLowerCase().includes(q) ||
+            (p.aliases || []).some((a: string) => a.toLowerCase().includes(q))
         )
-      : performers;
-  }, [performers, searchQuery]);
+      : list;
+  }, [performers, perfPlayableOnly, searchQuery]);
 
   const filteredStudios = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -306,56 +462,59 @@ function RestrictedContent() {
   }, [studios, searchQuery]);
 
   const filteredHentai = useMemo(() => {
-    let list = CURATED_HENTAI_COLLECTIONS.map((h) => ({
-      ...h,
-      subType: h.type.toLowerCase().includes('3d')
-        ? h.type.toLowerCase().includes('cgi')
-          ? 'CGI'
-          : '3D Animation'
-        : h.type.toLowerCase().includes('hentai')
-        ? 'Hentai'
-        : 'Animated Adult',
-    }));
-    if (hentaiSubcat !== 'All') {
-      list = list.filter(
-        (h) =>
-          h.subType === hentaiSubcat ||
-          h.type.toLowerCase().includes(hentaiSubcat.toLowerCase()) ||
-          h.tags.some((t) => t.toLowerCase().includes(hentaiSubcat.toLowerCase())) ||
-          h.synopsis.toLowerCase().includes(hentaiSubcat.toLowerCase())
-      );
-    }
+    let list = [...hentaiItems];
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
-        (h) => h.title.toLowerCase().includes(q) || h.studio.toLowerCase().includes(q)
+        (h) =>
+          h.title.toLowerCase().includes(q) ||
+          (h.studio || '').toLowerCase().includes(q) ||
+          (h.tags || []).some((t: string) => t.toLowerCase().includes(q))
       );
     }
     return list;
-  }, [hentaiSubcat, searchQuery]);
+  }, [hentaiItems, searchQuery]);
 
   const filteredSeries = useMemo(() => {
-    let list = CURATED_HOT_WEB_SERIES.map((s) => ({
-      ...s,
-      subcategory: s.studio.toLowerCase().includes('ullu') || s.studio.toLowerCase().includes('alt')
-        ? 'Regional Series'
-        : 'Adult Web Series',
-    }));
+    let list = [...seriesItems];
     if (seriesSubcat !== 'All') {
       list = list.filter(
         (s) =>
           s.subcategory === seriesSubcat ||
-          s.genres.some((g) => g.toLowerCase().includes(seriesSubcat.toLowerCase()))
+          (s.studio || '').toLowerCase().includes(seriesSubcat.toLowerCase())
       );
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
-        (s) => s.title.toLowerCase().includes(q) || s.studio.toLowerCase().includes(q)
+        (s) =>
+          s.title.toLowerCase().includes(q) ||
+          (s.studio || '').toLowerCase().includes(q) ||
+          (s.tags || []).some((t: string) => t.toLowerCase().includes(q))
       );
     }
     return list;
-  }, [seriesSubcat, searchQuery]);
+  }, [seriesItems, seriesSubcat, searchQuery]);
+
+  const filteredGalleries = useMemo(() => {
+    let list = [...galleries];
+    if (galleryCatFilter !== 'All') {
+      list = list.filter(
+        (g) =>
+          (g.details || '').toLowerCase().includes(galleryCatFilter.toLowerCase()) ||
+          (g.tags || []).some((t) => t.name.toLowerCase().includes(galleryCatFilter.toLowerCase()))
+      );
+    }
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (g) =>
+          g.title.toLowerCase().includes(q) ||
+          (g.studio?.name || '').toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [galleries, galleryCatFilter, searchQuery]);
 
   const filteredTubes = useMemo(() => {
     let list = safeTubes;
@@ -379,26 +538,30 @@ function RestrictedContent() {
     [scenes]
   );
 
-  // Continue Watching & Favorites resolved against real library
+  // Continue Watching & Favorites resolved & STRICTLY DEDUPLICATED against real synced library
   const continueWatchingItems = useMemo(() => {
     const stashHistory = watchHistory.filter(
       (h) => h.contentId.startsWith('stash-') || h.contentId.startsWith('cine18-')
     );
-    return stashHistory
-      .map((h) => {
-        const cleanId = h.contentId.replace(/^(stash-)+/, '');
-        const match = scenes.find(
-          (s) => s.id === h.contentId || s.id === cleanId || s.id === `stash-${cleanId}`
-        );
-        return match
-          ? {
-              ...match,
-              progressSeconds: h.progressSeconds,
-              totalDurationSeconds: h.totalDurationSeconds,
-            }
-          : null;
-      })
-      .filter(Boolean) as any[];
+    const dedupMap = new Map<string, any>();
+
+    for (const h of stashHistory) {
+      const cleanId = h.contentId.replace(/^(stash-)+/, '');
+      const match = scenes.find(
+        (s) => s.id === h.contentId || s.id === cleanId || s.id === `stash-${cleanId}`
+      );
+      if (!match) continue;
+      const existing = dedupMap.get(match.id);
+      const nextProgress = Math.max(existing?.progressSeconds || 0, h.progressSeconds || 0);
+      if (!existing || nextProgress >= (existing.progressSeconds || 0)) {
+        dedupMap.set(match.id, {
+          ...match,
+          progressSeconds: nextProgress,
+          totalDurationSeconds: h.totalDurationSeconds,
+        });
+      }
+    }
+    return Array.from(dedupMap.values());
   }, [watchHistory, scenes]);
 
   const favoriteScenes = useMemo(
@@ -410,12 +573,12 @@ function RestrictedContent() {
     { id: 'all', label: 'All Stash & Adult Media', icon: Layers },
     { id: 'recent_uploads', label: 'Recent Uploads', icon: UploadCloud, count: recentUploads.length },
     { id: 'movies', label: 'Movies & Scenes', icon: Flame, count: scenes.length },
-    { id: 'series', label: 'Hot Web Series', icon: Tv, count: CURATED_HOT_WEB_SERIES.length },
+    { id: 'series', label: 'Hot Web Series', icon: Tv, count: seriesItems.length },
     { id: 'studios', label: 'Studios', icon: Building, count: studios.length },
     { id: 'performers', label: 'Performers', icon: Users, count: performers.length },
     { id: 'tubes', label: 'Tube Hub', icon: Globe, count: safeTubes.length },
-    { id: 'vr', label: '3D VR & Interactive', icon: Glasses, count: vrItems.length },
-    { id: 'hentai', label: 'Hentai & 3D', icon: Sparkles, count: CURATED_HENTAI_COLLECTIONS.length },
+    { id: 'vr', label: '3D VR & Interactive', icon: Glasses, count: vrTotalCount || vrItems.length },
+    { id: 'hentai', label: 'Hentai & 3D', icon: Sparkles, count: hentaiTotalCount || hentaiItems.length },
     { id: 'galleries', label: 'Photo Galleries', icon: ImageIcon, count: galleries.length },
     { id: 'stashdb', label: 'StashDB Catalogue', icon: Database },
     { id: 'recommendations', label: 'Recommended', icon: Compass },
@@ -642,7 +805,7 @@ function RestrictedContent() {
                 >
                   <div className="aspect-video relative bg-slate-900">
                     {sc.paths?.screenshot && (
-                      <img src={sc.paths.screenshot} alt={sc.title} className="w-full h-full object-cover" />
+                      <img src={sc.paths.screenshot} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     )}
                     <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] text-cyan-300 font-mono">
                       Resume {Math.floor((sc.progressSeconds || 0) / 60)}m
@@ -674,7 +837,7 @@ function RestrictedContent() {
                 >
                   <div className="aspect-video bg-slate-900">
                     {sc.paths?.screenshot && (
-                      <img src={sc.paths.screenshot} alt={sc.title} className="w-full h-full object-cover" />
+                      <img src={sc.paths.screenshot} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="p-3">
@@ -734,6 +897,7 @@ function RestrictedContent() {
                           <img
                             src={u.thumbnail}
                             alt={u.title}
+                            referrerPolicy="no-referrer"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
@@ -826,6 +990,7 @@ function RestrictedContent() {
                             <img
                               src={scene.paths.screenshot}
                               alt={scene.title}
+                              referrerPolicy="no-referrer"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                               loading="lazy"
                             />
@@ -868,16 +1033,16 @@ function RestrictedContent() {
           </section>
         )}
 
-        {/* 3. HOT WEB SERIES & DRAMA (Section 2H) */}
+        {/* 3. HOT WEB SERIES & DRAMA (Real Live Cine18 OTT Catalog) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'series') && (
           <section className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h2 className="text-xl font-black text-white flex items-center gap-2">
                 <Tv className="w-5 h-5 text-amber-400" />
-                <span>Hot Web Series &amp; Drama</span>
+                <span>Hot Web Series &amp; Drama ({filteredSeries.length})</span>
               </h2>
               <div className="flex flex-wrap gap-1.5">
-                {['All', 'Adult Web Series', 'Regional Series', '18+ Romantic'].map((sub) => (
+                {['All', 'Ullu', 'Alt Balaji', 'Kooku & Primeplay', 'MoodX & Hotshots', 'Regional & Drama'].map((sub) => (
                   <button
                     key={sub}
                     onClick={() => setSeriesSubcat(sub)}
@@ -893,47 +1058,74 @@ function RestrictedContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {filteredSeries.map((ser) => (
-                <div
-                  key={ser.id}
-                  onClick={() => setSelectedSeries(ser)}
-                  className="cursor-pointer rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-amber-500/40 transition flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="aspect-video relative bg-slate-900">
-                      <img src={ser.banner} alt={ser.title} className="w-full h-full object-cover" loading="lazy" />
-                      <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-amber-600/90 text-[10px] font-bold text-white">
-                        S{ser.seasons} • {ser.episodesCount} Eps
-                      </span>
+            {filteredSeries.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 text-center text-xs text-slate-400">
+                No hot web series matched &ldquo;{seriesSubcat}&rdquo;.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {(activeTab === 'all' ? filteredSeries.slice(0, 8) : filteredSeries.slice(0, pageLimit)).map((ser) => (
+                  <div
+                    key={ser.id}
+                    onClick={() => setSelectedSeries(ser)}
+                    className="cursor-pointer rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-amber-500/40 transition flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="aspect-video relative bg-slate-900">
+                        {ser.banner ? (
+                          <img src={ser.banner} alt={ser.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                            {ser.studio}
+                          </div>
+                        )}
+                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-amber-600/90 text-[10px] font-bold text-white">
+                          {ser.studio}
+                        </span>
+                        <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] text-amber-300 font-bold">
+                          ★ {(ser.rating || 4.7).toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="p-3.5 space-y-1">
+                        <h3 className="text-sm font-black text-white line-clamp-1">{ser.title}</h3>
+                        <p className="text-[11px] text-amber-300 truncate">{ser.subcategory}</p>
+                        <p className="text-xs text-slate-400 line-clamp-2">{ser.synopsis}</p>
+                      </div>
                     </div>
-                    <div className="p-4 space-y-1.5">
-                      <h3 className="text-sm sm:text-base font-black text-white">{ser.title}</h3>
-                      <p className="text-[11px] text-amber-300">{ser.studio} • {ser.subcategory}</p>
-                      <p className="text-xs text-slate-400 line-clamp-2">{ser.synopsis}</p>
+                    <div className="px-3.5 pb-3.5 flex items-center justify-between text-xs text-cyan-400 font-bold">
+                      <span>Open Episodes &amp; Play</span>
+                      <ChevronRight className="w-4 h-4" />
                     </div>
                   </div>
-                  <div className="px-4 pb-4 flex items-center justify-between text-xs text-cyan-400 font-bold">
-                    <span>Open Seasons &amp; Episodes</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
-        {/* 4. STUDIOS CATALOGUE (Section 2C) */}
+        {/* 4. STUDIOS CATALOGUE (Default: Real Playable Studios Only; Optional StashDB Toggle) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'studios') && (
           <section className="space-y-4">
-            <div>
-              <h2 className="text-xl font-black text-white flex items-center gap-2">
-                <Building className="w-5 h-5 text-purple-400" />
-                <span>Studios Directory ({filteredStudios.length})</span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Click any studio to inspect its actual indexed playable videos and StashDB studio credits.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <Building className="w-5 h-5 text-purple-400" />
+                  <span>Studios Directory ({filteredStudios.length})</span>
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Verified playable studios &amp; OTT channels shown by default. Click any studio to stream its real videos.
+                </p>
+              </div>
+              <button
+                onClick={() => setStudioIncludeMeta((v) => !v)}
+                className={`px-3 py-1.5 rounded-xl text-[11px] font-semibold border transition self-start sm:self-auto ${
+                  studioIncludeMeta
+                    ? 'bg-purple-600/25 text-purple-200 border-purple-500/40'
+                    : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
+                }`}
+              >
+                {studioIncludeMeta ? 'Showing Playable + Metadata-Only Studios' : '+ Include Metadata-Only Studios'}
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -946,7 +1138,7 @@ function RestrictedContent() {
                   >
                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
                       {st.image ? (
-                        <img src={st.image} alt={st.name} className="w-full h-full object-cover" loading="lazy" />
+                        <img src={st.image} alt={st.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
                       ) : (
                         <Building className="w-5 h-5 text-purple-400" />
                       )}
@@ -961,7 +1153,7 @@ function RestrictedContent() {
                             : 'bg-purple-500/15 text-purple-300'
                         }`}
                       >
-                        {st.hasDirectStreams ? 'Playable Media Available' : 'StashDB Metadata'}
+                        {st.hasDirectStreams ? 'Playable Media Available' : 'StashDB Metadata Only'}
                       </span>
                     </div>
                   </button>
@@ -971,21 +1163,53 @@ function RestrictedContent() {
           </section>
         )}
 
-        {/* 5. PERFORMERS DIRECTORY (Section 2D) */}
+        {/* 5. PERFORMERS DIRECTORY (Genuine Playable Stars + 70,489+ StashDB Pornstars) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'performers') && (
           <section className="space-y-4">
-            <div>
-              <h2 className="text-xl font-black text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-rose-400" />
-                <span>Performers Directory ({filteredPerformers.length})</span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Real Stash &amp; StashDB profiles with associated studios, scenes, and available photos.
-              </p>
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-rose-400" />
+                  <span>Performers Directory ({filteredPerformers.length})</span>
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Playable adult stars &amp; genuine StashDB pornstar profiles with real bios, photos &amp; studio credits.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                {[
+                  { id: 'FEMALE', label: 'Female Stars (70k+)' },
+                  { id: 'MALE', label: 'Male Performers' },
+                  { id: 'TRANSGENDER_FEMALE', label: 'Trans Performers' },
+                  { id: 'ALL', label: 'All Genders' },
+                ].map((g) => (
+                  <button
+                    key={g.id}
+                    onClick={() => setPerfGender(g.id as any)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                      perfGender === g.id
+                        ? 'bg-rose-600 text-white border-rose-500'
+                        : 'bg-white/5 text-slate-300 border-white/10'
+                    }`}
+                  >
+                    {g.label}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPerfPlayableOnly((v) => !v)}
+                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                    perfPlayableOnly
+                      ? 'bg-emerald-600 text-white border-emerald-500'
+                      : 'bg-white/5 text-emerald-300 border-emerald-500/30'
+                  }`}
+                >
+                  Playable Stars Only
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {(activeTab === 'all' ? filteredPerformers.slice(0, 12) : filteredPerformers.slice(0, pageLimit)).map(
+              {(activeTab === 'all' ? filteredPerformers.slice(0, 12) : filteredPerformers.slice(0, Math.max(pageLimit, filteredPerformers.length))).map(
                 (p) => (
                   <button
                     key={p.id}
@@ -997,6 +1221,7 @@ function RestrictedContent() {
                         <img
                           src={p.image}
                           alt={p.name}
+                          referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
                         />
@@ -1005,6 +1230,11 @@ function RestrictedContent() {
                           <Users className="w-8 h-8" />
                         </div>
                       )}
+                      {p.hasPlayableScenes && (
+                        <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-emerald-600/90 text-[9px] font-bold text-white">
+                          Playable
+                        </span>
+                      )}
                       {favorites.includes(p.id) && (
                         <Heart className="w-4 h-4 text-rose-500 fill-rose-500 absolute top-2 right-2" />
                       )}
@@ -1012,76 +1242,152 @@ function RestrictedContent() {
                     <div className="p-2.5">
                       <h4 className="text-xs font-bold text-white truncate">{p.name}</h4>
                       <p className="text-[10px] text-slate-400 truncate">
-                        {p.country || 'Verified Profile'} • {(p.sceneCount || 0).toLocaleString()} scenes
+                        {p.country || 'Verified'} • {(p.sceneCount || 0).toLocaleString()} credits
                       </p>
                     </div>
                   </button>
                 )
               )}
             </div>
+
+            {activeTab === 'performers' && !perfPlayableOnly && (
+              <div className="flex justify-center pt-2">
+                <button
+                  onClick={handleLoadMorePerformers}
+                  disabled={loadingMorePerfs}
+                  className="px-5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/35 border border-rose-500/30 text-xs font-bold text-rose-200 disabled:opacity-50"
+                >
+                  {loadingMorePerfs ? 'Loading Performers...' : `Load More Pornstars (Page ${perfPage + 1})`}
+                </button>
+              </div>
+            )}
           </section>
         )}
 
-        {/* 6. 3D VR & INTERACTIVE (Section 2F) */}
+        {/* 6. 3D VR & INTERACTIVE (Live 39,407+ VR & 15,113+ 3D StashDB Scenes — ZERO Ullu Redirects) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'vr') && (
           <section className="space-y-4">
-            <div>
-              <h2 className="text-xl font-black text-white flex items-center gap-2">
-                <Glasses className="w-5 h-5 text-cyan-400" />
-                <span>3D VR &amp; Interactive Experiences</span>
-              </h2>
-              <p className="text-xs text-slate-400">
-                Supports Stereoscopic 180° SBS, 360° Interactive Panning, and Mobile Gyroscope inside PROZ player.
-              </p>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-xl font-black text-white flex items-center gap-2">
+                  <Glasses className="w-5 h-5 text-cyan-400" />
+                  <span>3D VR &amp; Interactive Experiences ({(vrTotalCount || filteredVr.length).toLocaleString()})</span>
+                </h2>
+                <p className="text-xs text-slate-400">
+                  Real Stereoscopic 180° VR, 360° VR &amp; 3D scenes from StashDB &amp; matched Stash library files.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {['All', 'Stereoscopic 180° VR', '3D Stereoscopic'].map((fmt) => (
+                  <button
+                    key={fmt}
+                    onClick={() => setVrFormatFilter(fmt)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                      vrFormatFilter === fmt
+                        ? 'bg-cyan-600 text-white border-cyan-500'
+                        : 'bg-white/5 text-slate-300 border-white/10'
+                    }`}
+                  >
+                    {fmt}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {vrItems.map((vr) => (
-                <Link
-                  key={vr.id}
-                  href={toStashWatchPath(vr.streamId)}
-                  className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-cyan-500/25 hover:border-cyan-400 transition grid grid-cols-1 sm:grid-cols-5"
-                >
-                  <div className="sm:col-span-2 aspect-video sm:aspect-auto bg-slate-900 relative">
-                    <img src={vr.cover} alt={vr.title} className="w-full h-full object-cover" loading="lazy" />
-                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-cyan-600/90 text-[10px] font-bold text-white">
-                      {vr.vrFormat}
-                    </span>
-                  </div>
-                  <div className="sm:col-span-3 p-4 space-y-2">
-                    <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition">
-                      {vr.title}
-                    </h3>
-                    <p className="text-xs text-slate-400">{vr.performer} • {vr.duration}</p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {vr.features.map((f: string) => (
-                        <span
-                          key={f}
-                          className="px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-200"
-                        >
-                          {f}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(activeTab === 'all' ? filteredVr.slice(0, 6) : filteredVr).map((vr) =>
+                vr.isPlayable && vr.matchedSceneId ? (
+                  <Link
+                    key={vr.id}
+                    href={toStashWatchPath(vr.matchedSceneId)}
+                    className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-emerald-500/35 hover:border-emerald-400 transition flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="aspect-video bg-slate-900 relative">
+                        {vr.image && (
+                          <img src={vr.image} alt={vr.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                        )}
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-cyan-600/90 text-[10px] font-bold text-white">
+                          {vr.vrFormat}
                         </span>
-                      ))}
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-emerald-600/90 text-[10px] font-bold text-white">
+                          Playable
+                        </span>
+                      </div>
+                      <div className="p-3.5 space-y-1">
+                        <h3 className="text-sm font-bold text-white line-clamp-1">{vr.title}</h3>
+                        <p className="text-xs text-cyan-300 truncate">{vr.studioName}</p>
+                        <p className="text-[11px] text-slate-400 truncate">
+                          {(vr.performers || []).slice(0, 3).join(', ') || 'VR Performer'}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ) : (
+                  <button
+                    key={vr.id}
+                    onClick={() => setSelectedVrMeta(vr)}
+                    className="text-left group rounded-2xl overflow-hidden bg-white/[0.03] border border-cyan-500/25 hover:border-cyan-400 transition flex flex-col justify-between"
+                  >
+                    <div className="w-full">
+                      <div className="aspect-video bg-slate-900 relative">
+                        {vr.image ? (
+                          <img src={vr.image} alt={vr.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                            {vr.studioName}
+                          </div>
+                        )}
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-cyan-600/90 text-[10px] font-bold text-white">
+                          {vr.vrFormat}
+                        </span>
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-zinc-900/90 border border-white/15 text-[10px] font-bold text-slate-300">
+                          Metadata Only
+                        </span>
+                      </div>
+                      <div className="p-3.5 space-y-1">
+                        <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition line-clamp-1">
+                          {vr.title}
+                        </h3>
+                        <p className="text-xs text-cyan-300 truncate">{vr.studioName}</p>
+                        <p className="text-[11px] text-slate-400 truncate">
+                          {(vr.performers || []).slice(0, 3).join(', ') || vr.date || 'VR Archive'}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                )
+              )}
             </div>
+
+            {activeTab === 'vr' && filteredVr.length > 0 && (
+              <div className="flex justify-center pt-2">
+                <button
+                  onClick={handleLoadMoreVr}
+                  className="px-5 py-2 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/35 border border-cyan-500/30 text-xs font-bold text-cyan-200"
+                >
+                  Load More VR &amp; 3D Scenes (Page {vrPage + 1})
+                </button>
+              </div>
+            )}
           </section>
         )}
 
-        {/* 7. HENTAI & 3D ANIMATION (Section 2G — Strictly Consenting Adults Only) */}
+        {/* 7. HENTAI & 3D CGI ANIMATION (Real Adult Animation + 1,639+ Hentai & 15,113+ 3D — Consenting Adults Only) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'hentai') && (
           <section className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="text-xl font-black text-white flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-purple-400" />
-                  <span>Hentai &amp; 3D CGI Animation (18+ Consenting Adults)</span>
+                  <span>Hentai &amp; 3D CGI Animation ({(hentaiTotalCount || filteredHentai.length).toLocaleString()})</span>
                 </h2>
+                <p className="text-xs text-slate-400">
+                  Playable 18+ adult animation plus StashDB Hentai OVAs &amp; 3D CGI (strictly consenting adults).
+                </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {['All', 'Hentai', 'Animated Adult', '3D Animation', 'CGI'].map((sub) => (
+                {['All', 'Playable Adult Animation', 'Hentai OVAs', '3D CGI', 'VR Hentai'].map((sub) => (
                   <button
                     key={sub}
                     onClick={() => setHentaiSubcat(sub)}
@@ -1097,33 +1403,61 @@ function RestrictedContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {filteredHentai.map((h) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {(activeTab === 'all' ? filteredHentai.slice(0, 8) : filteredHentai).map((h) => (
                 <div
                   key={h.id}
                   className="rounded-2xl overflow-hidden bg-white/[0.03] border border-purple-500/25 hover:border-purple-400 transition flex flex-col justify-between"
                 >
                   <div>
                     <div className="aspect-video relative bg-slate-900">
-                      <img src={h.cover} alt={h.title} className="w-full h-full object-cover" loading="lazy" />
+                      {h.cover ? (
+                        <img src={h.cover} alt={h.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                          {h.studio}
+                        </div>
+                      )}
                       <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-purple-600/90 text-[10px] font-bold text-white">
-                        {h.subType} • {h.episodes} Eps
+                        {h.subType}
                       </span>
+                      {h.isPlayable && (
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-emerald-600/90 text-[10px] font-bold text-white">
+                          Playable
+                        </span>
+                      )}
                     </div>
-                    <div className="p-4 space-y-1.5">
-                      <h3 className="text-sm font-bold text-white">{h.title}</h3>
-                      <p className="text-[11px] text-purple-300">{h.studio}</p>
+                    <div className="p-3.5 space-y-1">
+                      <h3 className="text-sm font-bold text-white line-clamp-1">{h.title}</h3>
+                      <p className="text-[11px] text-purple-300 truncate">{h.studio}</p>
                       <p className="text-xs text-slate-400 line-clamp-2">{h.synopsis}</p>
                     </div>
                   </div>
-                  <div className="px-4 pb-4 flex items-center gap-2">
-                    <Link
-                      href={toStashWatchPath(h.streamId)}
-                      className="flex-1 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center justify-center gap-1.5"
-                    >
-                      <Play className="w-3.5 h-3.5 fill-white" />
-                      <span>Play Inside PROZ</span>
-                    </Link>
+                  <div className="px-3.5 pb-3.5 flex items-center gap-2">
+                    {h.isPlayable && h.watchHref ? (
+                      <Link
+                        href={h.watchHref}
+                        className="flex-1 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center justify-center gap-1.5"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-white" />
+                        <span>Play Inside PROZ</span>
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          setSelectedVrMeta({
+                            ...h,
+                            studioName: h.studio,
+                            image: h.cover,
+                            vrFormat: h.subType,
+                            details: h.synopsis,
+                          })
+                        }
+                        className="flex-1 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5"
+                      >
+                        <span>View Metadata</span>
+                      </button>
+                    )}
                     <button
                       onClick={() => toggleFavorite(h.id)}
                       className="p-2 rounded-xl bg-white/5 border border-white/10"
@@ -1138,61 +1472,97 @@ function RestrictedContent() {
                 </div>
               ))}
             </div>
+
+            {activeTab === 'hentai' && filteredHentai.length > 0 && (
+              <div className="flex justify-center pt-2">
+                <button
+                  onClick={handleLoadMoreHentai}
+                  className="px-5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/35 border border-purple-500/30 text-xs font-bold text-purple-200"
+                >
+                  Load More Hentai &amp; 3D (Page {hentaiPage + 1})
+                </button>
+              </div>
+            )}
           </section>
         )}
 
-        {/* 8. PHOTO GALLERIES (Inside Gallery & 18+ Ecosystem) */}
+        {/* 8. ADULT PHOTO GALLERIES (Categorized Multi-Photo Sets & Stills) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'galleries') && (
           <section className="space-y-4">
-            <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-cyan-400" />
-              <span>Adult Photo Galleries ({galleries.length})</span>
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {galleries.map((gal) => (
-                <button
-                  key={gal.id}
-                  onClick={() => setLightboxGallery({ title: gal.title, images: gal.images || (gal.coverPath ? [gal.coverPath] : []) })}
-                  className="text-left group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-400/50 transition"
-                >
-                  <div className="aspect-video bg-slate-900 relative overflow-hidden">
-                    <img
-                      src={gal.coverPath || ''}
-                      alt={gal.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      loading="lazy"
-                    />
-                    <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300">
-                      {gal.imageCount} Photos
-                    </span>
-                  </div>
-                  <div className="p-3.5">
-                    <h4 className="text-sm font-bold text-white truncate">{gal.title}</h4>
-                    <p className="text-[11px] text-slate-400 truncate">
-                      {gal.studio?.name || 'Stash Photography'} • {gal.date}
-                    </p>
-                  </div>
-                </button>
-              ))}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <h2 className="text-xl font-black text-white flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-cyan-400" />
+                <span>Adult Photo Galleries ({filteredGalleries.length})</span>
+              </h2>
+              <div className="flex flex-wrap gap-1.5">
+                {['All', 'Performer Portrait Sets', 'Adult Scene Stills', 'Hentai & Anime CG', 'VR & 3D Stills'].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setGalleryCatFilter(cat)}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                      galleryCatFilter === cat
+                        ? 'bg-cyan-600 text-white border-cyan-500'
+                        : 'bg-white/5 text-slate-300 border-white/10'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {filteredGalleries.length === 0 ? (
+              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 text-center text-xs text-slate-400">
+                No adult photo galleries matched &ldquo;{galleryCatFilter}&rdquo;.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {(activeTab === 'all' ? filteredGalleries.slice(0, 8) : filteredGalleries).map((gal) => (
+                  <button
+                    key={gal.id}
+                    onClick={() => setLightboxGallery({ title: gal.title, images: gal.images || (gal.coverPath ? [gal.coverPath] : []) })}
+                    className="text-left group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-400/50 transition"
+                  >
+                    <div className="aspect-video bg-slate-900 relative overflow-hidden">
+                      <img
+                        src={gal.coverPath || ''}
+                        alt={gal.title}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300">
+                        {gal.imageCount} Photos
+                      </span>
+                    </div>
+                    <div className="p-3.5">
+                      <h4 className="text-sm font-bold text-white truncate">{gal.title}</h4>
+                      <p className="text-[11px] text-slate-400 truncate">
+                        {gal.studio?.name || 'Stash Photography'} • {gal.tags?.[0]?.name || gal.date}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
-        {/* 9. TUBE HUB (Section 2E — Explicit External Portal Limitation Notices, Zero Paywall Bypass) */}
+        {/* 9. TUBE HUB (24 Categorized Popular Sites — External Portal Directory) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'tubes') && (
           <section className="space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="text-xl font-black text-white flex items-center gap-2">
                   <Globe className="w-5 h-5 text-emerald-400" />
-                  <span>Tube Hub Directory</span>
+                  <span>Tube Hub Directory ({filteredTubes.length})</span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Categorized external provider portals. Sites that do not offer open embed streams are clearly labeled as External Reference Only.
+                  Categorized external adult sites &amp; portals. Direct in-app scraping/bypass is intentionally disabled.
                 </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {['All', 'Full Feature', 'HD Studio', 'Creator'].map((c) => (
+                {['All', 'Mainstream HD Tubes', '4K & Full Length', 'Hentai & 3D Tubes', 'VR Adult Hubs', 'Creator & Studio Hubs'].map((c) => (
                   <button
                     key={c}
                     onClick={() => setTubeCatFilter(c)}
@@ -1241,7 +1611,8 @@ function RestrictedContent() {
                         <img
                           src={tube.logo}
                           alt={tube.name}
-                          className="w-11 h-11 rounded-xl object-cover border border-white/10"
+                          referrerPolicy="no-referrer"
+                          className="w-10 h-10 rounded-xl object-contain bg-slate-900 p-1 border border-white/10"
                         />
                         <div>
                           <h4 className="text-sm font-bold text-white">{tube.name}</h4>
@@ -1324,7 +1695,7 @@ function RestrictedContent() {
                         >
                           <div className="aspect-video bg-slate-900">
                             {sc.paths?.screenshot && (
-                              <img src={sc.paths.screenshot} alt={sc.title} className="w-full h-full object-cover" />
+                              <img src={sc.paths.screenshot} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                             )}
                           </div>
                           <div className="p-2.5">
@@ -1385,6 +1756,53 @@ function RestrictedContent() {
           images={lightboxGallery.images}
           onClose={() => setLightboxGallery(null)}
         />
+      )}
+
+      {selectedVrMeta && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-[#0B0F1A] border border-cyan-500/30 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                  {selectedVrMeta.vrFormat} • StashDB Metadata
+                </span>
+                <h3 className="text-lg font-black text-white mt-2">{selectedVrMeta.title}</h3>
+                <p className="text-xs text-purple-300 mt-0.5">{selectedVrMeta.studioName}</p>
+              </div>
+              <button
+                onClick={() => setSelectedVrMeta(null)}
+                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-white"
+              >
+                Close
+              </button>
+            </div>
+
+            {selectedVrMeta.image && (
+              <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
+                <img
+                  src={selectedVrMeta.image}
+                  alt={selectedVrMeta.title}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              {selectedVrMeta.details || 'Indexed StashDB metadata entry. Connect a matching local Stash server file to stream directly inside PROZ.'}
+            </p>
+
+            {Array.isArray(selectedVrMeta.performers) && selectedVrMeta.performers.length > 0 && (
+              <p className="text-xs text-slate-400">
+                <strong className="text-white">Performers:</strong> {selectedVrMeta.performers.join(', ')}
+              </p>
+            )}
+
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200">
+              Metadata Only — No matching local VR/CGI video file is currently linked to your personal Stash server for this record.
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

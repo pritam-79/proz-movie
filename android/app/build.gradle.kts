@@ -10,8 +10,8 @@ android {
         applicationId = "com.prozmovie.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 9
-        versionName = "0.09"
+        versionCode = 10
+        versionName = "0.09.1"
     }
 
     signingConfigs {
@@ -42,3 +42,4 @@ android {
 dependencies {
     implementation("androidx.core:core:1.15.0")
 }
+

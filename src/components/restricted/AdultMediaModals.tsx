@@ -55,6 +55,7 @@ export function PhotoGalleryModal({
         <img
           src={images[idx]}
           alt={`${title} #${idx + 1}`}
+          referrerPolicy="no-referrer"
           className="max-h-full max-w-full object-contain rounded-2xl border border-white/10 shadow-2xl"
         />
         {images.length > 1 && (
@@ -85,7 +86,7 @@ export function PhotoGalleryModal({
                 i === idx ? 'border-cyan-400' : 'border-white/10 opacity-60 hover:opacity-100'
               }`}
             >
-              <img src={img} alt={`Thumb ${i + 1}`} className="w-full h-full object-cover" />
+              <img src={img} alt={`Thumb ${i + 1}`} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
@@ -171,6 +172,7 @@ export function PerformerProfileModal({
                   <img
                     src={p.imageUrl || p.imagePath}
                     alt={p.name}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -279,7 +281,7 @@ export function PerformerProfileModal({
                       onClick={() => onOpenPhotos(`${p.name} Photos`, profile.photos)}
                       className="w-24 h-28 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0"
                     >
-                      <img src={img} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={img} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -305,6 +307,7 @@ export function PerformerProfileModal({
                           <img
                             src={sc.paths.screenshot}
                             alt={sc.title}
+                            referrerPolicy="no-referrer"
                             className="w-full h-full object-cover"
                           />
                         )}
@@ -338,7 +341,7 @@ export function PerformerProfileModal({
                     >
                       {sc.image && (
                         <div className="aspect-video rounded-lg overflow-hidden bg-slate-900">
-                          <img src={sc.image} alt={sc.title} className="w-full h-full object-cover" />
+                          <img src={sc.image} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         </div>
                       )}
                       <p className="text-xs font-bold text-white truncate">{sc.title}</p>
@@ -434,7 +437,7 @@ export function StudioDetailModal({
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
                 {studio.image ? (
-                  <img src={studio.image} alt={studio.name} className="w-full h-full object-cover" />
+                  <img src={studio.image} alt={studio.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                 ) : (
                   <Building className="w-8 h-8 text-purple-400" />
                 )}
@@ -463,7 +466,7 @@ export function StudioDetailModal({
                     >
                       <div className="aspect-video bg-slate-900 relative">
                         {sc.paths?.screenshot && (
-                          <img src={sc.paths.screenshot} alt={sc.title} className="w-full h-full object-cover" />
+                          <img src={sc.paths.screenshot} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         )}
                         <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                           <Play className="w-8 h-8 text-white fill-white" />
@@ -489,7 +492,7 @@ export function StudioDetailModal({
                     <div key={sc.id} className="rounded-xl bg-white/[0.03] border border-white/10 p-2.5 space-y-1.5">
                       {sc.image && (
                         <div className="aspect-video rounded-lg overflow-hidden bg-slate-900">
-                          <img src={sc.image} alt={sc.title} className="w-full h-full object-cover" />
+                          <img src={sc.image} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                         </div>
                       )}
                       <p className="text-xs font-bold text-white truncate">{sc.title}</p>
@@ -549,11 +552,56 @@ export function SeriesDetailModal({
   onClose: () => void;
 }) {
   const { getProgress } = useAuth();
+  const [loadingEpisodes, setLoadingEpisodes] = useState(false);
+  const [liveEpisodes, setLiveEpisodes] = useState<any[]>([]);
+  const [liveMeta, setLiveMeta] = useState<{ description?: string; cast?: string; language?: string } | null>(null);
+
+  useEffect(() => {
+    if (!series) return;
+    setLiveEpisodes([]);
+    setLiveMeta(null);
+
+    const seriesId = String(series.id || '');
+    if (series.isRealCine18Series || seriesId.startsWith('cine18-')) {
+      let active = true;
+      setLoadingEpisodes(true);
+      const cleanUid = seriesId.replace(/^cine18-/, '');
+      fetch(`/api/library/cine18-stream?uid=${encodeURIComponent(cleanUid)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (!active) return;
+          if (data.success) {
+            setLiveMeta({
+              description: data.description,
+              cast: data.cast,
+              language: data.language,
+            });
+            if (Array.isArray(data.episodes)) {
+              setLiveEpisodes(data.episodes);
+            }
+          }
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (active) setLoadingEpisodes(false);
+        });
+      return () => {
+        active = false;
+      };
+    }
+  }, [series]);
+
   if (!series) return null;
 
-  const episodeList = series.episodes || series.episodeList || [];
-  const firstStreamId = episodeList[0]?.streamId || 'stash-sc-001';
-  const resumeSec = getProgress(normalizeStashId(firstStreamId));
+  const isCine18 = Boolean(series.isRealCine18Series || String(series.id || '').startsWith('cine18-'));
+  const staticEpisodes = series.episodes || series.episodeList || [];
+  const episodesToShow = isCine18 ? liveEpisodes : staticEpisodes;
+  const baseWatchHref = series.watchHref || (isCine18 ? `/watch/${series.id}` : toStashWatchPath(normalizeStashId(series.id || '')));
+  const firstEpisodeHref =
+    isCine18 && episodesToShow[0]?.id
+      ? `${baseWatchHref}?episode=${encodeURIComponent(episodesToShow[0].id)}`
+      : baseWatchHref;
+  const resumeSec = getProgress(normalizeStashId(String(series.id || '')));
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
@@ -561,11 +609,14 @@ export function SeriesDetailModal({
         <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
           <div>
             <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase">
-              {series.subcategory || series.studio || 'Hot Web Series'}
+              {series.studio || series.subcategory || 'Hot Web Series'}
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white mt-2">{series.title}</h2>
             <p className="text-xs text-slate-400 mt-1">
-              {series.seasons} Season(s) • {series.episodesCount || episodeList.length} Episodes • {series.rating}/5.0
+              {series.subcategory ? `${series.subcategory} • ` : ''}
+              {episodesToShow.length > 0 ? `${episodesToShow.length} Episodes • ` : ''}
+              {(series.rating || 4.7)}/5.0
+              {liveMeta?.language ? ` • ${liveMeta.language}` : ''}
             </p>
           </div>
           <button onClick={onClose} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">
@@ -573,59 +624,87 @@ export function SeriesDetailModal({
           </button>
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">{series.synopsis}</p>
+        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          {liveMeta?.description || series.synopsis || `${series.studio || 'OTT'} exclusive hot web series & drama.`}
+        </p>
+
+        {liveMeta?.cast && (
+          <p className="text-xs text-cyan-300">
+            <strong className="text-slate-400">Cast:</strong> {liveMeta.cast}
+          </p>
+        )}
 
         <div className="flex items-center gap-3">
           <Link
-            href={toStashWatchPath(firstStreamId)}
+            href={firstEpisodeHref}
             onClick={onClose}
             className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg"
           >
             <Play className="w-4 h-4 fill-white" />
-            <span>{resumeSec > 5 ? 'Continue Watching' : 'Play Episode 1'}</span>
+            <span>{resumeSec > 5 ? 'Continue Watching' : 'Play Series Now'}</span>
           </Link>
         </div>
 
         <div className="space-y-2.5">
           <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-            <Tv className="w-3.5 h-3.5" /> Season 1 Episodes
+            <Tv className="w-3.5 h-3.5" /> Playable Episodes
           </h4>
-          <div className="space-y-2">
-            {episodeList.map((ep: any) => {
-              const epProg = getProgress(normalizeStashId(ep.streamId));
-              return (
-                <Link
-                  key={ep.ep}
-                  href={toStashWatchPath(ep.streamId)}
-                  onClick={onClose}
-                  className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 flex items-center justify-between gap-3 transition"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-20 aspect-video rounded-xl overflow-hidden bg-slate-900 shrink-0 relative">
-                      <img src={series.banner || series.poster} alt={ep.title} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white fill-white" />
+          {loadingEpisodes ? (
+            <div className="py-6 text-center text-xs text-slate-400">
+              Loading verified episodes &amp; direct streams...
+            </div>
+          ) : episodesToShow.length === 0 ? (
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-400 flex items-center justify-between gap-3">
+              <span>Single feature / direct web series stream ready inside player.</span>
+              <Link
+                href={baseWatchHref}
+                onClick={onClose}
+                className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold shrink-0"
+              >
+                Watch Now
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {episodesToShow.map((ep: any, idx: number) => {
+                const epHref = isCine18
+                  ? `${baseWatchHref}?episode=${encodeURIComponent(ep.id)}`
+                  : toStashWatchPath(ep.streamId);
+                const epNum = ep.episodeNumber || ep.ep || idx + 1;
+                const thumb = ep.thumbnailUrl || series.banner || series.poster;
+                return (
+                  <Link
+                    key={ep.id || epNum}
+                    href={epHref}
+                    onClick={onClose}
+                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 flex items-center justify-between gap-3 transition"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-20 aspect-video rounded-xl overflow-hidden bg-slate-900 shrink-0 relative">
+                        {thumb && (
+                          <img src={thumb} alt={ep.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                          <Play className="w-4 h-4 text-white fill-white" />
+                        </div>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm font-bold text-white truncate">
+                          E{epNum}: {ep.title}
+                        </p>
+                        <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                          <Clock className="w-3 h-3" /> {ep.duration || 'HD Stream'}
+                        </span>
                       </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-bold text-white truncate">
-                        E{ep.ep}: {ep.title}
-                      </p>
-                      <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                        <Clock className="w-3 h-3" /> {ep.duration}
-                        {epProg > 5 && (
-                          <span className="text-cyan-400 font-semibold">• Resume {Math.floor(epProg / 60)}m</span>
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 rounded-lg bg-rose-600/20 text-rose-300 border border-rose-500/30 text-[11px] font-bold shrink-0">
-                    Play
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+                    <span className="px-3 py-1 rounded-lg bg-rose-600/20 text-rose-300 border border-rose-500/30 text-[11px] font-bold shrink-0">
+                      Play
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -35,6 +35,8 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
   onSelectStudio,
 }) => {
   const [subTab, setSubTab] = useState<'scenes' | 'performers' | 'studios'>('scenes');
+  const [sceneTag, setSceneTag] = useState<'all' | 'hentai' | 'vr' | '3d'>('all');
+  const [perfGender, setPerfGender] = useState<'FEMALE' | 'MALE' | 'TRANSGENDER_FEMALE' | 'ALL'>('FEMALE');
   const [searchInput, setSearchInput] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -44,18 +46,22 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
   const [studios, setStudios] = useState<StashDbStudioItem[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [connected, setConnected] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('Connecting to backend StashDB service...');
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedScene, setSelectedScene] = useState<StashDbSceneItem | null>(null);
 
   const loadStashDb = useCallback(async () => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       const params = new URLSearchParams({
         mode: subTab,
         page: String(page),
       });
       if (activeQuery.trim()) params.set('q', activeQuery.trim());
+      if (subTab === 'scenes' && sceneTag !== 'all') params.set('tag', sceneTag);
+      if (subTab === 'performers') params.set('gender', perfGender);
 
       const res = await fetch(`/api/library/stash/stashdb?${params.toString()}`);
       const data = await res.json();
@@ -71,15 +77,19 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
         );
       } else {
         setConnected(false);
-        setStatusMessage(data.error || data.message || 'StashDB backend unavailable');
+        const msg = data.error || data.message || 'StashDB backend unavailable';
+        setErrorMsg(msg);
+        setStatusMessage(msg);
       }
     } catch (err: any) {
       setConnected(false);
-      setStatusMessage(err?.message || 'Unable to query backend StashDB service');
+      const msg = err?.message || 'Unable to query backend StashDB service';
+      setErrorMsg(msg);
+      setStatusMessage(msg);
     } finally {
       setLoading(false);
     }
-  }, [subTab, page, activeQuery]);
+  }, [subTab, page, activeQuery, sceneTag, perfGender]);
 
   useEffect(() => {
     loadStashDb();
@@ -180,6 +190,75 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
         </form>
       </div>
 
+      {/* Category Tag / Gender Filters */}
+      {subTab === 'scenes' && (
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { id: 'all', label: 'All Indexed Scenes (1.13M+)' },
+            { id: 'vr', label: 'Virtual Reality (39k+)' },
+            { id: '3d', label: '3D Available (15k+)' },
+            { id: 'hentai', label: 'Hentai (1,639+)' },
+          ].map((tagItem) => (
+            <button
+              key={tagItem.id}
+              onClick={() => {
+                setSceneTag(tagItem.id as any);
+                setPage(1);
+              }}
+              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition ${
+                sceneTag === tagItem.id
+                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
+                  : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-white'
+              }`}
+            >
+              {tagItem.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {subTab === 'performers' && (
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { id: 'FEMALE', label: 'Female Stars (70k+)' },
+            { id: 'MALE', label: 'Male Performers' },
+            { id: 'TRANSGENDER_FEMALE', label: 'Transgender Performers' },
+            { id: 'ALL', label: 'All Genders' },
+          ].map((g) => (
+            <button
+              key={g.id}
+              onClick={() => {
+                setPerfGender(g.id as any);
+                setPage(1);
+              }}
+              className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition ${
+                perfGender === g.id
+                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                  : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-white'
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Explicit Error & Retry State */}
+      {!loading && errorMsg && (
+        <div className="rounded-2xl bg-rose-950/30 border border-rose-500/30 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-xs text-rose-200 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button
+            onClick={loadStashDb}
+            className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shrink-0 self-start sm:self-auto"
+          >
+            Retry Connection
+          </button>
+        </div>
+      )}
+
       {/* Results Grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -208,6 +287,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                       <img
                         src={scene.image}
                         alt={scene.title}
+                        referrerPolicy="no-referrer"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
@@ -305,6 +385,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   <img
                     src={p.imageUrl}
                     alt={p.name}
+                    referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
@@ -342,7 +423,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
             >
               <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
                 {s.imageUrl ? (
-                  <img src={s.imageUrl} alt={s.name} className="w-full h-full object-contain" loading="lazy" />
+                  <img src={s.imageUrl} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" loading="lazy" />
                 ) : (
                   <Building className="w-5 h-5 text-purple-400" />
                 )}
@@ -399,7 +480,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
 
             {selectedScene.image && (
               <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-white/10">
-                <img src={selectedScene.image} alt={selectedScene.title} className="w-full h-full object-cover" />
+                <img src={selectedScene.image} alt={selectedScene.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
               </div>
             )}
 

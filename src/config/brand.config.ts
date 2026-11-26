@@ -70,8 +70,8 @@ export interface BrandConfig {
 
 export const brandConfig: BrandConfig = {
   name: "PROZ Entertainment",
-  version: "v0.09",
-  versionCode: 9,
+  version: "v0.09.1",
+  versionCode: 10,
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
   websiteTitle: "PROZ Entertainment – Stream Your World",
   description:
@@ -209,3 +209,4 @@ export const brandConfig: BrandConfig = {
     },
   },
 };
+

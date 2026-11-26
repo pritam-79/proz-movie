@@ -1,4 +1,4 @@
-# PROZ ENTERTAINMENT v0.09 — YOUR WORLD. YOUR ENTERTAINMENT.
+# PROZ ENTERTAINMENT v0.09.1 — YOUR WORLD. YOUR ENTERTAINMENT.
 
 A production-grade, authorized OTT streaming platform combined with a private, federated multi-user media library and restricted 18+ ecosystem inspired by the open-source **Peek Stash Browser** architecture.
 
@@ -117,3 +117,4 @@ This establishes the 23 relational tables and RLS security policies for federate
 
 Proprietary — Developed for PROZ MOVIE OTT Platform.
 Peek Stash Browser architecture patterns referenced under the MIT License.
+

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getNormalizedMockContent } from '@/lib/data/mockContent';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(_req: NextRequest) {
   try {
     const supabase = createSupabaseServerClient();

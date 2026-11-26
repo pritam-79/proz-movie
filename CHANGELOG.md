@@ -4,6 +4,26 @@ All notable changes to the PROZ Entertainment OTT & Stash platform are documente
 
 ---
 
+## [0.09.1] — 2026-11-26
+
+### Real Cine18 OTT Catalog, StashDB VR/Hentai/Performers, Dedup Continue Watching & Gallery Categories
+
+- **Real Cine18 Hot Web Series Catalog:** Hot Web Series section now fetches live series from Cine18 API (Ullu, Alt Balaji, Kooku, Neon, MxPlayer, Primeshots, etc.) — zero fake/hardcoded placeholder cards remain.
+- **SeriesDetailModal Live Episodes:** Series detail modal now fetches real live episodes from `/user/video-card/${uid}` endpoint on demand; removed hardcoded fake episode list.
+- **StashDB VR Section — Real Data:** 3D VR section now pulls genuine StashDB VR scenes (39k+) with format filter buttons (All/180°/360°/Positional/180° SBS). No more Ullu redirects.
+- **StashDB Hentai Section — Real Data:** Hentai section shows real StashDB hentai (1,639+) & 3D CGI (15k+) with correct subcategory filters (Playable Adult Animation/Hentai OVAs/3D CGI/VR Hentai).
+- **Genuine Performer Profiles:** Performers Directory shows real pornstars with gender filter pills (Female/Male/Trans/All) and Load More pagination.
+- **Deduplicated Continue Watching:** Each scene now appears once at the highest saved progress — eliminates the "Resume 0m + Resume 1m" duplicate bug.
+- **Adult Photo Galleries Live:** Photo Galleries now fetches real gallery data with category filter pills (All/Portrait Sets/Scene Stills/Hentai & Anime CG/VR & 3D Stills).
+- **Tube Hub Expanded to 24 Portals:** Tube Hub now lists 24 categorized portals with filter buttons (Free Tube/Premium/Niche/Regional/VR).
+- **StashDB Panel Improvements:** Always-visible tag chips (All Scenes/VR 39k+/3D 15k+/Hentai 1,639+), gender filter, Retry on error, explicit error messages.
+- **Studios Metadata Toggle:** Metadata-only toggle to browse community-indexed studios alongside playable ones.
+- **referrerPolicy Fix:** All thumbnail images use `referrerPolicy="no-referrer"` preventing hotlink blocks from StashDB, Cine18 & CDNs.
+- **New Backend API Routes:** `/api/library/stash/series`, `/api/library/stash/vr`, `/api/library/stash/hentai` created with `force-dynamic` to prevent stale static caching.
+- **Version Bump:** `versionCode = 10`, `versionName = "0.09.1"` across Next.js, Android Gradle, and MainActivity.
+
+---
+
 ## [0.09.0] — 2026-11-26
 
 ### Critical Player Overlay Fix, Auto Stash Backend, PRO 18+ Ecosystem & Persistent Updater

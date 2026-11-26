@@ -1,8 +1,8 @@
-# PROZ ENTERTAINMENT v0.09 — Implementation Status & Architecture Report
+# PROZ ENTERTAINMENT v0.09.1 — Implementation Status & Architecture Report
 
 **Platform Identity:** PROZ ENTERTAINMENT  
-**Version:** v0.09  
-**Previous Version:** v0.08  
+**Version:** v0.09.1  
+**Previous Version:** v0.09  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
 **Design System:** Obsidian Crimson & Liquid Glass (`#06080F`, `#0D111A`, `#E11D48`, `#8B5CF6`, `#22D3EE`)  
 **Release Date:** November 2026  
@@ -100,3 +100,4 @@ PROZ MOVIE operates under strict legal and ethical distribution standards:
 2. **Creative Commons:** PeerTube and Openverse content is distributed under Creative Commons licenses (CC-BY, CC-BY-SA, CC0) with author attribution preserved.
 3. **Commercial Content:** Mainstream Hollywood and Bollywood titles provide official streaming deep links to verified providers (Netflix, Prime Video, Disney+ Hotstar, JioCinema, Zee5) rather than unauthorized video streams.
 4. **Private Vault:** The Stash integration acts solely as a client-side proxy to user-owned, self-hosted media repositories with zero cloud scraping or DRM circumvention.
+

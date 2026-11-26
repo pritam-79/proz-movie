@@ -7,6 +7,8 @@ export async function GET(req: NextRequest) {
   try {
     const id = req.nextUrl.searchParams.get('id')?.trim();
     const q = req.nextUrl.searchParams.get('q')?.trim() || '';
+    const includeMetadataOnly =
+      req.nextUrl.searchParams.get('includeMetadata') === 'true';
 
     if (id) {
       const detail = await stashService.getStudioDetail(id);
@@ -16,9 +18,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, ...detail });
     }
 
-    const studios = await stashService.getStudiosDirectory(q);
+    const studios = await stashService.getStudiosDirectory({
+      q,
+      includeMetadataOnly,
+    });
     return NextResponse.json({
       success: true,
+      includeMetadataOnly,
       count: studios.length,
       studios,
     });

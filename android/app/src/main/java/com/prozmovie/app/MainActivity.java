@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionName;
             } catch (Exception e) {
-                return "0.09";
+                return "0.09.1";
             }
         }
 
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionCode;
             } catch (Exception e) {
-                return 9;
+                return 10;
             }
         }
     }
@@ -397,7 +397,7 @@ public class MainActivity extends Activity {
             try {
                 URL url = new URL(apkUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.08");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.09.1");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(30000);
                 conn.connect();
@@ -415,7 +415,7 @@ public class MainActivity extends Activity {
                 if (downloadDir == null) {
                     downloadDir = getCacheDir();
                 }
-                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.08.apk");
+                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.09.1.apk");
                 if (apkFile.exists()) {
                     apkFile.delete();
                 }
@@ -529,3 +529,4 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 }
+

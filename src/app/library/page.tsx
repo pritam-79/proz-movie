@@ -257,7 +257,7 @@ export default function LibraryPage() {
                   className="text-left rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-400/50 transition"
                 >
                   <div className="aspect-video bg-slate-900 relative">
-                    <img src={gal.coverPath || ''} alt={gal.title} className="w-full h-full object-cover" loading="lazy" />
+                    <img src={gal.coverPath || ''} alt={gal.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
                     <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300">
                       {gal.imageCount} Photos
                     </span>
@@ -434,7 +434,7 @@ export default function LibraryPage() {
                 >
                   <div className="aspect-[3/4] bg-slate-900">
                     {(p.image || p.imagePath) && (
-                      <img src={p.image || p.imagePath} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
+                      <img src={p.image || p.imagePath} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
                     )}
                   </div>
                   <div className="p-2">

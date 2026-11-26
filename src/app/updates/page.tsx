@@ -26,6 +26,54 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.09.1 Real Cine18 OTT Catalog",
+      desc: "Hot Web Series now shows live Ullu, Alt Balaji, Kooku, Neon, MxPlayer, Primeshots & more — zero fake placeholder cards, real episode list fetched live from Cine18 API.",
+      icon: Flame,
+      color: "text-rose-400"
+    },
+    {
+      title: "v0.09.1 StashDB VR / Hentai / 3D Real Data",
+      desc: "3D VR section pulls genuine StashDB VR scenes (39k+) with format filters; Hentai shows real StashDB hentai (1,639+) & 3D CGI (15k+). No more Ullu redirects.",
+      icon: Glasses,
+      color: "text-purple-400"
+    },
+    {
+      title: "v0.09.1 Genuine Performer Profiles",
+      desc: "Performers Directory shows real pornstars from StashDB + Cine18 with gender filter pills (Female/Male/Trans/All), Load More pagination, and correct thumbnails.",
+      icon: Sparkles,
+      color: "text-emerald-400"
+    },
+    {
+      title: "v0.09.1 Deduplicated Continue Watching",
+      desc: "No more duplicate Resume cards for the same scene — each title appears once at the highest saved progress, eliminating the 'Resume 0m + Resume 1m' double-entry bug.",
+      icon: Activity,
+      color: "text-cyan-400"
+    },
+    {
+      title: "v0.09.1 Adult Photo Galleries Live",
+      desc: "Photo Galleries now shows real gallery data with category filter pills: Portrait Sets, Scene Stills, Hentai & Anime CG, VR & 3D Stills.",
+      icon: Globe,
+      color: "text-amber-400"
+    },
+    {
+      title: "v0.09.1 Tube Hub Expanded to 24 Portals",
+      desc: "Tube Hub now lists 24 categorized adult portals with filter buttons (Free Tube / Premium / Niche / Regional / VR) instead of just 5 static links.",
+      icon: Layers,
+      color: "text-blue-400"
+    },
+    {
+      title: "v0.09.1 StashDB Panel Improvements",
+      desc: "StashDB panel always visible with tag chips (All Scenes / VR 39k+ / 3D 15k+ / Hentai 1,639+), gender filter, Retry button on error, explicit error messages.",
+      icon: Server,
+      color: "text-purple-400"
+    },
+    {
+      title: "v0.09.1 referrer Policy Fix",
+      desc: "All thumbnail images across the app now use referrerPolicy='no-referrer' preventing hotlink blocks from StashDB, Cine18 and other CDNs.",
+      icon: ShieldCheck,
+      color: "text-emerald-400"
+    },
+    {
       title: "v0.09 Video Player Overlay Fix & Playback Engine",
       desc: "Eliminated colliding upper navbars/update banners and duplicated overlays on /watch/*, aligned docked responsive player headers, added Picture-in-Picture, real resolution detection, Shaka audio/quality/subtitle tracks, and strict playback state accuracy.",
       icon: Film,
@@ -179,7 +227,7 @@ export default function UpdatesPage() {
             PROZ ENTERTAINMENT {brandConfig.version}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Video Player Overlay &amp; PiP Fixes, Demon Slayer Catalog Repair, Automated Stash &amp; StashDB Backend Service, Organized PRO 18+ Ecosystem in Gallery, and Persistent Smart Update Checks across Android, iOS, Windows, macOS, Linux, and Web.
+            Video Player Overlay &amp; PiP Fixes, Demon Slayer Catalog Repair, Automated Stash &amp; StashDB Backend Service, Real Cine18 OTT Catalog, Genuine StashDB VR/Hentai/Performers, Deduplicated Continue Watching, 24 Tube Portals &amp; Gallery Categories across Android, iOS, Windows, macOS, Linux, and Web.
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
