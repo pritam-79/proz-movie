@@ -20,6 +20,7 @@ android/app/build/
 # Environment variables
 .env*.local
 .admin-credentials.json
+.proz-vault.enc
 
 # Debug logs
 npm-debug.log*

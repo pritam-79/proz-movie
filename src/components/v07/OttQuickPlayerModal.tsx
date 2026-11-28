@@ -167,33 +167,33 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 sm:p-6">
-      <div className="relative w-full max-w-4xl rounded-3xl bg-[#0D111A] border border-white/15 shadow-2xl overflow-hidden">
+      <div className="relative w-full max-w-4xl rounded-3xl cinema-card bg-proz-navy border border-proz-border shadow-2xl overflow-hidden">
         {/* Top Modal Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-[#0A0E16]">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-proz-border/70 bg-proz-elevated/80">
           <div className="flex items-center gap-2.5 min-w-0">
             {item.playableType === 'live_hls' ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-600/20 text-rose-400 border border-rose-500/40 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-proz-purple/20 text-proz-purple border border-proz-purple/40 text-[11px] font-bold">
                 <Radio className="w-3 h-3 animate-pulse" /> LIVE HLS
               </span>
             ) : item.playableType === 'drm_test' ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-600/20 text-purple-300 border border-purple-500/40 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-proz-cyan/20 text-proz-cyan border border-proz-cyan/40 text-[11px] font-bold">
                 <ShieldCheck className="w-3 h-3" /> EME / DRM
               </span>
             ) : item.playableType === 'full_stream' ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-600/20 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 text-[11px] font-bold">
                 <Play className="w-3 h-3 fill-current" /> FULL PLAYABLE
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[11px] font-bold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[11px] font-bold">
                 <Film className="w-3 h-3" /> {item.rightsLabel}
               </span>
             )}
-            <h3 className="text-sm sm:text-base font-bold text-white truncate">{item.title}</h3>
+            <h3 className="text-sm sm:text-base font-bold text-proz-white truncate">{item.title}</h3>
           </div>
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition"
+            className="p-2 rounded-full bg-proz-elevated hover:bg-proz-purple/20 text-proz-grey hover:text-proz-white transition"
             aria-label="Close player"
           >
             <X className="w-4 h-4" />
@@ -204,20 +204,20 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
         <div className="relative aspect-video bg-black flex items-center justify-center">
           {loading ? (
             <div className="flex flex-col items-center gap-2 text-slate-300">
-              <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
+              <Loader2 className="w-8 h-8 animate-spin text-proz-cyan" />
               <span className="text-xs">Resolving verified media stream...</span>
             </div>
           ) : errorMsg ? (
             <div className="max-w-md text-center px-6 space-y-3">
               <AlertTriangle className="w-9 h-9 text-amber-400 mx-auto" />
-              <p className="text-sm text-slate-200">{errorMsg}</p>
+              <p className="text-sm text-slate-200 keep-white">{errorMsg}</p>
               <div className="flex items-center justify-center gap-3 pt-1">
                 {item.detailHref && (
                   <a
                     href={item.detailHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-semibold flex items-center gap-1.5 hover:bg-cyan-500/30"
+                    className="px-4 py-2 rounded-xl bg-proz-cyan/20 border border-proz-cyan/40 text-proz-cyan text-xs font-semibold flex items-center gap-1.5 hover:bg-proz-cyan/30"
                   >
                     <span>Open Source Page</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -226,7 +226,7 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
                 {item.id.startsWith('proz-') && (
                   <Link
                     href={`/watch/${item.id}`}
-                    className="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold hover:bg-purple-500"
+                    className="px-4 py-2 rounded-xl glass-button-primary text-xs font-semibold"
                   >
                     Open Full Player
                   </Link>
@@ -255,24 +255,24 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
             />
           ) : (
             <div className="text-center px-6 space-y-3">
-              <Sparkles className="w-8 h-8 text-purple-400 mx-auto" />
-              <p className="text-sm text-slate-200">
-                Catalog & Channel Index Entry ({item.providerName})
+              <Sparkles className="w-8 h-8 text-proz-purple mx-auto" />
+              <p className="text-sm text-slate-200 keep-white">
+                Catalog &amp; Channel Index Entry ({item.providerName})
               </p>
               <div className="flex justify-center gap-3">
                 {item.detailHref.startsWith('/') ? (
                   <Link
                     href={item.detailHref}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold"
+                    className="px-5 py-2.5 rounded-xl glass-button-primary text-xs font-bold"
                   >
-                    Browse Channel & Episodes
+                    Browse Channel &amp; Episodes
                   </Link>
                 ) : (
                   <a
                     href={item.detailHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold inline-flex items-center gap-1.5"
+                    className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white keep-white text-xs font-bold inline-flex items-center gap-1.5"
                   >
                     <span>View Official Listing</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -284,11 +284,11 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
         </div>
 
         {/* Footer Metadata & Stream Provenance */}
-        <div className="px-5 py-4 bg-[#0B0F18] border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="px-5 py-4 bg-proz-elevated/70 border-t border-proz-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="space-y-1 max-w-2xl">
-            <p className="text-slate-300 line-clamp-2">{item.description}</p>
-            <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-              <span className="text-cyan-400 font-semibold">{item.providerName}</span>
+            <p className="text-proz-grey line-clamp-2">{item.description}</p>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] text-proz-grey">
+              <span className="text-proz-cyan font-semibold">{item.providerName}</span>
               <span>•</span>
               <span>{item.subCategory}</span>
               <span>•</span>
@@ -296,7 +296,7 @@ export const OttQuickPlayerModal: React.FC<OttQuickPlayerModalProps> = ({
               {drmInfo?.note && (
                 <>
                   <span>•</span>
-                  <span className="text-purple-300">{drmInfo.note}</span>
+                  <span className="text-proz-purple">{drmInfo.note}</span>
                 </>
               )}
             </div>

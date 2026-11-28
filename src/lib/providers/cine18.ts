@@ -102,7 +102,7 @@ export class Cine18Adapter implements BaseProviderAdapter {
       try {
         const res = await fetch(url, {
           signal: AbortSignal.timeout(timeoutMs),
-          headers: { 'Accept': 'application/json', 'User-Agent': 'PROZEntertainment/0.09.1' },
+          headers: { 'Accept': 'application/json', 'User-Agent': 'PROZMovie/0.09.02' },
           next: { revalidate: 300 }
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

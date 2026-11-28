@@ -178,6 +178,17 @@ export const VERIFIED_CHANNEL_MAP: Record<string, Partial<VerifiedChannelProfile
  * Automatically inspects and resolves channel integration status and official endpoints
  */
 export function resolveChannelProfile(channel: Channel): Channel {
+  // Preserve verified live API channels (e.g. Cine18 330+ active channels)
+  if (channel.providerId === 'cine18' && channel.channelUid) {
+    return {
+      ...channel,
+      integrationStatus: 'API Connected',
+      supportedPlaybackMethods: ['html5_mp4', 'direct_hls'],
+      syncEnabled: true,
+      country: channel.category === '18+ Exclusive' ? 'GLOBAL' : 'IN',
+    };
+  }
+
   const slug = channel.slug;
   const verified = VERIFIED_CHANNEL_MAP[slug];
 
@@ -202,7 +213,6 @@ export function resolveChannelProfile(channel: Channel): Channel {
     return {
       ...channel,
       providerId: 'restricted_adult',
-      officialWebsite: `https://duckduckgo.com/?q=${encodeURIComponent(channel.name + ' official streaming')}`,
       integrationStatus: 'Playback Restricted',
       supportedPlaybackMethods: ['official_web'],
       syncEnabled: false,
@@ -214,7 +224,6 @@ export function resolveChannelProfile(channel: Channel): Channel {
   return {
     ...channel,
     providerId: 'creator_studio',
-    officialWebsite: `https://www.google.com/search?q=${encodeURIComponent(channel.name + ' streaming app')}`,
     integrationStatus: 'Awaiting Verification',
     supportedPlaybackMethods: ['official_web'],
     syncEnabled: false,

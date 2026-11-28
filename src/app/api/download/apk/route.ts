@@ -5,6 +5,8 @@ import path from 'path';
 export async function GET() {
   try {
     const candidates = [
+      path.join(process.cwd(), 'public', 'download', 'PROZ-MOVIE-v0.09.02.apk'),
+      path.join(process.cwd(), 'PROZ-MOVIE-v0.09.02.apk'),
       path.join(process.cwd(), 'public', 'download', 'PROZ-MOVIE-v0.09.1.apk'),
       path.join(process.cwd(), 'PROZ-MOVIE-v0.09.1.apk'),
       path.join(process.cwd(), 'public', 'download', 'app-release.apk'),
@@ -41,7 +43,7 @@ export async function GET() {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.android.package-archive',
-        'Content-Disposition': 'attachment; filename="PROZ-MOVIE-v0.09.1.apk"',
+        'Content-Disposition': 'attachment; filename="PROZ-MOVIE-v0.09.02.apk"',
         'Content-Length': fileBuffer.length.toString(),
       },
     });

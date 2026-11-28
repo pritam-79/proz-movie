@@ -12,7 +12,7 @@ export async function POST() {
       success: true,
       jobId: `sync-${Date.now()}`,
       status: 'completed',
-      version: status.personalStash.version || 'v0.09 Backend Sync',
+      version: status.personalStash.version || 'v0.09.02 Backend Sync',
       summary: {
         scenesScanned: status.syncState.totalPlayableScenes,
         scenesUpdated: status.syncState.totalPlayableScenes,

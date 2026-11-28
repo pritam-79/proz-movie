@@ -28,7 +28,19 @@ export async function GET(request: NextRequest) {
       }))
       .filter((v) => Boolean(v.video_link));
 
-    const firstVideo = playableVideos[0] || videos[0];
+    const firstVideo = playableVideos[0];
+
+    if (!firstVideo?.video_link) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Upstream channel did not supply a playable video source URL for this entry.',
+          uid: cleanUid,
+          title: details.title,
+        },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       success: true,

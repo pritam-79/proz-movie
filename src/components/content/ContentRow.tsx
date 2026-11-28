@@ -48,25 +48,25 @@ export const ContentRow: React.FC<ContentRowProps> = ({
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             {icon ? (
-              <span className="text-rose-400 shrink-0">{icon}</span>
+              <span className="text-proz-purple shrink-0">{icon}</span>
             ) : (
-              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-rose-500 to-purple-500 shrink-0" />
+              <div className="w-1 h-5 rounded-full bg-gradient-to-b from-proz-purple to-proz-cyan shrink-0" />
             )}
-            <h2 className="text-base sm:text-lg font-extrabold text-[#F8FAFC] tracking-tight truncate">{title}</h2>
+            <h2 className="text-base sm:text-lg font-extrabold text-proz-white tracking-tight truncate">{title}</h2>
             {badge && (
-              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase bg-rose-500/15 text-rose-300 border border-rose-500/30 shrink-0">
+              <span className="px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase bg-proz-purple/15 text-proz-purple border border-proz-purple/30 shrink-0">
                 {badge}
               </span>
             )}
           </div>
           {subtitle && (
-            <p className="text-xs text-[#94A3B8] mt-0.5 line-clamp-1">{subtitle}</p>
+            <p className="text-xs text-proz-grey mt-0.5 line-clamp-1">{subtitle}</p>
           )}
         </div>
         {viewAllHref && (
           <Link
             href={viewAllHref}
-            className="flex items-center gap-1 text-xs font-semibold text-cyan-400 hover:text-white transition-colors shrink-0"
+            className="flex items-center gap-1 text-xs font-semibold text-proz-cyan hover:text-proz-purple transition-colors shrink-0"
           >
             View All <ArrowRight className="w-3.5 h-3.5" />
           </Link>

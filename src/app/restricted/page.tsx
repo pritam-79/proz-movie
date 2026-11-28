@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -31,11 +31,12 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { normalizeStashId, toStashWatchPath } from '@/lib/utils/streamUtils';
+import { normalizeStashId, toStashWatchPath, toImageProxyFallback } from '@/lib/utils/streamUtils';
+import { diagnosticFetch } from '@/lib/diagnostics/bugDetector';
 import { StashScene, StashGallery } from '@/types/library';
 import {
   VERIFIED_ADULT_TUBE_PORTALS,
-} from '@/lib/providers/stash';
+} from '@/lib/data/adultTubesData';
 import StashDbPanel from '@/components/stash/StashDbPanel';
 import {
   PerformerProfileModal,
@@ -43,6 +44,14 @@ import {
   SeriesDetailModal,
   StudioDetailModal,
 } from '@/components/restricted/AdultMediaModals';
+
+function imgFallback(e: React.SyntheticEvent<HTMLImageElement>, rawSrc?: string) {
+  const img = e.currentTarget;
+  if (!img.dataset.proxied && rawSrc && !rawSrc.startsWith('/') && !rawSrc.startsWith('data:')) {
+    img.dataset.proxied = '1';
+    img.src = toImageProxyFallback(rawSrc);
+  }
+}
 
 type RestrictedTab =
   | 'all'
@@ -78,10 +87,26 @@ function RestrictedContent() {
   const [studioFilter, setStudioFilter] = useState<string>('all');
   const [uploadKindFilter, setUploadKindFilter] = useState<'all' | 'video' | 'photo_gallery' | 'collection'>('all');
   const [hentaiSubcat, setHentaiSubcat] = useState<string>('All');
+  const [hentaiSort, setHentaiSort] = useState<'newest' | 'popular' | 'rating' | 'title'>('newest');
   const [seriesSubcat, setSeriesSubcat] = useState<string>('All');
+  const [seriesSort, setSeriesSort] = useState<'newest' | 'popular' | 'rating' | 'title'>('newest');
+  const [seriesPage, setSeriesPage] = useState<number>(1);
+  const [seriesTotalPages, setSeriesTotalPages] = useState<number>(1);
+  const [seriesCategories, setSeriesCategories] = useState<string[]>([
+    'All',
+    'Ullu',
+    'Alt Balaji',
+    'Kooku & Primeplay',
+    'MoodX & Hotshots',
+    'Regional & Drama',
+  ]);
   const [tubeCatFilter, setTubeCatFilter] = useState<string>('All');
   const [galleryCatFilter, setGalleryCatFilter] = useState<string>('All');
+  const [galleryPage, setGalleryPage] = useState<number>(1);
+  const [galleryHasMore, setGalleryHasMore] = useState<boolean>(false);
+  const [loadingMoreGalleries, setLoadingMoreGalleries] = useState<boolean>(false);
   const [perfGender, setPerfGender] = useState<'FEMALE' | 'MALE' | 'TRANSGENDER_FEMALE' | 'ALL'>('FEMALE');
+  const [perfLetter, setPerfLetter] = useState<string>('All');
   const [perfPlayableOnly, setPerfPlayableOnly] = useState<boolean>(false);
   const [perfPage, setPerfPage] = useState<number>(1);
   const [loadingMorePerfs, setLoadingMorePerfs] = useState<boolean>(false);
@@ -90,6 +115,9 @@ function RestrictedContent() {
   const [vrPage, setVrPage] = useState<number>(1);
   const [hentaiPage, setHentaiPage] = useState<number>(1);
   const [pageLimit, setPageLimit] = useState(24);
+  const [tubeNiches, setTubeNiches] = useState<any[]>([]);
+  const [tubeLiveClips, setTubeLiveClips] = useState<any[]>([]);
+  const didInitialLoadRef = useRef<boolean>(false);
 
   // Sync URL query param (?tab=...)
   useEffect(() => {
@@ -167,16 +195,18 @@ function RestrictedContent() {
         seriesRes,
         vrRes,
         hentaiRes,
+        tubesRes,
       ] = await Promise.all([
-        fetch('/api/library/servers').then((r) => r.json()).catch(() => ({})),
-        fetch('/api/library/stash/scenes').then((r) => r.json()).catch(() => ({})),
-        fetch('/api/library/stash/recent-uploads').then((r) => r.json()).catch(() => ({})),
-        fetch(`/api/library/stash/performers?gender=${perfGender}&page=1`).then((r) => r.json()).catch(() => ({})),
-        fetch(`/api/library/stash/studios?includeMetadata=${studioIncludeMeta}`).then((r) => r.json()).catch(() => ({})),
-        fetch('/api/library/stash/galleries').then((r) => r.json()).catch(() => ({})),
-        fetch('/api/library/stash/series').then((r) => r.json()).catch(() => ({})),
-        fetch(`/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=1`).then((r) => r.json()).catch(() => ({})),
-        fetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&page=1`).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/servers', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/stash/scenes', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/stash/recent-uploads', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch(`/api/library/stash/performers?gender=${perfGender}&letter=${perfLetter === 'All' ? '' : perfLetter}&page=1`, { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch(`/api/library/stash/studios?includeMetadata=${studioIncludeMeta}`, { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/stash/galleries?page=1', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/stash/series?page=1&sort=newest', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch(`/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=1`, { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&sort=${hentaiSort}&page=1`, { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
+        diagnosticFetch('/api/library/stash/tubes', { category: 'stash' }).then((r) => r.json()).catch(() => ({})),
       ]);
 
       if (srvRes?.backendStatus) setBackendStatus(srvRes.backendStatus);
@@ -187,8 +217,19 @@ function RestrictedContent() {
         setPerfPage(1);
       }
       if (Array.isArray(studiosRes?.studios)) setStudios(studiosRes.studios);
-      if (Array.isArray(galRes?.galleries)) setGalleries(galRes.galleries);
-      if (Array.isArray(seriesRes?.series)) setSeriesItems(seriesRes.series);
+      if (Array.isArray(galRes?.galleries)) {
+        setGalleries(galRes.galleries);
+        setGalleryHasMore(Boolean(galRes.hasMore));
+        setGalleryPage(1);
+      }
+      if (Array.isArray(seriesRes?.series)) {
+        setSeriesItems(seriesRes.series);
+        setSeriesTotalPages(seriesRes.totalPages || 1);
+        setSeriesPage(seriesRes.page || 1);
+        if (Array.isArray(seriesRes.categories) && seriesRes.categories.length > 0) {
+          setSeriesCategories(seriesRes.categories);
+        }
+      }
       if (Array.isArray(vrRes?.scenes)) {
         setVrItems(vrRes.scenes);
         setVrTotalCount(vrRes.totalCount || vrRes.scenes.length);
@@ -199,7 +240,10 @@ function RestrictedContent() {
         setHentaiTotalCount(hentaiRes.totalCount || hentaiRes.items.length);
         setHentaiPage(1);
       }
+      if (Array.isArray(tubesRes?.niches)) setTubeNiches(tubesRes.niches);
+      if (Array.isArray(tubesRes?.liveClips)) setTubeLiveClips(tubesRes.liveClips);
     } finally {
+      didInitialLoadRef.current = true;
       setLoadingData(false);
     }
     // Initial full load; individual filter toggles below update only their own slice without page flicker
@@ -207,15 +251,15 @@ function RestrictedContent() {
   }, []);
 
   useEffect(() => {
-    if (isUnlocked) {
+    if (isUnlocked && !didInitialLoadRef.current) {
       loadAllEcosystemData();
     }
   }, [isUnlocked, loadAllEcosystemData]);
 
-  // Smooth per-section filter updates (no full-page loading flash)
+  // Smooth per-section filter updates (skipped on initial mount since Promise.all handles mount)
   useEffect(() => {
-    if (!isUnlocked) return;
-    fetch(`/api/library/stash/performers?gender=${perfGender}&page=1`)
+    if (!isUnlocked || !didInitialLoadRef.current) return;
+    fetch(`/api/library/stash/performers?gender=${perfGender}&letter=${perfLetter === 'All' ? '' : perfLetter}&page=1`)
       .then((r) => r.json())
       .then((res) => {
         if (Array.isArray(res?.performers)) {
@@ -224,10 +268,10 @@ function RestrictedContent() {
         }
       })
       .catch(() => {});
-  }, [isUnlocked, perfGender]);
+  }, [isUnlocked, perfGender, perfLetter]);
 
   useEffect(() => {
-    if (!isUnlocked) return;
+    if (!isUnlocked || !didInitialLoadRef.current) return;
     fetch(`/api/library/stash/studios?includeMetadata=${studioIncludeMeta}`)
       .then((r) => r.json())
       .then((res) => {
@@ -237,7 +281,36 @@ function RestrictedContent() {
   }, [isUnlocked, studioIncludeMeta]);
 
   useEffect(() => {
-    if (!isUnlocked) return;
+    if (!isUnlocked || !didInitialLoadRef.current) return;
+    fetch(
+      `/api/library/stash/series?subcat=${encodeURIComponent(seriesSubcat)}&sort=${seriesSort}&page=${seriesPage}`
+    )
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.series)) {
+          setSeriesItems(res.series);
+          setSeriesTotalPages(res.totalPages || 1);
+        }
+      })
+      .catch(() => {});
+  }, [isUnlocked, seriesSubcat, seriesSort, seriesPage]);
+
+  useEffect(() => {
+    if (!isUnlocked || !didInitialLoadRef.current) return;
+    fetch(`/api/library/stash/galleries?category=${encodeURIComponent(galleryCatFilter)}&page=1`)
+      .then((r) => r.json())
+      .then((res) => {
+        if (Array.isArray(res?.galleries)) {
+          setGalleries(res.galleries);
+          setGalleryHasMore(Boolean(res.hasMore));
+          setGalleryPage(1);
+        }
+      })
+      .catch(() => {});
+  }, [isUnlocked, galleryCatFilter]);
+
+  useEffect(() => {
+    if (!isUnlocked || !didInitialLoadRef.current) return;
     fetch(`/api/library/stash/vr?format=${encodeURIComponent(vrFormatFilter)}&page=1`)
       .then((r) => r.json())
       .then((res) => {
@@ -251,8 +324,8 @@ function RestrictedContent() {
   }, [isUnlocked, vrFormatFilter]);
 
   useEffect(() => {
-    if (!isUnlocked) return;
-    fetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&page=1`)
+    if (!isUnlocked || !didInitialLoadRef.current) return;
+    fetch(`/api/library/stash/hentai?subcat=${encodeURIComponent(hentaiSubcat)}&sort=${hentaiSort}&page=1`)
       .then((r) => r.json())
       .then((res) => {
         if (Array.isArray(res?.items)) {
@@ -262,7 +335,7 @@ function RestrictedContent() {
         }
       })
       .catch(() => {});
-  }, [isUnlocked, hentaiSubcat]);
+  }, [isUnlocked, hentaiSubcat, hentaiSort]);
 
   // Separate lightweight recommendation refresh (prevents re-fetching whole library on favorite/progress tick)
   useEffect(() => {
@@ -286,7 +359,7 @@ function RestrictedContent() {
     setLoadingMorePerfs(true);
     try {
       const res = await fetch(
-        `/api/library/stash/performers?gender=${perfGender}&page=${nextPage}${
+        `/api/library/stash/performers?gender=${perfGender}&letter=${perfLetter === 'All' ? '' : perfLetter}&page=${nextPage}${
           searchQuery.trim() ? `&q=${encodeURIComponent(searchQuery.trim())}` : ''
         }`
       ).then((r) => r.json());
@@ -300,6 +373,31 @@ function RestrictedContent() {
       }
     } finally {
       setLoadingMorePerfs(false);
+    }
+  };
+
+  const handleLoadMoreGalleries = async () => {
+    if (loadingMoreGalleries || !galleryHasMore) return;
+    const nextPage = galleryPage + 1;
+    setLoadingMoreGalleries(true);
+    try {
+      const res = await fetch(
+        `/api/library/stash/galleries?category=${encodeURIComponent(galleryCatFilter)}&page=${nextPage}`
+      )
+        .then((r) => r.json())
+        .catch(() => ({}));
+      if (Array.isArray(res?.galleries) && res.galleries.length > 0) {
+        setGalleries((prev) => {
+          const seen = new Set(prev.map((g) => g.id));
+          return [...prev, ...res.galleries.filter((g: StashGallery) => !seen.has(g.id))];
+        });
+        setGalleryPage(nextPage);
+        setGalleryHasMore(Boolean(res.hasMore));
+      } else {
+        setGalleryHasMore(false);
+      }
+    } finally {
+      setLoadingMoreGalleries(false);
     }
   };
 
@@ -587,8 +685,8 @@ function RestrictedContent() {
   // ─── 18+ STRICT COMPLIANCE AGE GATE ───────────────────────────────────────────
   if (!isUnlocked) {
     return (
-      <div className="min-h-screen bg-[#06080F] flex flex-col items-center justify-center p-4 sm:p-6 text-center">
-        <div className="max-w-md w-full p-8 rounded-3xl bg-white/[0.03] backdrop-blur-2xl border border-rose-500/40 shadow-[0_0_50px_rgba(225,29,72,0.18)] space-y-6">
+      <div className="min-h-screen bg-proz-midnight text-proz-white flex flex-col items-center justify-center p-4 sm:p-6 text-center">
+        <div className="max-w-md w-full p-8 rounded-3xl cinema-card border border-proz-purple/40 shadow-purple-glow space-y-6">
           <div className="w-16 h-16 mx-auto rounded-2xl bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400">
             <ShieldAlert className="w-8 h-8" />
           </div>
@@ -650,9 +748,9 @@ function RestrictedContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#06080F] text-white pb-20">
+    <div className="min-h-screen bg-proz-midnight text-proz-white pb-20">
       {/* Header Banner */}
-      <div className="relative overflow-hidden border-b border-rose-500/20 bg-gradient-to-r from-rose-950/35 via-[#090D18] to-purple-950/30 py-8 sm:py-10">
+      <div className="relative overflow-hidden border-b border-proz-border/50 bg-gradient-to-r from-proz-purple/15 via-proz-navy to-proz-cyan/10 py-8 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div className="space-y-1.5">
@@ -691,16 +789,16 @@ function RestrictedContent() {
               <button
                 onClick={handleManualRefreshSync}
                 disabled={syncing}
-                className="px-4 py-2 rounded-xl bg-purple-600/25 hover:bg-purple-600/40 border border-purple-500/40 text-purple-200 text-xs font-bold flex items-center gap-1.5 transition"
+                className="px-4 py-2 rounded-xl glass-button-primary text-xs font-bold flex items-center gap-1.5 transition"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
                 <span>{syncing ? 'Syncing Library...' : 'Refresh Backend Sync'}</span>
               </button>
               <Link
                 href="/library"
-                className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-200 text-xs font-semibold flex items-center gap-1.5"
+                className="px-4 py-2 rounded-xl bg-proz-elevated hover:bg-proz-purple/15 border border-proz-border text-proz-white text-xs font-semibold flex items-center gap-1.5"
               >
-                <ImageIcon className="w-3.5 h-3.5 text-cyan-400" />
+                <ImageIcon className="w-3.5 h-3.5 text-proz-cyan" />
                 <span>Gallery Tab</span>
               </Link>
             </div>
@@ -1036,69 +1134,117 @@ function RestrictedContent() {
         {/* 3. HOT WEB SERIES & DRAMA (Real Live Cine18 OTT Catalog) */}
         {!loadingData && (activeTab === 'all' || activeTab === 'series') && (
           <section className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h2 className="text-xl font-black text-white flex items-center gap-2">
-                <Tv className="w-5 h-5 text-amber-400" />
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <h2 className="text-xl font-black text-proz-white flex items-center gap-2">
+                <Tv className="w-5 h-5 text-proz-cyan" />
                 <span>Hot Web Series &amp; Drama ({filteredSeries.length})</span>
               </h2>
-              <div className="flex flex-wrap gap-1.5">
-                {['All', 'Ullu', 'Alt Balaji', 'Kooku & Primeplay', 'MoodX & Hotshots', 'Regional & Drama'].map((sub) => (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {seriesCategories.map((sub) => (
                   <button
                     key={sub}
-                    onClick={() => setSeriesSubcat(sub)}
-                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                    onClick={() => {
+                      setSeriesSubcat(sub);
+                      setSeriesPage(1);
+                    }}
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border transition ${
                       seriesSubcat === sub
-                        ? 'bg-amber-600 text-white border-amber-500'
-                        : 'bg-white/5 text-slate-300 border-white/10'
+                        ? 'bg-proz-cyan text-slate-950 border-proz-cyan font-bold'
+                        : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
                     }`}
                   >
                     {sub}
                   </button>
                 ))}
+                <select
+                  value={seriesSort}
+                  onChange={(e) => {
+                    setSeriesSort(e.target.value as any);
+                    setSeriesPage(1);
+                  }}
+                  className="px-2.5 py-1 rounded-lg glass-input text-[11px] font-semibold"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="popular">Most Popular</option>
+                  <option value="rating">Top Rated</option>
+                  <option value="title">A–Z</option>
+                </select>
               </div>
             </div>
 
             {filteredSeries.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 text-center text-xs text-slate-400">
+              <div className="p-8 rounded-2xl cinema-card text-center text-xs text-proz-grey">
                 No hot web series matched &ldquo;{seriesSubcat}&rdquo;.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {(activeTab === 'all' ? filteredSeries.slice(0, 8) : filteredSeries.slice(0, pageLimit)).map((ser) => (
-                  <div
-                    key={ser.id}
-                    onClick={() => setSelectedSeries(ser)}
-                    className="cursor-pointer rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-amber-500/40 transition flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="aspect-video relative bg-slate-900">
-                        {ser.banner ? (
-                          <img src={ser.banner} alt={ser.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {(activeTab === 'all' ? filteredSeries.slice(0, 8) : filteredSeries).map((ser) => (
+                    <div
+                      key={ser.id}
+                      onClick={() => setSelectedSeries(ser)}
+                      className="cursor-pointer rounded-2xl overflow-hidden cinema-card cinema-card-hover flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="aspect-video relative bg-proz-elevated">
+                          {ser.banner ? (
+                            <img
+                              src={ser.banner}
+                              alt={ser.title}
+                              referrerPolicy="no-referrer"
+                              onError={(e) => imgFallback(e, ser.banner)}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs text-proz-grey">
+                              {ser.studio}
+                            </div>
+                          )}
+                          <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-proz-cyan text-slate-950 text-[10px] font-bold">
                             {ser.studio}
-                          </div>
-                        )}
-                        <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-amber-600/90 text-[10px] font-bold text-white">
-                          {ser.studio}
-                        </span>
-                        <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] text-amber-300 font-bold">
-                          ★ {(ser.rating || 4.7).toFixed(1)}
-                        </span>
+                          </span>
+                          <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] text-proz-cyan font-bold">
+                            ★ {(ser.rating || 4.7).toFixed(1)}
+                          </span>
+                        </div>
+                        <div className="p-3.5 space-y-1">
+                          <h3 className="text-sm font-black text-proz-white line-clamp-1">{ser.title}</h3>
+                          <p className="text-[11px] text-proz-cyan truncate">{ser.subcategory}</p>
+                          <p className="text-xs text-proz-grey line-clamp-2">{ser.synopsis}</p>
+                        </div>
                       </div>
-                      <div className="p-3.5 space-y-1">
-                        <h3 className="text-sm font-black text-white line-clamp-1">{ser.title}</h3>
-                        <p className="text-[11px] text-amber-300 truncate">{ser.subcategory}</p>
-                        <p className="text-xs text-slate-400 line-clamp-2">{ser.synopsis}</p>
+                      <div className="px-3.5 pb-3.5 flex items-center justify-between text-xs text-proz-cyan font-bold">
+                        <span>Open Episodes &amp; Play</span>
+                        <ChevronRight className="w-4 h-4" />
                       </div>
                     </div>
-                    <div className="px-3.5 pb-3.5 flex items-center justify-between text-xs text-cyan-400 font-bold">
-                      <span>Open Episodes &amp; Play</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </div>
+                  ))}
+                </div>
+                {activeTab === 'series' && seriesTotalPages > 1 && (
+                  <div className="flex items-center justify-center gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setSeriesPage((p) => Math.max(1, p - 1))}
+                      disabled={seriesPage <= 1}
+                      className="px-3.5 py-1.5 rounded-xl bg-proz-elevated border border-proz-border text-xs text-proz-white disabled:opacity-40"
+                    >
+                      Prev
+                    </button>
+                    <span className="text-xs text-proz-grey">
+                      Page <strong className="text-proz-white">{seriesPage}</strong> / {seriesTotalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setSeriesPage((p) => Math.min(seriesTotalPages, p + 1))}
+                      disabled={seriesPage >= seriesTotalPages}
+                      className="px-3.5 py-1.5 rounded-xl bg-proz-elevated border border-proz-border text-xs text-proz-white disabled:opacity-40"
+                    >
+                      Next
+                    </button>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </section>
         )}
@@ -1186,10 +1332,10 @@ function RestrictedContent() {
                   <button
                     key={g.id}
                     onClick={() => setPerfGender(g.id as any)}
-                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border transition ${
                       perfGender === g.id
-                        ? 'bg-rose-600 text-white border-rose-500'
-                        : 'bg-white/5 text-slate-300 border-white/10'
+                        ? 'bg-proz-purple text-white keep-white border-proz-purple'
+                        : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
                     }`}
                   >
                     {g.label}
@@ -1197,15 +1343,33 @@ function RestrictedContent() {
                 ))}
                 <button
                   onClick={() => setPerfPlayableOnly((v) => !v)}
-                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                  className={`px-3 py-1 rounded-lg text-[11px] font-semibold border transition ${
                     perfPlayableOnly
-                      ? 'bg-emerald-600 text-white border-emerald-500'
-                      : 'bg-white/5 text-emerald-300 border-emerald-500/30'
+                      ? 'bg-emerald-600 text-white keep-white border-emerald-500'
+                      : 'bg-proz-elevated text-emerald-400 border-emerald-500/30'
                   }`}
                 >
                   Playable Stars Only
                 </button>
               </div>
+            </div>
+
+            {/* A-Z Alphabetical Index Filter */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 no-scrollbar">
+              {['All', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')].map((ch) => (
+                <button
+                  key={ch}
+                  type="button"
+                  onClick={() => setPerfLetter(ch)}
+                  className={`px-2 py-1 rounded-md text-[10px] font-bold shrink-0 border transition ${
+                    perfLetter === ch
+                      ? 'bg-proz-purple text-white keep-white border-proz-purple'
+                      : 'bg-proz-elevated/60 border-proz-border/70 text-proz-grey hover:text-proz-white'
+                  }`}
+                >
+                  {ch}
+                </button>
+              ))}
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
@@ -1214,19 +1378,20 @@ function RestrictedContent() {
                   <button
                     key={p.id}
                     onClick={() => setSelectedPerformerId(p.id)}
-                    className="group text-left rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-rose-500/40 transition flex flex-col"
+                    className="group text-left rounded-2xl overflow-hidden cinema-card hover:border-proz-purple/50 transition flex flex-col"
                   >
-                    <div className="aspect-[3/4] w-full bg-slate-900 overflow-hidden relative">
+                    <div className="aspect-[3/4] w-full bg-proz-elevated overflow-hidden relative">
                       {p.image ? (
                         <img
                           src={p.image}
                           alt={p.name}
                           referrerPolicy="no-referrer"
+                          onError={(e) => imgFallback(e, p.image)}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-500">
+                        <div className="w-full h-full flex items-center justify-center text-proz-grey">
                           <Users className="w-8 h-8" />
                         </div>
                       )}
@@ -1295,29 +1460,38 @@ function RestrictedContent() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {(activeTab === 'all' ? filteredVr.slice(0, 6) : filteredVr).map((vr) =>
-                vr.isPlayable && vr.matchedSceneId ? (
+              {(activeTab === 'all' ? filteredVr.slice(0, 6) : filteredVr).map((vr) => {
+                const vrWatchHref =
+                  vr.watchHref || (vr.isPlayable && vr.matchedSceneId ? toStashWatchPath(vr.matchedSceneId) : '');
+                return vrWatchHref ? (
                   <Link
                     key={vr.id}
-                    href={toStashWatchPath(vr.matchedSceneId)}
-                    className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-emerald-500/35 hover:border-emerald-400 transition flex flex-col justify-between"
+                    href={vrWatchHref}
+                    className="group rounded-2xl overflow-hidden cinema-card border border-emerald-500/40 hover:border-proz-cyan transition flex flex-col justify-between"
                   >
                     <div>
-                      <div className="aspect-video bg-slate-900 relative">
+                      <div className="aspect-video bg-proz-elevated relative">
                         {vr.image && (
-                          <img src={vr.image} alt={vr.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                          <img
+                            src={vr.image}
+                            alt={vr.title}
+                            referrerPolicy="no-referrer"
+                            onError={(e) => imgFallback(e, vr.image)}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
                         )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-cyan-600/90 text-[10px] font-bold text-white">
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-proz-cyan text-slate-950 text-[10px] font-bold">
                           {vr.vrFormat}
                         </span>
-                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-emerald-600/90 text-[10px] font-bold text-white">
-                          Playable
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-emerald-600/95 text-[10px] font-bold text-white keep-white">
+                          Playable VR
                         </span>
                       </div>
                       <div className="p-3.5 space-y-1">
-                        <h3 className="text-sm font-bold text-white line-clamp-1">{vr.title}</h3>
-                        <p className="text-xs text-cyan-300 truncate">{vr.studioName}</p>
-                        <p className="text-[11px] text-slate-400 truncate">
+                        <h3 className="text-sm font-bold text-proz-white line-clamp-1">{vr.title}</h3>
+                        <p className="text-xs text-proz-cyan truncate">{vr.studioName}</p>
+                        <p className="text-[11px] text-proz-grey truncate">
                           {(vr.performers || []).slice(0, 3).join(', ') || 'VR Performer'}
                         </p>
                       </div>
@@ -1327,37 +1501,44 @@ function RestrictedContent() {
                   <button
                     key={vr.id}
                     onClick={() => setSelectedVrMeta(vr)}
-                    className="text-left group rounded-2xl overflow-hidden bg-white/[0.03] border border-cyan-500/25 hover:border-cyan-400 transition flex flex-col justify-between"
+                    className="text-left group rounded-2xl overflow-hidden cinema-card hover:border-proz-cyan transition flex flex-col justify-between"
                   >
                     <div className="w-full">
-                      <div className="aspect-video bg-slate-900 relative">
+                      <div className="aspect-video bg-proz-elevated relative">
                         {vr.image ? (
-                          <img src={vr.image} alt={vr.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" loading="lazy" />
+                          <img
+                            src={vr.image}
+                            alt={vr.title}
+                            referrerPolicy="no-referrer"
+                            onError={(e) => imgFallback(e, vr.image)}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs text-slate-500">
+                          <div className="w-full h-full flex items-center justify-center text-xs text-proz-grey">
                             {vr.studioName}
                           </div>
                         )}
-                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-cyan-600/90 text-[10px] font-bold text-white">
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-proz-cyan text-slate-950 text-[10px] font-bold">
                           {vr.vrFormat}
                         </span>
-                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-zinc-900/90 border border-white/15 text-[10px] font-bold text-slate-300">
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/80 border border-white/15 text-[10px] font-bold text-white keep-white">
                           Metadata Only
                         </span>
                       </div>
                       <div className="p-3.5 space-y-1">
-                        <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition line-clamp-1">
+                        <h3 className="text-sm font-bold text-proz-white group-hover:text-proz-cyan transition line-clamp-1">
                           {vr.title}
                         </h3>
-                        <p className="text-xs text-cyan-300 truncate">{vr.studioName}</p>
-                        <p className="text-[11px] text-slate-400 truncate">
+                        <p className="text-xs text-proz-cyan truncate">{vr.studioName}</p>
+                        <p className="text-[11px] text-proz-grey truncate">
                           {(vr.performers || []).slice(0, 3).join(', ') || vr.date || 'VR Archive'}
                         </p>
                       </div>
                     </div>
                   </button>
-                )
-              )}
+                );
+              })}
             </div>
 
             {activeTab === 'vr' && filteredVr.length > 0 && (
@@ -1386,20 +1567,30 @@ function RestrictedContent() {
                   Playable 18+ adult animation plus StashDB Hentai OVAs &amp; 3D CGI (strictly consenting adults).
                 </p>
               </div>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap items-center gap-1.5">
                 {['All', 'Playable Adult Animation', 'Hentai OVAs', '3D CGI', 'VR Hentai'].map((sub) => (
                   <button
                     key={sub}
                     onClick={() => setHentaiSubcat(sub)}
-                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border transition ${
                       hentaiSubcat === sub
-                        ? 'bg-purple-600 text-white border-purple-500'
-                        : 'bg-white/5 text-slate-300 border-white/10'
+                        ? 'bg-proz-purple text-white keep-white border-proz-purple'
+                        : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
                     }`}
                   >
                     {sub}
                   </button>
                 ))}
+                <select
+                  value={hentaiSort}
+                  onChange={(e) => setHentaiSort(e.target.value as any)}
+                  className="px-2.5 py-1 rounded-lg glass-input text-[11px] font-semibold"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="popular">Popular</option>
+                  <option value="rating">Top Rated</option>
+                  <option value="title">A–Z</option>
+                </select>
               </div>
             </div>
 
@@ -1495,14 +1686,14 @@ function RestrictedContent() {
                 <span>Adult Photo Galleries ({filteredGalleries.length})</span>
               </h2>
               <div className="flex flex-wrap gap-1.5">
-                {['All', 'Performer Portrait Sets', 'Adult Scene Stills', 'Hentai & Anime CG', 'VR & 3D Stills'].map((cat) => (
+                {['All', 'Portrait Sets', 'Scene Stills', 'Hentai & Anime CG', 'VR & 3D Stills'].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setGalleryCatFilter(cat)}
-                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border ${
+                    className={`px-3 py-1 rounded-lg text-[11px] font-semibold border transition ${
                       galleryCatFilter === cat
-                        ? 'bg-cyan-600 text-white border-cyan-500'
-                        : 'bg-white/5 text-slate-300 border-white/10'
+                        ? 'bg-proz-cyan text-slate-950 border-proz-cyan font-bold'
+                        : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
                     }`}
                   >
                     {cat}
@@ -1512,38 +1703,53 @@ function RestrictedContent() {
             </div>
 
             {filteredGalleries.length === 0 ? (
-              <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/10 text-center text-xs text-slate-400">
+              <div className="p-8 rounded-2xl cinema-card text-center text-xs text-proz-grey">
                 No adult photo galleries matched &ldquo;{galleryCatFilter}&rdquo;.
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {(activeTab === 'all' ? filteredGalleries.slice(0, 8) : filteredGalleries).map((gal) => (
-                  <button
-                    key={gal.id}
-                    onClick={() => setLightboxGallery({ title: gal.title, images: gal.images || (gal.coverPath ? [gal.coverPath] : []) })}
-                    className="text-left group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-cyan-400/50 transition"
-                  >
-                    <div className="aspect-video bg-slate-900 relative overflow-hidden">
-                      <img
-                        src={gal.coverPath || ''}
-                        alt={gal.title}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        loading="lazy"
-                      />
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-cyan-300">
-                        {gal.imageCount} Photos
-                      </span>
-                    </div>
-                    <div className="p-3.5">
-                      <h4 className="text-sm font-bold text-white truncate">{gal.title}</h4>
-                      <p className="text-[11px] text-slate-400 truncate">
-                        {gal.studio?.name || 'Stash Photography'} • {gal.tags?.[0]?.name || gal.date}
-                      </p>
-                    </div>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {(activeTab === 'all' ? filteredGalleries.slice(0, 8) : filteredGalleries).map((gal) => (
+                    <button
+                      key={gal.id}
+                      onClick={() => setLightboxGallery({ title: gal.title, images: gal.images || (gal.coverPath ? [gal.coverPath] : []) })}
+                      className="text-left group rounded-2xl overflow-hidden cinema-card hover:border-proz-cyan/60 transition"
+                    >
+                      <div className="aspect-video bg-proz-elevated relative overflow-hidden">
+                        <img
+                          src={gal.coverPath || ''}
+                          alt={gal.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => imgFallback(e, gal.coverPath)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        <span className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] font-bold text-proz-cyan">
+                          {gal.imageCount} Photos
+                        </span>
+                      </div>
+                      <div className="p-3.5">
+                        <h4 className="text-sm font-bold text-proz-white truncate">{gal.title}</h4>
+                        <p className="text-[11px] text-proz-grey truncate">
+                          {gal.studio?.name || 'Stash Photography'} • {gal.tags?.[0]?.name || gal.date}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {galleryHasMore && activeTab === 'galleries' && (
+                  <div className="flex justify-center pt-2">
+                    <button
+                      type="button"
+                      onClick={handleLoadMoreGalleries}
+                      disabled={loadingMoreGalleries}
+                      className="px-5 py-2 rounded-xl bg-proz-cyan/20 hover:bg-proz-cyan/30 border border-proz-cyan/40 text-xs font-bold text-proz-cyan disabled:opacity-50"
+                    >
+                      {loadingMoreGalleries ? 'Loading Galleries...' : `Load More Galleries (Page ${galleryPage + 1})`}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </section>
         )}
@@ -1640,7 +1846,7 @@ function RestrictedContent() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => recordTubeAccess(tube.id)}
-                    className="py-2 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition"
+                    className="py-2 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 border border-proz-border text-proz-white text-xs font-semibold flex items-center justify-center gap-1.5 transition"
                   >
                     <span>Visit External Site</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -1648,6 +1854,61 @@ function RestrictedContent() {
                 </div>
               ))}
             </div>
+
+            {tubeNiches.length > 0 && (
+              <div className="space-y-3 pt-4 border-t border-proz-border/40">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-bold text-proz-cyan uppercase tracking-wider">
+                    Live Community Hubs &amp; Playable Channels ({tubeNiches.length})
+                  </h3>
+                  <span className="text-[11px] text-proz-grey">Click any hub to open in-app clips</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {tubeNiches.slice(0, 18).map((niche: any) => (
+                    <button
+                      key={niche.id}
+                      type="button"
+                      onClick={() => setSelectedStudioId(`redgifs-niche-${niche.id}`)}
+                      className="px-3 py-1.5 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 border border-proz-border text-xs font-semibold text-proz-white transition"
+                    >
+                      #{niche.name} ({Number(niche.gifs || 0).toLocaleString()})
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tubeLiveClips.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
+                {tubeLiveClips.slice(0, 12).map((clip: any) => (
+                  <Link
+                    key={clip.id}
+                    href={`/watch/${clip.id}`}
+                    className="group rounded-xl overflow-hidden cinema-card hover:border-proz-purple/60 transition flex flex-col"
+                  >
+                    <div className="aspect-video bg-proz-elevated relative overflow-hidden">
+                      {clip.poster || clip.thumbnail ? (
+                        <img
+                          src={clip.poster || clip.thumbnail}
+                          alt={clip.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => imgFallback(e, clip.poster || clip.thumbnail)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition"
+                          loading="lazy"
+                        />
+                      ) : null}
+                      <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-[9px] text-white keep-white font-bold">
+                        HD
+                      </span>
+                    </div>
+                    <div className="p-2">
+                      <p className="text-[11px] font-bold text-proz-white truncate">{clip.title}</p>
+                      <p className="text-[10px] text-proz-grey truncate">{clip.displayName}</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -1760,45 +2021,46 @@ function RestrictedContent() {
 
       {selectedVrMeta && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0B0F1A] border border-cyan-500/30 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="cinema-card bg-proz-navy border border-proz-cyan/40 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-proz-cyan/15 text-proz-cyan border border-proz-cyan/30">
                   {selectedVrMeta.vrFormat} • StashDB Metadata
                 </span>
-                <h3 className="text-lg font-black text-white mt-2">{selectedVrMeta.title}</h3>
-                <p className="text-xs text-purple-300 mt-0.5">{selectedVrMeta.studioName}</p>
+                <h3 className="text-lg font-black text-proz-white mt-2">{selectedVrMeta.title}</h3>
+                <p className="text-xs text-proz-purple mt-0.5">{selectedVrMeta.studioName}</p>
               </div>
               <button
                 onClick={() => setSelectedVrMeta(null)}
-                className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs font-bold text-white"
+                className="px-3 py-1.5 rounded-xl bg-proz-elevated hover:bg-proz-border text-xs font-bold text-proz-white"
               >
                 Close
               </button>
             </div>
 
             {selectedVrMeta.image && (
-              <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 border border-white/10">
+              <div className="aspect-video rounded-2xl overflow-hidden bg-proz-elevated border border-proz-border">
                 <img
                   src={selectedVrMeta.image}
                   alt={selectedVrMeta.title}
                   referrerPolicy="no-referrer"
+                  onError={(e) => imgFallback(e, selectedVrMeta.image)}
                   className="w-full h-full object-cover"
                 />
               </div>
             )}
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-proz-grey leading-relaxed">
               {selectedVrMeta.details || 'Indexed StashDB metadata entry. Connect a matching local Stash server file to stream directly inside PROZ.'}
             </p>
 
             {Array.isArray(selectedVrMeta.performers) && selectedVrMeta.performers.length > 0 && (
-              <p className="text-xs text-slate-400">
-                <strong className="text-white">Performers:</strong> {selectedVrMeta.performers.join(', ')}
+              <p className="text-xs text-proz-grey">
+                <strong className="text-proz-white">Performers:</strong> {selectedVrMeta.performers.join(', ')}
               </p>
             )}
 
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-200">
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-400">
               Metadata Only — No matching local VR/CGI video file is currently linked to your personal Stash server for this record.
             </div>
           </div>
@@ -1812,7 +2074,7 @@ export default function RestrictedPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#06080F] flex items-center justify-center text-xs text-slate-400">
+        <div className="min-h-screen bg-proz-midnight flex items-center justify-center text-xs text-proz-grey">
           Initializing PRO 18+ Ecosystem...
         </div>
       }

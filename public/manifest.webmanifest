@@ -1,12 +1,12 @@
 {
   "name": "PROZ Entertainment",
-  "short_name": "PROZ v0.09.1",
-  "version": "0.09.1",
-  "description": "PROZ Entertainment v0.09.1 — Multi-Platform Streaming & Stash Ecosystem",
+  "short_name": "PROZ v0.09.02",
+  "version": "0.09.02",
+  "description": "PROZ Entertainment v0.09.02 — Complete Obsidian Ember Redesign, All Channels & .ts Range Playback, RedGIFs/Stash/StashDB Ecosystem & Bug Detector",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#06080F",
-  "theme_color": "#080B12",
+  "background_color": "#07070A",
+  "theme_color": "#07070A",
   "icons": [
     {
       "src": "/brand/app-icon.svg",

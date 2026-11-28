@@ -5,9 +5,13 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const category = req.nextUrl.searchParams.get('category')?.trim() || 'All';
-    const q = req.nextUrl.searchParams.get('q')?.trim().toLowerCase() || '';
-    let galleries = await stashService.getPhotoGalleries(category);
+    const sp = req.nextUrl.searchParams;
+    const category = sp.get('category')?.trim() || 'All';
+    const q = sp.get('q')?.trim().toLowerCase() || '';
+    const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
+
+    const res = await stashService.getPhotoGalleries(category, page);
+    let galleries = res.galleries;
 
     if (q) {
       galleries = galleries.filter(
@@ -22,7 +26,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       category,
+      page,
       count: galleries.length,
+      totalCount: res.totalCount,
+      hasMore: res.hasMore,
       galleries,
     });
   } catch (error: any) {

@@ -48,13 +48,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({ featuredItems }) => {
         <img
           src={currentItem.backdropUrl}
           alt={currentItem.title}
+          referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center filter brightness-90 transform scale-102 transition-all duration-1000 ease-out"
         />
         
         {/* Cinematic Vignette Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-t from-proz-midnight via-proz-midnight/50 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-proz-midnight via-proz-midnight/70 to-transparent" />
-        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-proz-midnight/80 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-proz-midnight via-proz-midnight/55 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-proz-midnight via-proz-midnight/75 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-proz-midnight/85 to-transparent" />
       </div>
 
       {/* Hero Content Container */}

@@ -73,6 +73,11 @@ export const Footer: React.FC = () => {
                   Compare VIP Plans
                 </Link>
               </li>
+              <li>
+                <Link href="/settings" className="hover:text-proz-cyan transition-colors">
+                  Settings &amp; Bug Diagnostics
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -25,8 +25,8 @@ export async function fetchIptvLiveStreams(options: {
   if (!iptvCache || Date.now() - iptvCache.fetchedAt > CACHE_TTL_MS) {
     try {
       const [channelsRes, streamsRes] = await Promise.all([
-        fetch('https://iptv-org.github.io/api/channels.json', { signal: AbortSignal.timeout(12000) }),
-        fetch('https://iptv-org.github.io/api/streams.json', { signal: AbortSignal.timeout(12000) }),
+        fetch('https://iptv-org.github.io/api/channels.json', { signal: AbortSignal.timeout(20000) }),
+        fetch('https://iptv-org.github.io/api/streams.json', { signal: AbortSignal.timeout(20000) }),
       ]);
 
       if (!channelsRes.ok || !streamsRes.ok) {
@@ -100,16 +100,18 @@ export async function fetchIptvLiveStreams(options: {
         }
       }
 
-      iptvCache = {
-        channels: merged,
-        fetchedAt: Date.now(),
-      };
+      if (merged.length > 0) {
+        iptvCache = {
+          channels: merged,
+          fetchedAt: Date.now(),
+        };
+      }
     } catch {
       return iptvCache?.channels.slice(0, limit) || [];
     }
   }
 
-  let pool = iptvCache.channels;
+  let pool = iptvCache?.channels || [];
 
   if (options.country && options.country !== 'ALL') {
     const cc = options.country.toUpperCase();

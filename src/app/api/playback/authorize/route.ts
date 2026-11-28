@@ -165,12 +165,14 @@ export async function POST(req: NextRequest) {
       console.warn('Supabase playback authorization fell back:', e);
     }
 
-    // Dynamic remote metadata IDs (AniList, Kitsu, TVmaze, TMDB) authorize directly
+    // Dynamic remote metadata IDs (AniList, Kitsu, TVmaze, TMDB, RedGIFs, IPTV) authorize directly
     if (
       contentId.startsWith('anilist-') ||
       contentId.startsWith('kitsu-') ||
       contentId.startsWith('tvmaze-') ||
-      contentId.startsWith('tmdb-')
+      contentId.startsWith('tmdb-') ||
+      contentId.startsWith('redgifs-') ||
+      contentId.startsWith('iptv-')
     ) {
       const sessionToken = `proz_dynamic_sess_${Date.now()}`;
       return NextResponse.json({
@@ -186,7 +188,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Fallback: mock content authorization
+    // Fallback: mock content authorization (strictly reject mismatched demo clips)
     const mockContent = getNormalizedMockContent();
     const match = mockContent.find((c) => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
 
@@ -208,39 +210,19 @@ export async function POST(req: NextRequest) {
     const sessionToken = `proz_demo_session_${Date.now()}`;
     const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString();
 
-    const isDash = match.dashUrl || 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
-    const isHls = match.streamUrl?.includes('.m3u8')
-      ? match.streamUrl
-      : 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8';
-    const isMp4 = match.fallbackMp4?.endsWith('.mp4')
-      ? match.fallbackMp4
-      : 'https://archive.org/download/BigBuckBunny_124/Content/big_buck_bunny_720p_surround.mp4';
+    const { isMismatchedPlaceholderStream } = await import('@/lib/utils/streamUtils');
+    const cleanStream = match.streamUrl && !isMismatchedPlaceholderStream(match.streamUrl, match.title) ? match.streamUrl : null;
+    const cleanMp4 = match.fallbackMp4 && !isMismatchedPlaceholderStream(match.fallbackMp4, match.title) ? match.fallbackMp4 : null;
 
     return NextResponse.json({
       session: { token: sessionToken },
       sessionToken,
-      hlsUrl: isHls,
-      dashUrl: isDash,
-      fallbackMp4: isMp4,
-      drmConfig: {
-        keySystems: {
-          'com.widevine.alpha': {
-            licenseServerUri: process.env.WIDEVINE_LICENSE_URL || 'https://cwip-shaka-drm.appspot.com/no_auth'
-          },
-          'org.w3.clearkey': {
-            clearKeys: {
-              'nrQFDeRLSAKTLAvxUFRUiA': 'K8D899RhTJL6zpdMGHeTurnA'
-            }
-          }
-        }
-      },
-      subtitles: match.subtitles || [
-        { label: 'English', language: 'en', src: 'https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel-en.vtt' }
-      ],
-      audioTracks: match.audioTracks || [
-        { label: 'English [Original]', language: 'en' },
-        { label: 'Hindi [Dubbed]', language: 'hi' }
-      ],
+      hlsUrl: cleanStream && cleanStream.includes('.m3u8') ? cleanStream : null,
+      dashUrl: match.dashUrl || null,
+      fallbackMp4: cleanMp4 && cleanMp4.endsWith('.mp4') ? cleanMp4 : null,
+      drmConfig: null,
+      subtitles: match.subtitles || [],
+      audioTracks: match.audioTracks || [],
       expiresAt,
     });
   } catch (err) {

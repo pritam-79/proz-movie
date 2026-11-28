@@ -22,14 +22,15 @@ export const SubHeaderNav: React.FC = () => {
     { label: 'Asian Dramas', href: '/drama' },
     { label: 'Live TV', href: '/live', isLive: true },
     { label: 'Channels', href: '/channels' },
-    { label: 'Stash', href: '/library', isVault: true, badge: 'DB' },
+    { label: 'Gallery & Stash', href: '/library', isVault: true, badge: 'DB' },
     { label: 'Explore', href: '/explore' },
     { label: 'Ranking', href: '/ranking' },
     { label: '18+ Vault', href: '/restricted', isAdult: true },
+    { label: 'Diagnostics', href: '/settings' },
   ];
 
   return (
-    <div className="w-full bg-[#07090F]/92 backdrop-blur-xl border-b border-white/[0.08] sticky top-14 sm:top-16 z-30">
+    <div className="w-full cinema-nav sticky top-14 sm:top-16 z-30">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto scrollbar-none no-scrollbar py-2.5 text-xs">
           {tabs.map((tab) => {
@@ -39,14 +40,14 @@ export const SubHeaderNav: React.FC = () => {
               <Link
                 key={tab.href}
                 href={tab.href}
-                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold transition-all flex items-center gap-1.5 ${
+                className={`px-3.5 py-1.5 rounded-full whitespace-nowrap font-semibold transition-all flex items-center gap-1.5 border ${
                   isActive
-                    ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-lg shadow-rose-600/25'
+                    ? 'bg-gradient-to-r from-proz-purple to-orange-600 text-white keep-white border-transparent shadow-purple-glow'
                     : tab.isAdult
-                    ? 'bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20'
+                    ? 'bg-proz-purple/10 text-proz-purple border-proz-purple/25 hover:bg-proz-purple/20'
                     : tab.isVault
-                    ? 'bg-purple-500/10 text-purple-300 border border-purple-500/25 hover:bg-purple-500/20'
-                    : 'bg-white/[0.04] text-zinc-300 border border-white/[0.07] hover:bg-white/[0.09] hover:text-white'
+                    ? 'bg-proz-cyan/10 text-proz-cyan border-proz-cyan/25 hover:bg-proz-cyan/20'
+                    : 'bg-proz-elevated/60 text-proz-grey border-proz-border/45 hover:text-proz-white hover:border-proz-border'
                 }`}
               >
                 {tab.isLive && (
@@ -54,12 +55,12 @@ export const SubHeaderNav: React.FC = () => {
                 )}
                 <span>{tab.label}</span>
                 {tab.badge && (
-                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/30 font-bold">
+                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-proz-cyan/20 text-proz-cyan font-bold">
                     {tab.badge}
                   </span>
                 )}
                 {tab.isAdult && (
-                  <span className="text-[9px] px-1 py-0.2 rounded bg-rose-500/30 text-rose-200 font-bold">
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-proz-purple/25 text-proz-purple font-bold">
                     18+
                   </span>
                 )}

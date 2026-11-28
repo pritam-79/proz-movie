@@ -8,6 +8,8 @@
  *  - Multi-image Scene & Performer gallery harvesting
  */
 
+import { getResolvedServerEnv } from '@/lib/diagnostics/vaultConfig';
+
 export const STASHDB_TAG_IDS = {
   VR: '6458e5cf-4f65-400b-9067-582141e2a329',
   VIRTUAL_DATE: '08840e71-2431-43f1-a565-167e0515c449',
@@ -85,10 +87,11 @@ export function isConsentingAdultSafe(text?: string | null, tags?: string[]): bo
 }
 
 export function getStashDbEnvConfig() {
-  const endpoint = (process.env.STASHDB_ENDPOINT || DEFAULT_STASHDB_ENDPOINT).trim();
-  const apiKey = (process.env.STASHDB_API_KEY || '').trim();
+  const env = getResolvedServerEnv();
+  const endpoint = env.stashDbEndpoint || DEFAULT_STASHDB_ENDPOINT;
+  const apiKey = env.stashDbApiKey || '';
   return {
-    endpointConfigured: Boolean(process.env.STASHDB_ENDPOINT),
+    endpointConfigured: Boolean(env.stashDbEndpoint),
     isConfigured: Boolean(endpoint && apiKey),
     endpoint,
     apiKey,

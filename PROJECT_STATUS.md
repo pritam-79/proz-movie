@@ -1,10 +1,10 @@
-# PROZ ENTERTAINMENT v0.09.1 — Implementation Status & Architecture Report
+# PROZ ENTERTAINMENT v0.09.02 — Implementation Status & Architecture Report
 
 **Platform Identity:** PROZ ENTERTAINMENT  
-**Version:** v0.09.1  
-**Previous Version:** v0.09  
+**Version:** v0.09.02  
+**Previous Version:** v0.09.1  
 **Tagline:** YOUR WORLD. YOUR ENTERTAINMENT.  
-**Design System:** Obsidian Crimson & Liquid Glass (`#06080F`, `#0D111A`, `#E11D48`, `#8B5CF6`, `#22D3EE`)  
+**Design System:** Obsidian Onyx & Ember Crimson + Light Mode (`#07070A`, `#111218`, `#FF2E54`, `#F59E0B`, `#F5F6FA`)  
 **Release Date:** November 2026  
 **Repository:** [github.com/pritam-79/proz-movie](https://github.com/pritam-79/proz-movie)  
 **Live Production URL:** [proz-movie.vercel.app](https://proz-movie.vercel.app)

@@ -23,17 +23,17 @@ export const ActionButtonPair: React.FC<ActionButtonPairProps> = ({
       {moreHref ? (
         <Link
           href={moreHref}
-          className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl bg-[#1C202F]/90 hover:bg-[#252B3E] active:scale-98 border border-white/10 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-black/40 transition-all duration-200 group"
+          className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl cinema-card hover:border-proz-purple/60 active:scale-98 text-proz-white font-semibold text-xs sm:text-sm transition-all duration-200 group"
         >
-          <LayoutGrid className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          <LayoutGrid className="w-4 h-4 text-proz-purple group-hover:scale-110 transition-transform" />
           <span>More Wonderful</span>
         </Link>
       ) : (
         <button
           onClick={onMoreClick}
-          className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl bg-[#1C202F]/90 hover:bg-[#252B3E] active:scale-98 border border-white/10 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-black/40 transition-all duration-200 group"
+          className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl cinema-card hover:border-proz-purple/60 active:scale-98 text-proz-white font-semibold text-xs sm:text-sm transition-all duration-200 group"
         >
-          <LayoutGrid className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          <LayoutGrid className="w-4 h-4 text-proz-purple group-hover:scale-110 transition-transform" />
           <span>More Wonderful</span>
         </button>
       )}
@@ -41,9 +41,9 @@ export const ActionButtonPair: React.FC<ActionButtonPairProps> = ({
       {/* Button 2: [Change] (Refresh recommendations) */}
       <button
         onClick={onChangeClick}
-        className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl bg-[#1C202F]/90 hover:bg-[#252B3E] active:scale-98 border border-white/10 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-black/40 transition-all duration-200 group"
+        className="flex-1 max-w-[220px] flex items-center justify-center gap-2.5 py-3 px-5 rounded-2xl cinema-card hover:border-proz-cyan/60 active:scale-98 text-proz-white font-semibold text-xs sm:text-sm transition-all duration-200 group"
       >
-        <RefreshCw className="w-4 h-4 text-cyan-400 group-hover:rotate-180 transition-transform duration-500" />
+        <RefreshCw className="w-4 h-4 text-proz-cyan group-hover:rotate-180 transition-transform duration-500" />
         <span>Change</span>
       </button>
     </div>

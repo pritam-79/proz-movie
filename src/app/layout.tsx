@@ -2,13 +2,14 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { brandConfig } from '@/config/brand.config';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import AppChrome from '@/components/layout/AppChrome';
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: '#06080F',
+  themeColor: '#07070A',
 };
 
 export const metadata: Metadata = {
@@ -16,14 +17,14 @@ export const metadata: Metadata = {
   title: brandConfig.websiteTitle,
   description: brandConfig.description,
   keywords: [
+    'PROZ MOVIE',
     'PROZ Entertainment',
-    'Stream Your World',
+    '4K UHD Streaming',
     'Movies',
-    'Web Series',
+    'Hot Web Series',
     'Anime',
-    'Korean Drama',
-    '4K Streaming',
-    'Liquid Glass',
+    'Live Channels',
+    '3D VR Player',
   ],
   authors: [{ name: brandConfig.name }],
   icons: {
@@ -55,15 +56,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className="bg-[#06080F] text-proz-white min-h-screen flex flex-col font-sans selection:bg-rose-600 selection:text-white relative overflow-x-hidden">
-        <AuthProvider>
-          {/* Subtle Ambient Background Mesh Lights */}
-          <div className="fixed top-0 left-1/4 w-[420px] h-[420px] bg-rose-600/8 rounded-full blur-[140px] pointer-events-none -z-10" />
-          <div className="fixed top-1/3 right-1/4 w-[420px] h-[420px] bg-proz-purple/10 rounded-full blur-[140px] pointer-events-none -z-10" />
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className="bg-proz-midnight text-proz-white min-h-screen flex flex-col font-sans selection:bg-proz-purple selection:text-white relative overflow-x-hidden">
+        <ThemeProvider>
+          <AuthProvider>
+            {/* Obsidian Ember Ambient Stage Glows */}
+            <div className="fixed -top-24 left-1/4 w-[480px] h-[480px] bg-proz-purple/10 rounded-full blur-[160px] pointer-events-none -z-10" />
+            <div className="fixed top-1/3 right-1/5 w-[440px] h-[440px] bg-proz-cyan/10 rounded-full blur-[160px] pointer-events-none -z-10" />
 
-          <AppChrome>{children}</AppChrome>
-        </AuthProvider>
+            <AppChrome>{children}</AppChrome>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

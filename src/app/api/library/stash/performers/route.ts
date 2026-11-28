@@ -5,10 +5,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    const id = req.nextUrl.searchParams.get('id')?.trim();
-    const q = req.nextUrl.searchParams.get('q')?.trim() || '';
-    const page = Math.max(1, parseInt(req.nextUrl.searchParams.get('page') || '1', 10) || 1);
-    const genderParam = (req.nextUrl.searchParams.get('gender') || 'FEMALE').toUpperCase();
+    const sp = req.nextUrl.searchParams;
+    const id = sp.get('id')?.trim();
+    const q = sp.get('q')?.trim() || '';
+    const letter = sp.get('letter')?.trim() || '';
+    const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
+    const genderParam = (sp.get('gender') || 'FEMALE').toUpperCase();
     const gender = (
       ['FEMALE', 'MALE', 'TRANSGENDER_FEMALE', 'ALL'].includes(genderParam)
         ? genderParam
@@ -23,15 +25,19 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, ...profile });
     }
 
-    const performers = await stashService.getPerformersDirectory({ q, page, gender });
+    const performers = await stashService.getPerformersDirectory({ q, page, gender, letter });
     return NextResponse.json({
       success: true,
       page,
       gender,
+      letter: letter || 'All',
       count: performers.length,
       performers,
     });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message || 'Performer lookup failed' }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: error.message || 'Performer lookup failed' },
+      { status: 500 }
+    );
   }
 }

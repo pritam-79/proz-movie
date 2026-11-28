@@ -398,33 +398,33 @@ export default function SubscriptionPage() {
 
                 {/* Conditional Payment Method Fields */}
                 {paymentMethod === 'card' && (
-                  <div className="space-y-3 p-3.5 rounded-2xl bg-[#080B12]/60 border border-[#334155]/60 text-xs">
+                  <div className="space-y-3 p-3.5 rounded-2xl bg-proz-elevated/70 border border-proz-border text-xs">
                     <div>
-                      <label className="text-[10px] text-[#94A3B8] font-semibold block mb-1">Card Number (Visa / Mastercard / Amex)</label>
+                      <label className="text-[10px] text-proz-grey font-semibold block mb-1">Card Number (Visa / Mastercard / Amex)</label>
                       <input
                         type="text"
                         value={cardNumber}
                         onChange={(e) => setCardNumber(e.target.value)}
-                        className="w-full px-3 py-2 bg-[#111827] border border-[#334155]/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-proz-cyan"
+                        className="w-full px-3 py-2 glass-input rounded-xl font-mono text-xs"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-[10px] text-[#94A3B8] font-semibold block mb-1">Expiry Date</label>
+                        <label className="text-[10px] text-proz-grey font-semibold block mb-1">Expiry Date</label>
                         <input
                           type="text"
                           value={cardExpiry}
                           onChange={(e) => setCardExpiry(e.target.value)}
-                          className="w-full px-3 py-2 bg-[#111827] border border-[#334155]/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-proz-cyan"
+                          className="w-full px-3 py-2 glass-input rounded-xl font-mono text-xs"
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] text-[#94A3B8] font-semibold block mb-1">Security Code (CVC)</label>
+                        <label className="text-[10px] text-proz-grey font-semibold block mb-1">Security Code (CVC)</label>
                         <input
                           type="password"
                           value={cardCvc}
                           onChange={(e) => setCardCvc(e.target.value)}
-                          className="w-full px-3 py-2 bg-[#111827] border border-[#334155]/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-proz-cyan"
+                          className="w-full px-3 py-2 glass-input rounded-xl font-mono text-xs"
                         />
                       </div>
                     </div>
@@ -432,32 +432,32 @@ export default function SubscriptionPage() {
                 )}
 
                 {paymentMethod === 'upi' && (
-                  <div className="space-y-3 p-3.5 rounded-2xl bg-[#080B12]/60 border border-[#334155]/60 text-xs">
+                  <div className="space-y-3 p-3.5 rounded-2xl bg-proz-elevated/70 border border-proz-border text-xs">
                     <div>
-                      <label className="text-[10px] text-[#94A3B8] font-semibold block mb-1">UPI ID / VPA (Google Pay, PhonePe, Paytm, BHIM)</label>
+                      <label className="text-[10px] text-proz-grey font-semibold block mb-1">UPI ID / VPA (Google Pay, PhonePe, Paytm, BHIM)</label>
                       <input
                         type="text"
                         value={upiId}
                         onChange={(e) => setUpiId(e.target.value)}
                         placeholder="yourname@okaxis"
-                        className="w-full px-3 py-2 bg-[#111827] border border-[#334155]/60 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-proz-cyan"
+                        className="w-full px-3 py-2 glass-input rounded-xl font-mono text-xs"
                       />
                     </div>
-                    <p className="text-[10px] text-[#94A3B8]">A payment request will be sent to your UPI app for instant approval.</p>
+                    <p className="text-[10px] text-proz-grey">A payment request will be sent to your UPI app for instant approval.</p>
                   </div>
                 )}
 
                 {paymentMethod === 'paypal' && (
-                  <div className="p-3.5 rounded-2xl bg-[#080B12]/60 border border-[#334155]/60 text-xs space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-proz-elevated/70 border border-proz-border text-xs space-y-2">
                     <p className="text-xs text-proz-white font-semibold">PayPal One-Click Checkout</p>
-                    <p className="text-[11px] text-[#94A3B8]">You will be safely redirected to PayPal to complete your subscription authorization.</p>
+                    <p className="text-[11px] text-proz-grey">You will be safely redirected to PayPal to complete your subscription authorization.</p>
                   </div>
                 )}
 
                 {paymentMethod === 'crypto' && (
-                  <div className="p-3.5 rounded-2xl bg-[#080B12]/60 border border-[#334155]/60 text-xs space-y-2">
-                    <p className="text-xs text-amber-400 font-semibold">Web3 &amp; Crypto Payments</p>
-                    <p className="text-[11px] text-[#94A3B8]">Supports USDT (TRC-20 / ERC-20), Bitcoin, and Ethereum via decentralized gateway.</p>
+                  <div className="p-3.5 rounded-2xl bg-proz-elevated/70 border border-proz-border text-xs space-y-2">
+                    <p className="text-xs text-proz-cyan font-semibold">Web3 &amp; Crypto Payments</p>
+                    <p className="text-[11px] text-proz-grey">Supports USDT (TRC-20 / ERC-20), Bitcoin, and Ethereum via decentralized gateway.</p>
                   </div>
                 )}
 

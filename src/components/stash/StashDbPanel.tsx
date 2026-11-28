@@ -18,7 +18,7 @@ import {
   Clock,
   ExternalLink,
 } from 'lucide-react';
-import {
+import type {
   StashDbSceneItem,
   StashDbPerformerItem,
   StashDbStudioItem,
@@ -102,29 +102,29 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
   };
 
   return (
-    <div className="space-y-5 rounded-3xl bg-white/[0.02] border border-purple-500/25 p-4 sm:p-6">
+    <div className="space-y-5 rounded-3xl cinema-card p-4 sm:p-6">
       {/* Header Status Bar — strictly backend-managed (no manual API key inputs) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-proz-border/60 pb-4">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-bold uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-proz-purple/15 text-proz-purple border border-proz-purple/30 text-[11px] font-bold uppercase tracking-wider">
               <Database className="w-3.5 h-3.5" /> StashDB Metadata Catalogue
             </span>
             <span
               className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
                 connected
-                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                  : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  : 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
               }`}
             >
               {connected ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
               {statusMessage}
             </span>
           </div>
-          <h3 className="text-lg sm:text-xl font-black text-white">
+          <h3 className="text-lg sm:text-xl font-black text-proz-white">
             StashDB Community Metadata &amp; File Matcher
           </h3>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-proz-grey">
             Authenticated automatically through PROZ backend. Play actions appear only when a catalog item matches an actual playable media file in your library.
           </p>
         </div>
@@ -132,10 +132,10 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
         <button
           onClick={loadStashDb}
           disabled={loading}
-          className="px-3.5 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 text-purple-200 border border-purple-500/30 text-xs font-semibold flex items-center gap-1.5 transition shrink-0 self-start"
+          className="px-3.5 py-2 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 text-proz-white border border-proz-border text-xs font-semibold flex items-center gap-1.5 transition shrink-0 self-start"
           title="Refresh StashDB"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3.5 h-3.5 text-proz-purple ${loading ? 'animate-spin' : ''}`} />
           <span>Sync Catalogue</span>
         </button>
       </div>
@@ -159,8 +159,8 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                 }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 whitespace-nowrap transition ${
                   active
-                    ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-lg'
-                    : 'bg-white/[0.04] text-slate-300 hover:text-white border border-white/10'
+                    ? 'glass-button-primary shadow-purple-glow'
+                    : 'bg-proz-elevated text-proz-grey hover:text-proz-white border border-proz-border'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -172,18 +172,18 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
 
         <form onSubmit={handleSearch} className="flex items-center gap-2 w-full sm:w-80">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-proz-grey absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={`Search StashDB ${subTab}...`}
-              className="w-full pl-8 pr-3 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-white focus:border-purple-400 focus:outline-none"
+              className="w-full pl-8 pr-3 py-2 rounded-xl glass-input text-xs"
             />
           </div>
           <button
             type="submit"
-            className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold transition"
+            className="px-3.5 py-2 rounded-xl glass-button-primary text-xs font-semibold transition"
           >
             Search
           </button>
@@ -207,8 +207,8 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
               }}
               className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition ${
                 sceneTag === tagItem.id
-                  ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-                  : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-white'
+                  ? 'bg-proz-cyan/15 text-proz-cyan border-proz-cyan/40'
+                  : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
               }`}
             >
               {tagItem.label}
@@ -233,8 +233,8 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
               }}
               className={`px-3 py-1.5 rounded-full text-[11px] font-semibold border transition ${
                 perfGender === g.id
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
-                  : 'bg-white/[0.03] text-slate-400 border-white/10 hover:text-white'
+                  ? 'bg-proz-purple/15 text-proz-purple border-proz-purple/40'
+                  : 'bg-proz-elevated text-proz-grey border-proz-border hover:text-proz-white'
               }`}
             >
               {g.label}
@@ -245,17 +245,27 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
 
       {/* Explicit Error & Retry State */}
       {!loading && errorMsg && (
-        <div className="rounded-2xl bg-rose-950/30 border border-rose-500/30 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="text-xs text-rose-200 flex items-center gap-2">
+        <div className="rounded-2xl bg-rose-950/35 border border-rose-500/35 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-xs text-rose-200 keep-white flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{errorMsg}</span>
           </div>
-          <button
-            onClick={loadStashDb}
-            className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shrink-0 self-start sm:self-auto"
-          >
-            Retry Connection
-          </button>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+            {errorMsg.includes('STASHDB_API_KEY') && (
+              <Link
+                href="/settings"
+                className="px-3.5 py-1.5 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 border border-proz-border text-proz-white text-xs font-bold"
+              >
+                Settings Vault
+              </Link>
+            )}
+            <button
+              onClick={loadStashDb}
+              className="px-3.5 py-1.5 rounded-xl glass-button-primary text-xs font-bold"
+            >
+              Retry Connection
+            </button>
+          </div>
         </div>
       )}
 
@@ -263,12 +273,12 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-[16/11] rounded-2xl bg-white/[0.04] animate-pulse" />
+            <div key={i} className="aspect-[16/11] rounded-2xl bg-proz-elevated/60 animate-pulse" />
           ))}
         </div>
       ) : subTab === 'scenes' ? (
         scenes.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl bg-black/30 border border-white/10 text-xs text-slate-400">
+          <div className="text-center py-12 rounded-2xl bg-proz-elevated/50 border border-proz-border text-xs text-proz-grey">
             No StashDB scenes found matching &ldquo;{activeQuery || 'latest catalog'}&rdquo;.
           </div>
         ) : (
@@ -276,23 +286,30 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
             {scenes.map((scene) => (
               <div
                 key={scene.id}
-                className="group rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition-all flex flex-col justify-between"
+                className="group rounded-2xl overflow-hidden cinema-card border border-proz-border/60 hover:border-proz-purple/50 transition-all flex flex-col justify-between"
               >
                 <div
                   onClick={() => setSelectedScene(scene)}
                   className="cursor-pointer"
                 >
-                  <div className="relative aspect-video bg-slate-900 overflow-hidden">
+                  <div className="relative aspect-video bg-proz-elevated overflow-hidden">
                     {scene.image ? (
                       <img
                         src={scene.image}
                         alt={scene.title}
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          const img = e.currentTarget;
+                          if (!img.dataset.proxied && scene.image) {
+                            img.dataset.proxied = '1';
+                            img.src = `/api/library/image-proxy?url=${encodeURIComponent(scene.image)}`;
+                          }
+                        }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-950/60 to-slate-950 text-xs text-slate-400 p-3 text-center">
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-proz-purple/20 to-proz-midnight text-xs text-proz-grey p-3 text-center">
                         {scene.studioName}
                       </div>
                     )}
@@ -300,36 +317,36 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                     <span
                       className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                         scene.isPlayable
-                          ? 'bg-emerald-600/90 text-white border-emerald-400/50'
-                          : 'bg-zinc-900/90 text-zinc-300 border-white/15'
+                          ? 'bg-emerald-600/90 text-white keep-white border-emerald-400/50'
+                          : 'bg-black/80 text-zinc-200 keep-white border-white/15'
                       }`}
                     >
                       {scene.isPlayable ? 'Matched Playable File' : 'Metadata Only'}
                     </span>
                     {scene.durationSeconds > 0 && (
-                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/75 text-[10px] text-slate-200 font-mono">
+                      <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 text-[10px] text-white keep-white font-mono">
                         {Math.floor(scene.durationSeconds / 60)}m
                       </span>
                     )}
                   </div>
 
                   <div className="p-3 space-y-1.5">
-                    <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-1">
+                    <h4 className="text-xs sm:text-sm font-bold text-proz-white line-clamp-1">
                       {scene.title}
                     </h4>
-                    <p className="text-[11px] text-purple-300 truncate">
+                    <p className="text-[11px] text-proz-purple truncate">
                       {scene.studioName}
                       {scene.performers.length > 0
                         ? ` • ${scene.performers.map((p) => p.name).slice(0, 2).join(', ')}`
                         : ''}
                     </p>
-                    <p className="text-[10px] text-slate-400 line-clamp-2">{scene.details}</p>
+                    <p className="text-[10px] text-proz-grey line-clamp-2">{scene.details}</p>
                     {scene.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 pt-0.5">
                         {scene.tags.slice(0, 3).map((t) => (
                           <span
                             key={t}
-                            className="px-1.5 py-0.5 rounded bg-white/5 text-[9px] text-slate-400"
+                            className="px-1.5 py-0.5 rounded bg-proz-elevated text-[9px] text-proz-grey"
                           >
                             {t}
                           </span>
@@ -344,7 +361,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   {scene.isPlayable && scene.matchedSceneId ? (
                     <Link
                       href={toStashWatchPath(scene.matchedSceneId)}
-                      className="flex-1 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-purple-600 text-white text-[11px] font-bold flex items-center justify-center gap-1 hover:opacity-95 transition"
+                      className="flex-1 py-1.5 rounded-lg glass-button-primary text-[11px] font-bold flex items-center justify-center gap-1 hover:opacity-95 transition"
                     >
                       <Play className="w-3 h-3 fill-white" />
                       <span>Play Matched Media</span>
@@ -352,9 +369,9 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   ) : (
                     <button
                       onClick={() => setSelectedScene(scene)}
-                      className="flex-1 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition"
+                      className="flex-1 py-1.5 rounded-lg bg-proz-elevated/80 hover:bg-proz-elevated border border-proz-border text-proz-grey hover:text-proz-white text-[11px] font-semibold flex items-center justify-center gap-1 transition"
                     >
-                      <Info className="w-3 h-3 text-cyan-400" />
+                      <Info className="w-3 h-3 text-proz-cyan" />
                       <span>View Metadata Only</span>
                     </button>
                   )}
@@ -378,26 +395,33 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   setPage(1);
                 }
               }}
-              className="group text-left rounded-2xl overflow-hidden bg-white/[0.03] border border-white/10 hover:border-purple-500/40 transition flex flex-col"
+              className="group text-left rounded-2xl overflow-hidden cinema-card border border-proz-border/60 hover:border-proz-purple/50 transition flex flex-col"
             >
-              <div className="aspect-[3/4] w-full bg-slate-900 overflow-hidden">
+              <div className="aspect-[3/4] w-full bg-proz-elevated overflow-hidden">
                 {p.imageUrl ? (
                   <img
                     src={p.imageUrl}
                     alt={p.name}
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.proxied && p.imageUrl) {
+                        img.dataset.proxied = '1';
+                        img.src = `/api/library/image-proxy?url=${encodeURIComponent(p.imageUrl)}`;
+                      }
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-slate-500 text-xs">
+                  <div className="w-full h-full flex items-center justify-center text-proz-grey text-xs">
                     <Users className="w-6 h-6" />
                   </div>
                 )}
               </div>
               <div className="p-2.5">
-                <h4 className="text-xs font-bold text-white truncate">{p.name}</h4>
-                <p className="text-[10px] text-slate-400 truncate">
+                <h4 className="text-xs font-bold text-proz-white truncate">{p.name}</h4>
+                <p className="text-[10px] text-proz-grey truncate">
                   {p.country || 'Metadata'} • {(p.sceneCount || 0).toLocaleString()} credits
                 </p>
               </div>
@@ -419,18 +443,31 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   setPage(1);
                 }
               }}
-              className="text-left rounded-2xl bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 hover:border-purple-500/40 p-4 flex items-center gap-3 transition"
+              className="text-left rounded-2xl cinema-card hover:border-proz-purple/50 border border-proz-border/60 p-4 flex items-center gap-3 transition"
             >
-              <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-proz-elevated border border-proz-border shrink-0 flex items-center justify-center">
                 {s.imageUrl ? (
-                  <img src={s.imageUrl} alt={s.name} referrerPolicy="no-referrer" className="w-full h-full object-contain" loading="lazy" />
+                  <img
+                    src={s.imageUrl}
+                    alt={s.name}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (!img.dataset.proxied && s.imageUrl) {
+                        img.dataset.proxied = '1';
+                        img.src = `/api/library/image-proxy?url=${encodeURIComponent(s.imageUrl)}`;
+                      }
+                    }}
+                    className="w-full h-full object-contain"
+                    loading="lazy"
+                  />
                 ) : (
-                  <Building className="w-5 h-5 text-purple-400" />
+                  <Building className="w-5 h-5 text-proz-purple" />
                 )}
               </div>
               <div className="min-w-0">
-                <h4 className="text-sm font-bold text-white truncate">{s.name}</h4>
-                <span className="text-[11px] text-slate-400">Open Studio Metadata →</span>
+                <h4 className="text-sm font-bold text-proz-white truncate">{s.name}</h4>
+                <span className="text-[11px] text-proz-grey">Open Studio Metadata →</span>
               </div>
             </button>
           ))}
@@ -443,16 +480,16 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300 disabled:opacity-40"
+            className="px-3.5 py-1.5 rounded-xl bg-proz-elevated border border-proz-border text-xs text-proz-white disabled:opacity-40"
           >
             Prev
           </button>
-          <span className="text-xs text-slate-400">
-            Page <strong className="text-white">{page}</strong>
+          <span className="text-xs text-proz-grey">
+            Page <strong className="text-proz-white">{page}</strong>
           </span>
           <button
             onClick={() => setPage((p) => p + 1)}
-            className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-slate-300"
+            className="px-3.5 py-1.5 rounded-xl bg-proz-elevated border border-proz-border text-xs text-proz-white"
           >
             Next
           </button>
@@ -462,39 +499,51 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
       {/* Metadata Detail Drawer / Modal */}
       {selectedScene && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#0B0F1A] border border-purple-500/30 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="cinema-card bg-proz-navy border border-proz-purple/40 rounded-3xl max-w-xl w-full p-5 sm:p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-proz-purple/15 text-proz-purple border border-proz-purple/30">
                   {selectedScene.isPlayable ? 'Playable Media Linked' : 'StashDB Metadata Only — Not a Video File'}
                 </span>
-                <h4 className="text-lg font-black text-white mt-2">{selectedScene.title}</h4>
+                <h4 className="text-lg font-black text-proz-white mt-2">{selectedScene.title}</h4>
               </div>
               <button
                 onClick={() => setSelectedScene(null)}
-                className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300"
+                className="p-1.5 rounded-lg bg-proz-elevated hover:bg-proz-purple/20 text-proz-grey hover:text-proz-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {selectedScene.image && (
-              <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-white/10">
-                <img src={selectedScene.image} alt={selectedScene.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+              <div className="aspect-video rounded-2xl overflow-hidden bg-black border border-proz-border">
+                <img
+                  src={selectedScene.image}
+                  alt={selectedScene.title}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const img = e.currentTarget;
+                    if (!img.dataset.proxied && selectedScene.image) {
+                      img.dataset.proxied = '1';
+                      img.src = `/api/library/image-proxy?url=${encodeURIComponent(selectedScene.image)}`;
+                    }
+                  }}
+                  className="w-full h-full object-cover"
+                />
               </div>
             )}
 
-            <p className="text-xs text-slate-300 leading-relaxed">{selectedScene.details}</p>
+            <p className="text-xs text-proz-grey leading-relaxed">{selectedScene.details}</p>
 
-            <div className="grid grid-cols-2 gap-3 text-xs bg-white/[0.03] border border-white/10 rounded-xl p-3">
+            <div className="grid grid-cols-2 gap-3 text-xs bg-proz-elevated/60 border border-proz-border rounded-xl p-3">
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase">Studio</span>
-                <span className="font-semibold text-white">{selectedScene.studioName}</span>
+                <span className="text-proz-grey block text-[10px] uppercase">Studio</span>
+                <span className="font-semibold text-proz-white">{selectedScene.studioName}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[10px] uppercase">Release Date / Duration</span>
-                <span className="font-semibold text-white flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-cyan-400" />
+                <span className="text-proz-grey block text-[10px] uppercase">Release Date / Duration</span>
+                <span className="font-semibold text-proz-white flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-proz-cyan" />
                   {selectedScene.date || 'N/A'} • {Math.floor((selectedScene.durationSeconds || 0) / 60)}m
                 </span>
               </div>
@@ -502,7 +551,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
 
             {selectedScene.performers.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-400 uppercase">Cast / Performers</p>
+                <p className="text-[11px] font-bold text-proz-grey uppercase">Cast / Performers</p>
                 <div className="flex flex-wrap gap-2">
                   {selectedScene.performers.map((perf) => (
                     <button
@@ -511,7 +560,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                         setSelectedScene(null);
                         onSelectPerformer?.(`stashdb-${perf.id}`);
                       }}
-                      className="px-2.5 py-1 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-200 text-xs font-medium hover:bg-rose-500/25"
+                      className="px-2.5 py-1 rounded-full bg-proz-purple/15 border border-proz-purple/30 text-proz-purple text-xs font-medium hover:bg-proz-purple/25"
                     >
                       {perf.name}
                     </button>
@@ -522,14 +571,14 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
 
             {selectedScene.tags.length > 0 && (
               <div className="space-y-1.5">
-                <p className="text-[11px] font-bold text-slate-400 uppercase flex items-center gap-1">
-                  <Tag className="w-3 h-3 text-cyan-400" /> Tags
+                <p className="text-[11px] font-bold text-proz-grey uppercase flex items-center gap-1">
+                  <Tag className="w-3 h-3 text-proz-cyan" /> Tags
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {selectedScene.tags.map((t) => (
                     <span
                       key={t}
-                      className="px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-300"
+                      className="px-2 py-0.5 rounded-full bg-proz-elevated border border-proz-border text-[11px] text-proz-grey"
                     >
                       #{t}
                     </span>
@@ -542,7 +591,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
               {selectedScene.isPlayable && selectedScene.matchedSceneId ? (
                 <Link
                   href={toStashWatchPath(selectedScene.matchedSceneId)}
-                  className="px-4 py-2 rounded-xl bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl glass-button-primary text-xs font-bold flex items-center gap-1.5"
                 >
                   <Play className="w-3.5 h-3.5 fill-white" />
                   <span>Play Linked Stream</span>
@@ -552,7 +601,7 @@ export const StashDbPanel: React.FC<StashDbPanelProps> = ({
                   href={selectedScene.officialUrls[0].url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-semibold flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-proz-elevated hover:bg-proz-border text-proz-white text-xs font-semibold flex items-center gap-1.5"
                 >
                   <span>Reference Record</span>
                   <ExternalLink className="w-3.5 h-3.5" />

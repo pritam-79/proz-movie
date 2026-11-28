@@ -1,25 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import {
   X,
   Play,
   Heart,
-  Building,
-  Users,
-  Film,
   Image as ImageIcon,
-  Info,
+  Building,
+  Sparkles,
+  Film,
   ChevronLeft,
   ChevronRight,
   Globe,
   Clock,
-  Tv,
-  Sparkles,
+  Layers,
+  ZoomIn,
+  ZoomOut,
+  AlertCircle,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { normalizeStashId, toStashWatchPath } from '@/lib/utils/streamUtils';
+import { toStashWatchPath, normalizeStashId, toImageProxyFallback } from '@/lib/utils/streamUtils';
+
+function applyImgProxyFallback(e: React.SyntheticEvent<HTMLImageElement>, rawSrc?: string) {
+  const img = e.currentTarget;
+  if (!img.dataset.proxied && rawSrc && !rawSrc.startsWith('/') && !rawSrc.startsWith('data:')) {
+    img.dataset.proxied = '1';
+    img.src = toImageProxyFallback(rawSrc);
+  }
+}
 
 export function PhotoGalleryModal({
   title,
@@ -31,66 +40,131 @@ export function PhotoGalleryModal({
   onClose: () => void;
 }) {
   const [idx, setIdx] = useState(0);
+  const [zoom, setZoom] = useState<1 | 1.5 | 2>(1);
+
+  const handlePrev = useCallback(() => {
+    setZoom(1);
+    setIdx((p) => (p - 1 + images.length) % images.length);
+  }, [images.length]);
+
+  const handleNext = useCallback(() => {
+    setZoom(1);
+    setIdx((p) => (p + 1) % images.length);
+  }, [images.length]);
+
+  useEffect(() => {
+    setIdx(0);
+    setZoom(1);
+  }, [title, images]);
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      else if (e.key === 'ArrowLeft') handlePrev();
+      else if (e.key === 'ArrowRight') handleNext();
+      else if (e.key === '+' || e.key === '=') setZoom((z) => (z === 1 ? 1.5 : 2));
+      else if (e.key === '-') setZoom((z) => (z === 2 ? 1.5 : 1));
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [onClose, handlePrev, handleNext]);
+
   if (!images || images.length === 0) return null;
+  const activeUrl = images[idx] || images[0];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-xl flex flex-col p-4 sm:p-6">
-      <div className="flex items-center justify-between pb-3 border-b border-white/10">
-        <div className="flex items-center gap-2 min-w-0">
-          <ImageIcon className="w-4 h-4 text-cyan-400 shrink-0" />
-          <h3 className="text-sm sm:text-base font-bold text-white truncate">{title}</h3>
-          <span className="text-xs text-slate-400 font-mono shrink-0">
+    <div
+      className="fixed inset-0 z-50 bg-black/92 backdrop-blur-lg flex flex-col justify-between p-4 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
+      <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-3">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <ImageIcon className="w-4 h-4 text-proz-cyan shrink-0" />
+          <h3 className="text-sm sm:text-base font-bold text-white keep-white truncate">{title}</h3>
+          <span className="text-xs font-mono text-proz-cyan bg-white/10 px-2 py-0.5 rounded-md shrink-0">
             {idx + 1} / {images.length}
           </span>
         </div>
-        <button
-          onClick={onClose}
-          className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white"
-        >
-          <X className="w-4 h-4" />
-        </button>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={() => setZoom((z) => (z === 1 ? 1.5 : z === 1.5 ? 2 : 1))}
+            className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white keep-white text-xs font-semibold flex items-center gap-1 transition"
+            title="Toggle Zoom"
+          >
+            {zoom > 1 ? <ZoomOut className="w-3.5 h-3.5" /> : <ZoomIn className="w-3.5 h-3.5" />}
+            <span>{zoom}x</span>
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-white/10 hover:bg-proz-purple text-white keep-white transition"
+            aria-label="Close gallery"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 flex items-center justify-center relative overflow-hidden my-4">
-        <img
-          src={images[idx]}
-          alt={`${title} #${idx + 1}`}
-          referrerPolicy="no-referrer"
-          className="max-h-full max-w-full object-contain rounded-2xl border border-white/10 shadow-2xl"
-        />
+      <div className="relative flex-1 flex items-center justify-center overflow-auto my-3 select-none">
         {images.length > 1 && (
-          <>
-            <button
-              onClick={() => setIdx((i) => (i - 1 + images.length) % images.length)}
-              className="absolute left-2 sm:left-6 p-3 rounded-full bg-black/70 hover:bg-black text-white border border-white/15"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => setIdx((i) => (i + 1) % images.length)}
-              className="absolute right-2 sm:right-6 p-3 rounded-full bg-black/70 hover:bg-black text-white border border-white/15"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={handlePrev}
+            className="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/75 border border-white/20 text-white keep-white hover:bg-proz-purple transition"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
+        <img
+          src={activeUrl}
+          alt={`${title} - ${idx + 1}`}
+          referrerPolicy="no-referrer"
+          onError={(e) => applyImgProxyFallback(e, activeUrl)}
+          style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}
+          className="max-h-[74vh] max-w-full object-contain rounded-2xl border border-white/15 shadow-2xl transition-transform duration-200"
+        />
+
+        {images.length > 1 && (
+          <button
+            type="button"
+            onClick={handleNext}
+            className="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 p-3 rounded-full bg-black/75 border border-white/20 text-white keep-white hover:bg-proz-purple transition"
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         )}
       </div>
 
-      {images.length > 1 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 justify-center">
-          {images.map((img, i) => (
-            <button
-              key={i}
-              onClick={() => setIdx(i)}
-              className={`w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 ${
-                i === idx ? 'border-cyan-400' : 'border-white/10 opacity-60 hover:opacity-100'
-              }`}
-            >
-              <img src={img} alt={`Thumb ${i + 1}`} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="flex items-center justify-center gap-2 overflow-x-auto pb-1">
+        {images.map((src, i) => (
+          <button
+            type="button"
+            key={`${src}-${i}`}
+            onClick={() => {
+              setZoom(1);
+              setIdx(i);
+            }}
+            className={`w-14 h-14 rounded-xl overflow-hidden border-2 shrink-0 transition ${
+              i === idx ? 'border-proz-cyan shadow-cyan-glow' : 'border-white/10 opacity-55 hover:opacity-100'
+            }`}
+          >
+            <img
+              src={src}
+              alt="thumb"
+              referrerPolicy="no-referrer"
+              onError={(e) => applyImgProxyFallback(e, src)}
+              className="w-full h-full object-cover"
+            />
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -122,18 +196,14 @@ export function PerformerProfileModal({
       .then((r) => r.json())
       .then((d) => {
         if (!active) return;
-        if (d.success) {
-          setProfile(d);
+        if (!d.success) {
+          setError(d.error || 'Could not load performer profile');
         } else {
-          setError(d.error || 'Performer metadata unavailable');
+          setProfile(d);
         }
       })
-      .catch((e) => {
-        if (active) setError(e?.message || 'Unable to load performer profile');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+      .catch(() => active && setError('Network error loading performer profile'))
+      .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
@@ -143,115 +213,123 @@ export function PerformerProfileModal({
   const isFav = favorites.includes(performerId);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0B0F1A] border border-white/15 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-rose-400">
-            <Users className="w-4 h-4" />
-            <span>Performer Profile</span>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+      <div className="cinema-card bg-proz-navy border border-proz-border rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-6">
+        <div className="flex items-center justify-between gap-3 border-b border-proz-border/60 pb-3">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-proz-purple">
+            <Sparkles className="w-4 h-4" />
+            <span>Verified 18+ Performer Profile</span>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-proz-elevated hover:bg-proz-purple/20 text-proz-grey hover:text-proz-white transition"
+            aria-label="Close performer profile"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">
-            Loading verified performer metadata &amp; indexed scenes...
-          </div>
+          <div className="py-16 text-center text-sm text-proz-grey">Loading performer profile & filmography...</div>
         ) : error || !p ? (
-          <div className="py-16 text-center text-xs text-rose-400">
-            {error || 'No metadata returned for this performer.'}
+          <div className="py-16 text-center text-sm text-rose-400 flex items-center justify-center gap-2">
+            <AlertCircle className="w-4 h-4" />
+            <span>{error || 'Profile unavailable.'}</span>
           </div>
         ) : (
           <>
-            {/* Identity & Metadata — Strictly from source data, zero fabricated fields */}
             <div className="flex flex-col sm:flex-row gap-5">
-              <div className="w-36 h-48 rounded-2xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
-                {p.imageUrl || p.imagePath ? (
+              <div className="w-40 sm:w-48 aspect-[3/4] rounded-2xl overflow-hidden bg-proz-elevated border border-proz-border shrink-0 mx-auto sm:mx-0">
+                {p.imageUrl ? (
                   <img
-                    src={p.imageUrl || p.imagePath}
+                    src={p.imageUrl}
                     alt={p.name}
                     referrerPolicy="no-referrer"
+                    onError={(e) => applyImgProxyFallback(e, p.imageUrl)}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <Users className="w-10 h-10 text-slate-500" />
+                  <div className="w-full h-full flex items-center justify-center text-proz-grey text-xs">
+                    No Portrait
+                  </div>
                 )}
               </div>
 
               <div className="flex-1 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-2xl font-black text-white">{p.name}</h2>
-                    {p.aliases && (Array.isArray(p.aliases) ? p.aliases.length > 0 : Boolean(p.aliases)) && (
-                      <p className="text-xs text-slate-400">
-                        Also known as: {Array.isArray(p.aliases) ? p.aliases.slice(0, 4).join(', ') : p.aliases}
+                    <h2 className="text-2xl font-black text-proz-white">{p.name}</h2>
+                    {Array.isArray(p.aliases) && p.aliases.length > 0 && (
+                      <p className="text-xs text-proz-grey mt-0.5">
+                        Also known as: {p.aliases.slice(0, 4).join(', ')}
                       </p>
                     )}
                   </div>
                   <button
+                    type="button"
                     onClick={() => onToggleFavorite(performerId)}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border transition ${
+                    className={`px-3.5 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition ${
                       isFav
-                        ? 'bg-rose-600 text-white border-rose-500'
-                        : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
+                        ? 'bg-proz-purple/20 border-proz-purple text-proz-purple'
+                        : 'bg-proz-elevated border-proz-border text-proz-grey hover:text-proz-white'
                     }`}
                   >
-                    <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-white' : ''}`} />
-                    <span>{isFav ? 'Favorited' : 'Favorite'}</span>
+                    <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-current' : ''}`} />
+                    <span>{isFav ? 'Favorited' : 'Add Favorite'}</span>
                   </button>
                 </div>
 
                 {p.details && (
-                  <p className="text-xs text-slate-300 leading-relaxed">{p.details}</p>
+                  <p className="text-xs text-proz-grey leading-relaxed">{p.details}</p>
                 )}
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                  {p.country && (
-                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
-                      <span className="text-[10px] text-slate-500 block">Country</span>
-                      <span className="text-white font-semibold">{p.country}</span>
-                    </div>
-                  )}
-                  {p.ethnicity && (
-                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
-                      <span className="text-[10px] text-slate-500 block">Ethnicity</span>
-                      <span className="text-white font-semibold">{p.ethnicity}</span>
-                    </div>
-                  )}
-                  {p.hairColor && (
-                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
-                      <span className="text-[10px] text-slate-500 block">Hair</span>
-                      <span className="text-white font-semibold">{p.hairColor}</span>
-                    </div>
-                  )}
-                  {(p.heightCm || p.measurements) && (
-                    <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
-                      <span className="text-[10px] text-slate-500 block">Specs</span>
-                      <span className="text-white font-semibold">
-                        {p.measurements || `${p.heightCm} cm`}
-                      </span>
-                    </div>
-                  )}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Country</span>
+                    <span className="font-semibold text-proz-white">{p.country || 'International'}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Ethnicity</span>
+                    <span className="font-semibold text-proz-white">{p.ethnicity || 'N/A'}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Hair / Height</span>
+                    <span className="font-semibold text-proz-white">
+                      {p.hairColor || 'N/A'} {p.heightCm ? `• ${p.heightCm}cm` : ''}
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Active Since</span>
+                    <span className="font-semibold text-proz-white">{p.careerStartYear || '2020+'}</span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Indexed Credits</span>
+                    <span className="font-semibold text-proz-white">
+                      {((profile.playableScenes?.length || 0) + (p.sceneCount || 0)).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-proz-elevated/70 border border-proz-border/60">
+                    <span className="text-[10px] text-proz-grey block uppercase">Source</span>
+                    <span className="font-semibold text-proz-cyan uppercase">{profile.source}</span>
+                  </div>
                 </div>
 
-                {p.studios && p.studios.length > 0 && (
+                {Array.isArray(p.studios) && p.studios.length > 0 && (
                   <div className="space-y-1.5">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase">
-                      Associated Studios
-                    </span>
-                    <div className="flex flex-wrap gap-2">
+                    <p className="text-[11px] font-bold uppercase text-proz-grey">Associated Studios</p>
+                    <div className="flex flex-wrap gap-1.5">
                       {p.studios.map((s: any) => (
                         <button
+                          type="button"
                           key={s.id}
                           onClick={() => {
                             onClose();
                             onSelectStudio(`stashdb-${s.id}`);
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-200 text-xs font-medium hover:bg-purple-500/25"
+                          className="px-2.5 py-1 rounded-lg bg-proz-purple/15 border border-proz-purple/30 text-proz-purple text-xs font-medium hover:bg-proz-purple/25"
                         >
-                          {s.name} ({s.sceneCount || 0})
+                          {s.name}
                         </button>
                       ))}
                     </div>
@@ -260,66 +338,73 @@ export function PerformerProfileModal({
               </div>
             </div>
 
-            {/* Available Photos */}
-            {profile.photos && profile.photos.length > 0 && (
-              <div className="space-y-2">
+            {Array.isArray(profile.photos) && profile.photos.length > 0 && (
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                    Available Photographs ({profile.photos.length})
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-proz-cyan">
+                    Profile Photo Gallery ({profile.photos.length})
                   </h4>
                   <button
-                    onClick={() => onOpenPhotos(`${p.name} Photos`, profile.photos)}
-                    className="text-xs text-cyan-300 underline"
+                    type="button"
+                    onClick={() => onOpenPhotos(`${p.name} Gallery`, profile.photos)}
+                    className="text-xs text-proz-cyan underline font-semibold"
                   >
-                    Open Full Viewer
+                    Open Fullscreen Lightbox
                   </button>
                 </div>
                 <div className="flex gap-2.5 overflow-x-auto pb-1">
-                  {profile.photos.slice(0, 8).map((img: string, idx: number) => (
+                  {profile.photos.slice(0, 8).map((src: string, idx: number) => (
                     <button
-                      key={idx}
-                      onClick={() => onOpenPhotos(`${p.name} Photos`, profile.photos)}
-                      className="w-24 h-28 rounded-xl overflow-hidden bg-slate-900 border border-white/10 shrink-0"
+                      type="button"
+                      key={`${src}-${idx}`}
+                      onClick={() => onOpenPhotos(`${p.name} Gallery`, profile.photos)}
+                      className="w-24 h-32 rounded-xl overflow-hidden border border-proz-border hover:border-proz-cyan shrink-0 transition"
                     >
-                      <img src={img} alt={p.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                      <img
+                        src={src}
+                        alt="Performer still"
+                        referrerPolicy="no-referrer"
+                        onError={(e) => applyImgProxyFallback(e, src)}
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Associated Playable Scenes */}
-            {profile.playableScenes && profile.playableScenes.length > 0 && (
-              <div className="space-y-2.5">
+            {Array.isArray(profile.playableScenes) && profile.playableScenes.length > 0 && (
+              <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                  Playable Scenes in Library ({profile.playableScenes.length})
+                  Playable Videos Inside PROZ ({profile.playableScenes.length})
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {profile.playableScenes.map((sc: any) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {profile.playableScenes.slice(0, 12).map((sc: any) => (
                     <Link
                       key={sc.id}
                       href={toStashWatchPath(sc.id)}
                       onClick={onClose}
-                      className="group rounded-xl overflow-hidden bg-white/[0.04] border border-white/10 hover:border-rose-500/50 transition"
+                      className="group rounded-2xl overflow-hidden bg-proz-elevated/60 border border-proz-border hover:border-proz-purple/60 transition flex flex-col"
                     >
-                      <div className="aspect-video bg-slate-900 relative">
+                      <div className="relative aspect-video bg-proz-midnight overflow-hidden">
                         {sc.paths?.screenshot && (
                           <img
                             src={sc.paths.screenshot}
                             alt={sc.title}
                             referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover"
+                            onError={(e) => applyImgProxyFallback(e, sc.paths.screenshot)}
+                            className="w-full h-full object-cover group-hover:scale-105 transition"
                           />
                         )}
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                          <Play className="w-8 h-8 text-white fill-white" />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-80 group-hover:opacity-100">
+                          <div className="p-2 rounded-full bg-proz-purple text-white keep-white shadow-purple-glow">
+                            <Play className="w-4 h-4 fill-white" />
+                          </div>
                         </div>
                       </div>
-                      <div className="p-2.5">
-                        <p className="text-xs font-bold text-white truncate">{sc.title}</p>
-                        <span className="text-[10px] text-slate-400">
-                          {sc.studio?.name || 'Stash Library'}
-                        </span>
+                      <div className="p-3">
+                        <h5 className="text-xs font-bold text-proz-white line-clamp-1">{sc.title}</h5>
+                        <p className="text-[11px] text-proz-grey mt-0.5 truncate">{sc.studio?.name}</p>
                       </div>
                     </Link>
                   ))}
@@ -327,39 +412,43 @@ export function PerformerProfileModal({
               </div>
             )}
 
-            {/* StashDB Indexed Scene Credits (Metadata Only unless matched) */}
-            {profile.catalogScenes && profile.catalogScenes.length > 0 && (
+            {Array.isArray(profile.catalogScenes) && profile.catalogScenes.length > 0 && (
               <div className="space-y-2.5">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-300">
-                  Indexed StashDB Credits ({profile.catalogScenes.length})
+                <h4 className="text-xs font-bold uppercase tracking-wider text-proz-purple">
+                  StashDB Filmography Credits ({profile.catalogScenes.length})
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {profile.catalogScenes.slice(0, 9).map((sc: any) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {profile.catalogScenes.slice(0, 10).map((sc: any) => (
                     <div
                       key={sc.id}
-                      className="rounded-xl overflow-hidden bg-white/[0.03] border border-white/10 p-2.5 space-y-1.5"
+                      className="p-3 rounded-xl bg-proz-elevated/50 border border-proz-border/70 flex items-center gap-3"
                     >
                       {sc.image && (
-                        <div className="aspect-video rounded-lg overflow-hidden bg-slate-900">
-                          <img src={sc.image} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                        </div>
+                        <img
+                          src={sc.image}
+                          alt={sc.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => applyImgProxyFallback(e, sc.image)}
+                          className="w-16 h-11 rounded-lg object-cover shrink-0 bg-proz-midnight"
+                        />
                       )}
-                      <p className="text-xs font-bold text-white truncate">{sc.title}</p>
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>{sc.studioName}</span>
-                        <span>{sc.date || 'Metadata Only'}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-proz-white truncate">{sc.title}</p>
+                        <p className="text-[10px] text-proz-grey truncate">
+                          {sc.studioName} • {sc.date || 'N/A'}
+                        </p>
                       </div>
                       {sc.isPlayable && sc.matchedSceneId ? (
                         <Link
                           href={toStashWatchPath(sc.matchedSceneId)}
                           onClick={onClose}
-                          className="block w-full py-1.5 rounded-lg bg-rose-600 text-white text-center text-[11px] font-bold"
+                          className="px-2.5 py-1 rounded-lg bg-proz-purple text-white keep-white text-[10px] font-bold shrink-0"
                         >
-                          Play Matched Media
+                          Play
                         </Link>
                       ) : (
-                        <span className="block w-full py-1 rounded-lg bg-white/5 text-slate-400 text-center text-[10px]">
-                          Catalog Metadata Only
+                        <span className="px-2 py-0.5 rounded bg-proz-elevated text-proz-grey text-[9px] font-semibold shrink-0">
+                          Metadata
                         </span>
                       )}
                     </div>
@@ -390,22 +479,16 @@ export function StudioDetailModal({
   useEffect(() => {
     let active = true;
     setLoading(true);
+    setError(null);
     fetch(`/api/library/stash/studios?id=${encodeURIComponent(studioId)}`)
       .then((r) => r.json())
       .then((d) => {
         if (!active) return;
-        if (d.success) {
-          setDetail(d);
-        } else {
-          setError(d.error || 'Studio metadata unavailable');
-        }
+        if (!d.success) setError(d.error || 'Studio lookup failed');
+        else setDetail(d);
       })
-      .catch((e) => {
-        if (active) setError(e?.message || 'Failed to load studio catalog');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
+      .catch(() => active && setError('Network error loading studio details'))
+      .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
@@ -414,67 +497,81 @@ export function StudioDetailModal({
   const studio = detail?.studio;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0B0F1A] border border-white/15 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-6">
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-purple-300">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+      <div className="cinema-card bg-proz-navy border border-proz-border rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-6">
+        <div className="flex items-center justify-between border-b border-proz-border/60 pb-3">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-proz-purple">
             <Building className="w-4 h-4" />
-            <span>Studio Catalogue Profile</span>
+            <span>Studio Profile & Catalog</span>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-proz-elevated hover:bg-proz-purple/20 text-proz-grey hover:text-proz-white transition"
+            aria-label="Close studio detail"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-xs text-slate-400">Loading studio collection...</div>
+          <div className="py-16 text-center text-sm text-proz-grey">Loading studio details & releases...</div>
         ) : error || !studio ? (
-          <div className="py-16 text-center text-xs text-rose-400">
-            {error || 'Studio details unavailable.'}
-          </div>
+          <div className="py-16 text-center text-sm text-rose-400">{error || 'Studio unavailable.'}</div>
         ) : (
           <>
-            <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-900 border border-white/10 shrink-0 flex items-center justify-center">
+            <div className="flex flex-col sm:flex-row items-center gap-5 bg-proz-elevated/50 border border-proz-border/70 rounded-2xl p-4">
+              <div className="w-24 h-24 rounded-2xl overflow-hidden bg-proz-midnight border border-proz-border shrink-0 flex items-center justify-center">
                 {studio.image ? (
-                  <img src={studio.image} alt={studio.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                  <img
+                    src={studio.image}
+                    alt={studio.name}
+                    referrerPolicy="no-referrer"
+                    onError={(e) => applyImgProxyFallback(e, studio.image)}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
-                  <Building className="w-8 h-8 text-purple-400" />
+                  <Building className="w-8 h-8 text-proz-purple" />
                 )}
               </div>
-              <div>
-                <h2 className="text-2xl font-black text-white">{studio.name}</h2>
-                <p className="text-xs text-slate-400 mt-1">{studio.description}</p>
-                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 text-[10px] font-bold">
-                  {studio.category} • {studio.itemCount} Indexed Items
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-2xl font-black text-proz-white">{studio.name}</h2>
+                <p className="text-xs text-proz-grey mt-1">{studio.description}</p>
+                <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-proz-cyan/15 text-proz-cyan text-[10px] font-bold">
+                  {studio.category} • {studio.itemCount} Indexed
                 </span>
               </div>
             </div>
 
-            {detail.playableScenes && detail.playableScenes.length > 0 && (
+            {Array.isArray(detail.playableScenes) && detail.playableScenes.length > 0 && (
               <div className="space-y-3">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                  Playable Studio Videos ({detail.playableScenes.length})
+                  Playable Videos ({detail.playableScenes.length})
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {detail.playableScenes.map((sc: any) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {detail.playableScenes.slice(0, 12).map((sc: any) => (
                     <Link
                       key={sc.id}
                       href={toStashWatchPath(sc.id)}
                       onClick={onClose}
-                      className="group rounded-xl overflow-hidden bg-white/[0.04] border border-white/10 hover:border-rose-500/50 transition"
+                      className="group rounded-2xl overflow-hidden bg-proz-elevated/60 border border-proz-border hover:border-proz-purple transition flex flex-col"
                     >
-                      <div className="aspect-video bg-slate-900 relative">
+                      <div className="relative aspect-video bg-proz-midnight">
                         {sc.paths?.screenshot && (
-                          <img src={sc.paths.screenshot} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                          <img
+                            src={sc.paths.screenshot}
+                            alt={sc.title}
+                            referrerPolicy="no-referrer"
+                            onError={(e) => applyImgProxyFallback(e, sc.paths.screenshot)}
+                            className="w-full h-full object-cover"
+                          />
                         )}
-                        <div className="absolute inset-0 bg-black/35 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                          <Play className="w-8 h-8 text-white fill-white" />
+                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                          <Play className="w-7 h-7 text-white keep-white fill-white/85" />
                         </div>
                       </div>
-                      <div className="p-2.5">
-                        <p className="text-xs font-bold text-white truncate">{sc.title}</p>
-                        <span className="text-[10px] text-slate-400">{sc.date || 'HD Stream'}</span>
+                      <div className="p-3">
+                        <h5 className="text-xs font-bold text-proz-white line-clamp-1">{sc.title}</h5>
                       </div>
                     </Link>
                   ))}
@@ -482,57 +579,76 @@ export function StudioDetailModal({
               </div>
             )}
 
-            {detail.catalogScenes && detail.catalogScenes.length > 0 && (
-              <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-300">
-                  StashDB Studio Catalogue ({detail.catalogScenes.length})
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {detail.catalogScenes.slice(0, 9).map((sc: any) => (
-                    <div key={sc.id} className="rounded-xl bg-white/[0.03] border border-white/10 p-2.5 space-y-1.5">
-                      {sc.image && (
-                        <div className="aspect-video rounded-lg overflow-hidden bg-slate-900">
-                          <img src={sc.image} alt={sc.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <p className="text-xs font-bold text-white truncate">{sc.title}</p>
-                      <span className="text-[10px] text-slate-400 block">{sc.date || 'Indexed Metadata'}</span>
-                      {sc.isPlayable && sc.matchedSceneId ? (
-                        <Link
-                          href={toStashWatchPath(sc.matchedSceneId)}
-                          onClick={onClose}
-                          className="block py-1.5 rounded-lg bg-rose-600 text-white text-center text-[11px] font-bold"
-                        >
-                          Play Matched Media
-                        </Link>
-                      ) : (
-                        <span className="block py-1 rounded-lg bg-white/5 text-slate-400 text-center text-[10px]">
-                          Metadata Only (No Local Video File)
-                        </span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {detail.performers && detail.performers.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                  Featured Studio Roster
+            {Array.isArray(detail.performers) && detail.performers.length > 0 && (
+              <div className="space-y-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-proz-purple">
+                  Featured Studio Performers
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {detail.performers.map((perf: any) => (
                     <button
+                      type="button"
                       key={perf.id}
                       onClick={() => {
                         onClose();
                         onSelectPerformer(perf.id);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-white font-medium"
+                      className="px-3 py-1.5 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 border border-proz-border text-xs font-semibold text-proz-white flex items-center gap-2 transition"
                     >
-                      {perf.name}
+                      {perf.image && (
+                        <img
+                          src={perf.image}
+                          alt={perf.name}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => applyImgProxyFallback(e, perf.image)}
+                          className="w-5 h-5 rounded-full object-cover"
+                        />
+                      )}
+                      <span>{perf.name}</span>
                     </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {Array.isArray(detail.catalogScenes) && detail.catalogScenes.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-proz-cyan">
+                  StashDB Studio Releases
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {detail.catalogScenes.slice(0, 10).map((sc: any) => (
+                    <div
+                      key={sc.id}
+                      className="p-3 rounded-xl bg-proz-elevated/50 border border-proz-border/70 flex items-center gap-3"
+                    >
+                      {sc.image && (
+                        <img
+                          src={sc.image}
+                          alt={sc.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => applyImgProxyFallback(e, sc.image)}
+                          className="w-16 h-11 rounded-lg object-cover shrink-0 bg-proz-midnight"
+                        />
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-proz-white truncate">{sc.title}</p>
+                        <p className="text-[10px] text-proz-grey truncate">{sc.date || 'Metadata Record'}</p>
+                      </div>
+                      {sc.isPlayable && sc.matchedSceneId ? (
+                        <Link
+                          href={toStashWatchPath(sc.matchedSceneId)}
+                          onClick={onClose}
+                          className="px-2.5 py-1 rounded-lg bg-proz-purple text-white keep-white text-[10px] font-bold"
+                        >
+                          Play
+                        </Link>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded bg-proz-elevated text-proz-grey text-[9px] font-semibold">
+                          Metadata
+                        </span>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -558,37 +674,42 @@ export function SeriesDetailModal({
 
   useEffect(() => {
     if (!series) return;
-    setLiveEpisodes([]);
-    setLiveMeta(null);
+    const isCine18Series = Boolean(series.isRealCine18Series || String(series.id || '').startsWith('cine18-'));
+    if (!isCine18Series) return;
 
     const seriesId = String(series.id || '');
-    if (series.isRealCine18Series || seriesId.startsWith('cine18-')) {
-      let active = true;
-      setLoadingEpisodes(true);
-      const cleanUid = seriesId.replace(/^cine18-/, '');
-      fetch(`/api/library/cine18-stream?uid=${encodeURIComponent(cleanUid)}`)
-        .then((r) => r.json())
-        .then((data) => {
-          if (!active) return;
-          if (data.success) {
-            setLiveMeta({
-              description: data.description,
-              cast: data.cast,
-              language: data.language,
-            });
-            if (Array.isArray(data.episodes)) {
-              setLiveEpisodes(data.episodes);
-            }
-          }
-        })
-        .catch(() => {})
-        .finally(() => {
-          if (active) setLoadingEpisodes(false);
-        });
-      return () => {
-        active = false;
-      };
-    }
+    const channelSlug = String(series.studio || '').trim();
+    const uid =
+      series.channelUid ||
+      (seriesId.startsWith('cine18-')
+        ? seriesId.replace(/^cine18-/, '').split('-')[0] || seriesId.replace(/^cine18-/, '')
+        : seriesId);
+
+    const routeSlug = encodeURIComponent(uid || channelSlug);
+    const titleParam = encodeURIComponent(series.title || channelSlug);
+
+    let active = true;
+    setLoadingEpisodes(true);
+    fetch(`/api/channels/${routeSlug}/videos?title=${titleParam}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (!active) return;
+        const eps = Array.isArray(d.videos) ? d.videos : [];
+        setLiveEpisodes(eps);
+        if (eps[0]) {
+          setLiveMeta({
+            description: eps[0].description || eps[0].storyline || '',
+            cast: eps[0].cast || '',
+            language: eps[0].language || '',
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(() => active && setLoadingEpisodes(false));
+
+    return () => {
+      active = false;
+    };
   }, [series]);
 
   if (!series) return null;
@@ -598,106 +719,132 @@ export function SeriesDetailModal({
   const episodesToShow = isCine18 ? liveEpisodes : staticEpisodes;
   const baseWatchHref = series.watchHref || (isCine18 ? `/watch/${series.id}` : toStashWatchPath(normalizeStashId(series.id || '')));
   const firstEpisodeHref =
-    isCine18 && episodesToShow[0]?.id
-      ? `${baseWatchHref}?episode=${encodeURIComponent(episodesToShow[0].id)}`
+    isCine18 && liveEpisodes[0]
+      ? `/watch/cine18-${liveEpisodes[0].uid || liveEpisodes[0].id}`
       : baseWatchHref;
   const resumeSec = getProgress(normalizeStashId(String(series.id || '')));
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-[#0B0F1A] border border-white/15 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5">
-        <div className="flex items-start justify-between gap-3 border-b border-white/10 pb-3">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+      <div className="cinema-card bg-proz-navy border border-proz-border rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-5 sm:p-6 space-y-5">
+        <div className="flex items-start justify-between gap-3">
           <div>
-            <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold uppercase">
-              {series.studio || series.subcategory || 'Hot Web Series'}
+            <span className="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-proz-purple/20 text-proz-purple border border-proz-purple/30">
+              {series.subcategory || 'Hot Web Series'} • {series.studio}
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-white mt-2">{series.title}</h2>
-            <p className="text-xs text-slate-400 mt-1">
-              {series.subcategory ? `${series.subcategory} • ` : ''}
-              {episodesToShow.length > 0 ? `${episodesToShow.length} Episodes • ` : ''}
-              {(series.rating || 4.7)}/5.0
-              {liveMeta?.language ? ` • ${liveMeta.language}` : ''}
-            </p>
+            <h2 className="text-xl sm:text-2xl font-black text-proz-white mt-2">{series.title}</h2>
           </div>
-          <button onClick={onClose} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-white">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-2 rounded-full bg-proz-elevated hover:bg-proz-purple/20 text-proz-grey hover:text-proz-white transition"
+            aria-label="Close series modal"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          {liveMeta?.description || series.synopsis || `${series.studio || 'OTT'} exclusive hot web series & drama.`}
-        </p>
-
-        {liveMeta?.cast && (
-          <p className="text-xs text-cyan-300">
-            <strong className="text-slate-400">Cast:</strong> {liveMeta.cast}
-          </p>
+        {(series.banner || series.poster) && (
+          <div className="aspect-video rounded-2xl overflow-hidden bg-proz-midnight border border-proz-border relative">
+            <img
+              src={series.banner || series.poster}
+              alt={series.title}
+              referrerPolicy="no-referrer"
+              onError={(e) => applyImgProxyFallback(e, series.banner || series.poster)}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute bottom-3 left-3 flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-lg bg-black/80 text-white keep-white text-xs font-bold">
+                {loadingEpisodes ? 'Loading stream count...' : `${episodesToShow.length} Playable Videos`}
+              </span>
+              {series.rating && (
+                <span className="px-2.5 py-1 rounded-lg bg-proz-cyan/25 text-proz-cyan text-xs font-bold">
+                  ★ {series.rating}
+                </span>
+              )}
+            </div>
+          </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <p className="text-xs sm:text-sm text-proz-grey leading-relaxed">
+          {liveMeta?.description || series.synopsis || series.description}
+        </p>
+
+        {liveMeta && (liveMeta.cast || liveMeta.language) && (
+          <div className="flex flex-wrap gap-3 text-xs text-proz-grey bg-proz-elevated/50 border border-proz-border rounded-xl p-3">
+            {liveMeta.language && (
+              <span className="flex items-center gap-1.5">
+                <Globe className="w-3.5 h-3.5 text-proz-cyan" /> Language:{' '}
+                <strong className="text-proz-white">{liveMeta.language}</strong>
+              </span>
+            )}
+            {liveMeta.cast && (
+              <span>
+                Cast: <strong className="text-proz-white">{liveMeta.cast}</strong>
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-3">
           <Link
             href={firstEpisodeHref}
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg"
+            className="px-5 py-2.5 rounded-xl glass-button-primary text-xs font-bold flex items-center gap-2"
           >
             <Play className="w-4 h-4 fill-white" />
-            <span>{resumeSec > 5 ? 'Continue Watching' : 'Play Series Now'}</span>
+            <span>{resumeSec > 10 ? `Resume (${Math.floor(resumeSec / 60)}m)` : 'Stream Now in Player'}</span>
           </Link>
         </div>
 
         <div className="space-y-2.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
-            <Tv className="w-3.5 h-3.5" /> Playable Episodes
+          <h4 className="text-xs font-bold uppercase tracking-wider text-proz-cyan flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5" />
+            {loadingEpisodes ? 'Fetching Live Catalog Episodes...' : `Available Episodes & Videos (${episodesToShow.length})`}
           </h4>
           {loadingEpisodes ? (
-            <div className="py-6 text-center text-xs text-slate-400">
-              Loading verified episodes &amp; direct streams...
-            </div>
+            <div className="py-6 text-center text-xs text-proz-grey">Querying Cine18 live channel index...</div>
           ) : episodesToShow.length === 0 ? (
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/10 text-xs text-slate-400 flex items-center justify-between gap-3">
-              <span>Single feature / direct web series stream ready inside player.</span>
-              <Link
-                href={baseWatchHref}
-                onClick={onClose}
-                className="px-3 py-1.5 rounded-lg bg-rose-600 text-white font-bold shrink-0"
-              >
-                Watch Now
-              </Link>
+            <div className="p-4 rounded-xl bg-proz-elevated/40 border border-proz-border text-xs text-proz-grey flex items-center gap-2">
+              <Film className="w-4 h-4 text-proz-grey shrink-0" />
+              <span>Channel index loaded with no extra episode cards — use Stream Now above or browse Channels.</span>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
               {episodesToShow.map((ep: any, idx: number) => {
                 const epHref = isCine18
-                  ? `${baseWatchHref}?episode=${encodeURIComponent(ep.id)}`
-                  : toStashWatchPath(ep.streamId);
+                  ? `/watch/cine18-${ep.uid || ep.id || series.channelUid}`
+                  : `${baseWatchHref}${episodesToShow.length > 1 ? `?ep=${ep.episodeNumber || idx + 1}` : ''}`;
                 const epNum = ep.episodeNumber || ep.ep || idx + 1;
-                const thumb = ep.thumbnailUrl || series.banner || series.poster;
+                const thumb = ep.portrait_img || ep.banner_img || ep.thumbnailUrl || series.banner || series.poster;
+
                 return (
                   <Link
-                    key={ep.id || epNum}
+                    key={ep.id || ep.uid || idx}
                     href={epHref}
                     onClick={onClose}
-                    className="p-3 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 flex items-center justify-between gap-3 transition"
+                    className="p-3 rounded-xl bg-proz-elevated/60 hover:bg-proz-elevated border border-proz-border/70 hover:border-proz-purple/50 flex items-center justify-between gap-3 transition"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-20 aspect-video rounded-xl overflow-hidden bg-slate-900 shrink-0 relative">
-                        {thumb && (
-                          <img src={thumb} alt={ep.title} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                        )}
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <Play className="w-4 h-4 text-white fill-white" />
-                        </div>
-                      </div>
+                      {thumb && (
+                        <img
+                          src={thumb}
+                          alt={ep.title}
+                          referrerPolicy="no-referrer"
+                          onError={(e) => applyImgProxyFallback(e, thumb)}
+                          className="w-16 h-10 rounded-lg object-cover shrink-0 bg-proz-midnight"
+                        />
+                      )}
                       <div className="min-w-0">
-                        <p className="text-xs sm:text-sm font-bold text-white truncate">
-                          E{epNum}: {ep.title}
+                        <p className="text-xs font-bold text-proz-white truncate">
+                          {ep.season ? `S${ep.season}:E${epNum}` : `EP ${epNum}`} • {ep.title}
                         </p>
-                        <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                          <Clock className="w-3 h-3" /> {ep.duration || 'HD Stream'}
-                        </span>
+                        <p className="text-[11px] text-proz-grey flex items-center gap-1 mt-0.5">
+                          <Clock className="w-3 h-3" /> {ep.duration || 'Full Stream'} • {ep.releaseDate || ep.language || series.studio}
+                        </p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-lg bg-rose-600/20 text-rose-300 border border-rose-500/30 text-[11px] font-bold shrink-0">
+                    <span className="px-3 py-1 rounded-lg bg-proz-purple text-white keep-white text-[11px] font-bold shrink-0">
                       Play
                     </span>
                   </Link>

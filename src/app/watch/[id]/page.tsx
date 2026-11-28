@@ -138,10 +138,25 @@ function WatchContent() {
         fallbackMp4: '',
         streamUrl: '',
         description: 'Authorized streaming session served via high-speed CDN.',
-        poster_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=600&auto=format&fit=crop',
-        backdrop_url: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200&auto=format&fit=crop',
+        poster_url: '',
+        backdrop_url: '',
         video_sources: [cineSource],
         videoSources: [cineSource]
+      };
+    } else if (contentId?.startsWith('redgifs-')) {
+      return {
+        id: contentId,
+        title: 'Resolving Creator Stream...',
+        slug: contentId,
+        content_type: 'movie',
+        category: 'VR / 3D / Creator Clip',
+        is_adult: true,
+        age_rating: 'A 18+',
+        description: 'Resolving live stream from RedGIFs v2 API...',
+        poster_url: '',
+        backdrop_url: '',
+        video_sources: [],
+        videoSources: [],
       };
     } else {
       const matchedLocal = allContent.find(c => c.id === contentId || String(c.tmdb_id) === contentId || c.slug === contentId);
@@ -314,6 +329,69 @@ function WatchContent() {
           setEnrichedContent(updated);
         })
         .catch(console.error);
+    } else if (contentId?.startsWith('redgifs-')) {
+      fetch(`/api/library/redgifs?id=${encodeURIComponent(contentId)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (!active || !data?.success || !data.item) return;
+          const item = data.item;
+          const lowerTags = `${item.title} ${(item.tags || []).join(' ')}`.toLowerCase();
+          const isVr = /(vr|180|360|3d|sbs)/.test(lowerTags);
+          const vrProj = lowerTags.includes('360') ? '360_interactive' : isVr ? '180_sbs' : 'flat';
+
+          const sources: VideoSource[] = [];
+          if (item.hdUrl) {
+            sources.push({
+              id: `rg-hd-${item.id}`,
+              contentId: item.id,
+              providerId: 'redgifs',
+              providerName: 'RedGIFs HD CDN',
+              sourceType: 'html5_mp4',
+              format: 'mp4',
+              playbackUrl: item.hdUrl,
+              officialWatchUrl: item.hdUrl,
+              pricingType: 'free',
+              quality: item.height >= 2160 ? '4K' : item.height >= 1080 ? '1080p' : item.height >= 720 ? '720p' : 'SD',
+              country: 'GLOBAL',
+              rightsStatus: 'authorized',
+              verificationStatus: 'verified',
+              lastChecked: new Date().toISOString(),
+            });
+          }
+          if (item.sdUrl && item.sdUrl !== item.hdUrl) {
+            sources.push({
+              id: `rg-sd-${item.id}`,
+              contentId: item.id,
+              providerId: 'redgifs',
+              providerName: 'RedGIFs SD CDN',
+              sourceType: 'html5_mp4',
+              format: 'mp4',
+              playbackUrl: item.sdUrl,
+              officialWatchUrl: item.sdUrl,
+              pricingType: 'free',
+              quality: 'SD',
+              country: 'GLOBAL',
+              rightsStatus: 'authorized',
+              verificationStatus: 'verified',
+              lastChecked: new Date().toISOString(),
+            });
+          }
+
+          setEnrichedContent({
+            ...content,
+            title: item.title,
+            category: isVr ? '3D VR & Interactive' : 'Creator & 3D Studio',
+            description: item.description,
+            poster_url: item.poster || item.thumbnail || '',
+            backdrop_url: item.poster || item.thumbnail || '',
+            streamUrl: item.hdUrl,
+            fallbackMp4: item.hdUrl,
+            video_sources: sources,
+            videoSources: sources,
+            ...(isVr ? { isVr: true, vrProjection: vrProj } as any : {}),
+          });
+        })
+        .catch(() => {});
     } else if (isDynamicRemote && content.title === 'Loading Title...') {
       fetch(`/api/catalog/resolve-title?id=${encodeURIComponent(contentId!)}`)
         .then(r => r.json())
@@ -357,10 +435,11 @@ function WatchContent() {
       setIsAuthorizing(true);
       setAuthError(null);
 
-      // For cine18, stash, and p2p content — authorize instantly without network call
+      // For cine18, stash, redgifs, and p2p content — authorize instantly without network call
       if (
         content.id.startsWith('cine18-') ||
         content.id.startsWith('stash-') ||
+        content.id.startsWith('redgifs-') ||
         content.id.startsWith('p2p-')
       ) {
         if (isMounted) {

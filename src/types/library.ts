@@ -233,6 +233,7 @@ export interface DownloadItem {
 
 export interface MediaBrowsingFilters {
   searchQuery?: string;
+  query?: string;
   studioId?: string;
   performerId?: string;
   tagId?: string;
@@ -248,6 +249,7 @@ export interface MediaBrowsingFilters {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+  perPage?: number;
 }
 
 export type MediaViewMode = 'grid' | 'compact' | 'list' | 'gallery' | 'timeline';

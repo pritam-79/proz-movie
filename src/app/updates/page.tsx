@@ -26,6 +26,30 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.09.02 Complete Obsidian Ember Redesign & Light/Dark Themes",
+      desc: "Unified Obsidian Onyx & Ember Crimson color system with persistent Dark, Daylight Light & System modes across all pages, cards, player HUD & modals.",
+      icon: Sparkles,
+      color: "text-proz-purple"
+    },
+    {
+      title: "v0.09.02 Naughty America & All 330 Channels Repaired",
+      desc: "Chunked HTTP 206 Range Loader streams 116 MPEG-TS & 212 MP4 channels smoothly without buffer stalls, plus fixed 41 typo/unmapped UIDs and strict real-stream resolution.",
+      icon: Flame,
+      color: "text-proz-cyan"
+    },
+    {
+      title: "v0.09.02 Stash GraphQL, RedGIFs v2 & Expanded Directories",
+      desc: "Repaired Personal Stash GraphQL queries & /graphql normalizer, added RedGIFs v2 playable VR/3D/Photo Galleries, A–Z Performer index (>33), sorted Webseries & 30 Tube Hubs.",
+      icon: Server,
+      color: "text-proz-purple"
+    },
+    {
+      title: "v0.09.02 Automatic Bug Detector & Diagnostics (/settings)",
+      desc: "Live health audit for API Gateway, Cine18, Stash, StashDB, DB & playback engines, with bounded retries, cache eviction & non-restarting manual resolution switching.",
+      icon: Activity,
+      color: "text-emerald-400"
+    },
+    {
       title: "v0.09.1 Real Cine18 OTT Catalog",
       desc: "Hot Web Series now shows live Ullu, Alt Balaji, Kooku, Neon, MxPlayer, Primeshots & more — zero fake placeholder cards, real episode list fetched live from Cine18 API.",
       icon: Flame,
@@ -202,69 +226,76 @@ export default function UpdatesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-6 sm:pt-10 pb-24 px-4 md:px-8">
+    <div className="min-h-screen bg-proz-midnight text-proz-white pt-6 sm:pt-10 pb-24 px-4 md:px-8">
       <div className="max-w-4xl mx-auto">
         <Link 
           href="/" 
-          className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white mb-6 transition"
+          className="inline-flex items-center gap-1.5 text-xs text-proz-grey hover:text-proz-white mb-6 transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Back to Home
         </Link>
 
         {/* Release Hero Header */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-white/[0.03] border border-red-500/30 backdrop-blur-xl shadow-2xl relative overflow-hidden mb-10">
-          <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="p-6 sm:p-8 rounded-3xl cinema-card border border-proz-purple/35 shadow-2xl relative overflow-hidden mb-10">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-proz-purple/10 rounded-full blur-3xl pointer-events-none" />
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-3 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-proz-purple/20 text-proz-purple border border-proz-purple/35 text-xs font-bold uppercase tracking-wider">
               Release Notes
             </span>
-            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold uppercase tracking-wider">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/35 text-xs font-bold uppercase tracking-wider">
               {brandConfig.version} Latest
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
+          <h1 className="text-3xl sm:text-5xl font-black text-proz-white tracking-tight">
             PROZ ENTERTAINMENT {brandConfig.version}
           </h1>
-          <p className="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl leading-relaxed">
-            Video Player Overlay &amp; PiP Fixes, Demon Slayer Catalog Repair, Automated Stash &amp; StashDB Backend Service, Real Cine18 OTT Catalog, Genuine StashDB VR/Hentai/Performers, Deduplicated Continue Watching, 24 Tube Portals &amp; Gallery Categories across Android, iOS, Windows, macOS, Linux, and Web.
+          <p className="text-sm sm:text-base text-proz-grey mt-2 max-w-2xl leading-relaxed">
+            Complete Obsidian Ember UI Redesign with Light/Dark Themes, Naughty America &amp; 330-Channel Chunked TS/MP4 Playback Repair, Repaired Stash/StashDB &amp; RedGIFs Integrations, Honest Resolution Switching, Gesture Seeking, and Automatic Bug Detector (/settings).
           </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/library"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-lg transition flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl glass-button-primary text-xs shadow-purple-glow transition flex items-center gap-2"
             >
               <FolderLock className="w-4 h-4" />
               <span>Open Stash Vault</span>
             </Link>
             <Link
+              href="/settings"
+              className="px-5 py-2.5 rounded-xl bg-proz-elevated hover:bg-proz-purple/20 border border-proz-border text-proz-white font-bold text-xs transition flex items-center gap-2"
+            >
+              <Activity className="w-4 h-4 text-proz-cyan" />
+              <span>Settings &amp; Bug Detector</span>
+            </Link>
+            <Link
               href="/channels"
-              className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-600/30 transition flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-proz-purple/90 hover:bg-proz-purple text-white keep-white font-bold text-xs shadow-purple-glow transition flex items-center gap-2"
             >
               <Tv className="w-4 h-4" />
               <span>Explore Channels</span>
             </Link>
             <Link
               href="/restricted"
-              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white keep-white font-bold text-xs shadow-lg transition flex items-center gap-2"
             >
               <Flame className="w-4 h-4" />
               <span>Explore 18+ Section</span>
             </Link>
-            <Link
-              href="/movies"
-              className="px-5 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg shadow-cyan-600/30 transition flex items-center gap-2"
+            <a
+              href="/api/download/apk"
+              className="px-5 py-2.5 rounded-xl bg-proz-cyan hover:brightness-110 text-slate-950 font-bold text-xs shadow-cyan-glow transition flex items-center gap-2"
             >
-              <Film className="w-4 h-4" />
-              <span>Browse Movies</span>
-            </Link>
+              <Download className="w-4 h-4" />
+              <span>Download {brandConfig.version} APK</span>
+            </a>
           </div>
         </div>
 
         {/* Feature Cards Grid */}
-        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-red-400" />
+        <h2 className="text-xl font-bold text-proz-white mb-6 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-proz-purple" />
           <span>What&apos;s New in {brandConfig.version}</span>
         </h2>
 
@@ -274,14 +305,14 @@ export default function UpdatesPage() {
             return (
               <div 
                 key={i} 
-                className="p-5 rounded-2xl bg-white/[0.02] border border-white/10 hover:border-red-500/40 transition flex items-start gap-4"
+                className="p-5 rounded-2xl cinema-card hover:border-proz-purple/45 transition flex items-start gap-4"
               >
-                <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${f.color} flex-shrink-0`}>
+                <div className={`p-3 rounded-xl bg-proz-elevated border border-proz-border ${f.color} flex-shrink-0`}>
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">{f.title}</h3>
-                  <p className="text-xs text-slate-400 mt-1 leading-relaxed">{f.desc}</p>
+                  <h3 className="text-sm font-bold text-proz-white">{f.title}</h3>
+                  <p className="text-xs text-proz-grey mt-1 leading-relaxed">{f.desc}</p>
                 </div>
               </div>
             );

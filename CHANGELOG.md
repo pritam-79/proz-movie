@@ -4,6 +4,27 @@ All notable changes to the PROZ Entertainment OTT & Stash platform are documente
 
 ---
 
+## [0.09.02] — 2026-11-27
+
+### Complete Obsidian Ember Redesign, Light/Dark Themes, Naughty America & Channel Repairs, Stash/RedGIFs/StashDB Expansion & Bug Detector
+- **Complete Obsidian Onyx & Ember Crimson Visual Redesign (`globals.css`, `tailwind.config.ts`, `ThemeContext.tsx`):**
+  - Replaced legacy `#080B12` / `#8B5CF6` / `#22D3EE` palette across every page, card, modal, player, and navigation component with Obsidian Onyx (`#07070A`), Elevated Slate Carbon (`#111218`), Ember Crimson (`#FF2E54`), Warm Gold (`#F59E0B`), and Daylight Alabaster Light Theme (`#F5F6FA`).
+- **Repaired Channels & Playback (Naughty America & All 330 Unique Channels):**
+  - Rebuilt `CHANNELS_DATA` with all 330 unique, UID-verified Cine18 channels, resolved all 41 typo/unmapped slugs, excluded empty channels, and merged dynamic `/api/channels` discovery.
+  - Added custom `ChunkedTsRangeLoader` (1.5MB HTTP 206 byte ranges) in `VideoPlayer.tsx` alongside unbounded active-body proxy streaming in `/api/library/stream-proxy` so Naughty America and all 116 MPEG-TS channels stream smoothly without CORS blocks or timeouts.
+- **Personal Stash GraphQL & StashDB Improvements:**
+  - Replaced empty Personal Stash GraphQL stubs with live `findScenes`, `findPerformers`, `findStudios`, `findGalleries`, `findTags`, and `testConnection`, automatic `/graphql` normalization, circuit-breaker backoff, and `ApiKey` header forwarding in `/api/library/stash/proxy-stream`.
+  - Integrated RedGIFs Public v2 temporary-auth API (`src/lib/providers/redgifs.ts`) to ensure Photo Galleries, 3D VR, Hentai/3D CGI, Creators (>33 Performers + A–Z index), and Tube Hubs populate across all environments even when `STASHDB_API_KEY` or `STASH_SERVER_URL` is absent.
+- **Honest Resolution Switching & Player Gestures:**
+  - Removed any fake 4K upscaling claims; reports actual stream resolution (including `2160p 4K UHD`, `1440p QHD`, `1080p Full HD`, `720p HD`, `480p SD`, `360p`, `Auto`) and switches Shaka ABR tracks without restarting playback.
+  - Added double-tap left/right gesture seek (configurable in `/settings`), ripple feedback, keyboard shortcuts, auto-hiding fullscreen controls, VR projection/gyro HUD, and IPTV Live TV playback in `/live`.
+- **Automatic Bug Detector & Diagnostics Dashboard (`/settings` + `/api/diagnostics` + `bugDetector.ts`):**
+  - Monitors API latency, playback stalls, buffering loops, and image failures with automatic proxy fallbacks, bounded retries, transient cache eviction, and optional encrypted admin backend vault configuration.
+- **Version Sync (`v0.09.02`, `versionCode = 11`):**
+  - Updated `package.json`, `brand.config.ts`, `manifest.webmanifest`, `/api/app/update`, `/api/download/apk`, `android/app/build.gradle.kts`, `MainActivity.java`, and built signed `PROZ-MOVIE-v0.09.02.apk`.
+
+---
+
 ## [0.09.1] — 2026-11-26
 
 ### Real Cine18 OTT Catalog, StashDB VR/Hentai/Performers, Dedup Continue Watching & Gallery Categories

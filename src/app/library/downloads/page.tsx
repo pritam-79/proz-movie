@@ -44,35 +44,35 @@ export default function DownloadsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-28 pb-20 px-4 md:px-8">
+    <div className="min-h-screen bg-proz-midnight text-proz-white pt-10 sm:pt-14 pb-20 px-4 md:px-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-proz-border/60 pb-6 mb-8">
           <div>
             <Link 
               href="/library" 
-              className="inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 mb-2 transition"
+              className="inline-flex items-center gap-1.5 text-xs text-proz-purple hover:text-proz-cyan mb-2 transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Library
             </Link>
-            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-proz-white via-proz-purple to-proz-cyan bg-clip-text text-transparent">
               Authorized Download Manager
             </h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <p className="text-sm text-proz-grey mt-1">
               Permission-governed offline media caching with storage quota enforcement.
             </p>
           </div>
 
           {/* Storage Quota Card */}
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center gap-4">
-            <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400">
+          <div className="cinema-card rounded-2xl p-4 flex items-center gap-4">
+            <div className="p-2.5 rounded-xl bg-proz-purple/15 text-proz-purple">
               <HardDrive className="w-6 h-6" />
             </div>
             <div>
-              <div className="text-xs text-slate-400">Offline Storage Quota</div>
-              <div className="text-sm font-bold text-white">2.45 GB / 50.0 GB</div>
-              <div className="w-32 bg-slate-800 h-1.5 rounded-full mt-1.5 overflow-hidden">
-                <div className="bg-purple-500 h-full w-[5%]" />
+              <div className="text-xs text-proz-grey">Offline Storage Quota</div>
+              <div className="text-sm font-bold text-proz-white">2.45 GB / 50.0 GB</div>
+              <div className="w-32 bg-proz-elevated h-1.5 rounded-full mt-1.5 overflow-hidden">
+                <div className="bg-proz-purple h-full w-[5%]" />
               </div>
             </div>
           </div>
@@ -81,10 +81,10 @@ export default function DownloadsPage() {
         {/* Download Queue */}
         <div className="space-y-4">
           {downloads.length === 0 ? (
-            <div className="text-center py-20 bg-white/[0.02] border border-white/10 rounded-2xl p-8">
-              <Download className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-lg font-bold text-slate-300">No active downloads</h3>
-              <p className="text-sm text-slate-500 mt-1">
+            <div className="text-center py-20 cinema-card rounded-2xl p-8">
+              <Download className="w-12 h-12 text-proz-grey mx-auto mb-3" />
+              <h3 className="text-lg font-bold text-proz-white">No active downloads</h3>
+              <p className="text-sm text-proz-grey mt-1">
                 You can download authorized media scenes directly from your library or player.
               </p>
             </div>
@@ -94,35 +94,35 @@ export default function DownloadsPage() {
               return (
                 <div
                   key={item.id}
-                  className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
+                  className="cinema-card rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
                 >
                   <div className="flex items-center gap-3.5">
-                    <div className="p-3 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <div className="p-3 rounded-xl bg-proz-purple/15 text-proz-purple border border-proz-purple/30">
                       <FileVideo className="w-6 h-6" />
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-white">{item.title}</h4>
-                      <div className="text-xs text-slate-400 mt-0.5 flex items-center gap-3">
+                      <h4 className="text-sm font-bold text-proz-white">{item.title}</h4>
+                      <div className="text-xs text-proz-grey mt-0.5 flex items-center gap-3">
                         <span>{item.fileName}</span>
                         <span>•</span>
                         <span>{(item.fileSizeBytes / (1024 * 1024 * 1024)).toFixed(2)} GB</span>
                         <span>•</span>
-                        <span className="capitalize text-purple-300 font-medium">{item.status}</span>
+                        <span className="capitalize text-proz-purple font-medium">{item.status}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Progress & Speed */}
                   <div className="flex-1 max-w-xs px-2">
-                    <div className="flex justify-between text-xs text-slate-400 mb-1">
+                    <div className="flex justify-between text-xs text-proz-grey mb-1">
                       <span>{progress}%</span>
                       {item.speedBytesPerSec && (
                         <span>{(item.speedBytesPerSec / (1024 * 1024)).toFixed(1)} MB/s</span>
                       )}
                     </div>
-                    <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div className="w-full bg-proz-elevated h-2 rounded-full overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full transition-all duration-300"
+                        className="bg-gradient-to-r from-proz-purple to-proz-cyan h-full transition-all duration-300"
                         style={{ width: `${progress}%` }}
                       />
                     </div>

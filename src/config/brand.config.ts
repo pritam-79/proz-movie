@@ -70,8 +70,8 @@ export interface BrandConfig {
 
 export const brandConfig: BrandConfig = {
   name: "PROZ Entertainment",
-  version: "v0.09.1",
-  versionCode: 10,
+  version: "v0.09.02",
+  versionCode: 11,
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
   websiteTitle: "PROZ Entertainment – Stream Your World",
   description:
@@ -86,13 +86,13 @@ export const brandConfig: BrandConfig = {
   },
 
   colors: {
-    midnight: "#080B12",
-    glassNavy: "#111827",
-    glassBorder: "#334155",
-    electricPurple: "#8B5CF6",
-    neonCyan: "#22D3EE",
-    softWhite: "#F8FAFC",
-    mutedGrey: "#94A3B8",
+    midnight: "#07070A",
+    glassNavy: "#111218",
+    glassBorder: "#2A2D3A",
+    electricPurple: "#FF2E54",
+    neonCyan: "#F59E0B",
+    softWhite: "#FAFAFC",
+    mutedGrey: "#A1A1AA",
   },
 
   personality: [

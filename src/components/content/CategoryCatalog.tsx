@@ -91,22 +91,22 @@ export const CategoryCatalog: React.FC<CategoryCatalogProps> = ({ title, categor
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111827]/80 backdrop-blur-md border border-[#334155]/60 text-sm text-[#94A3B8] hover:text-[#F8FAFC] hover:border-[#8B5CF6]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-proz-navy border border-proz-border/70 text-sm text-proz-grey hover:text-proz-white hover:border-proz-purple/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
           >
             <ChevronLeft className="w-4 h-4" /> Prev
           </button>
 
-          <span className="text-sm text-[#94A3B8]">
+          <span className="text-sm text-proz-grey">
             Page{' '}
-            <span className="text-[#F8FAFC] font-semibold">{page}</span>
+            <span className="text-proz-white font-semibold">{page}</span>
             {' '}of{' '}
-            <span className="text-[#F8FAFC] font-semibold">{totalPages}</span>
+            <span className="text-proz-white font-semibold">{totalPages}</span>
           </span>
 
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#111827]/80 backdrop-blur-md border border-[#334155]/60 text-sm text-[#94A3B8] hover:text-[#F8FAFC] hover:border-[#8B5CF6]/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-proz-navy border border-proz-border/70 text-sm text-proz-grey hover:text-proz-white hover:border-proz-purple/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300"
           >
             Next <ChevronRight className="w-4 h-4" />
           </button>

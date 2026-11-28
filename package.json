@@ -1,6 +1,6 @@
 {
   "name": "proz-movie",
-  "version": "0.09.1",
+  "version": "0.09.02",
   "private": true,
   "scripts": {
     "dev": "next dev",

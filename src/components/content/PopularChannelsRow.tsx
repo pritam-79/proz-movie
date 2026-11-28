@@ -80,15 +80,15 @@ export const PopularChannelsRow: React.FC = () => {
               href={`/channels/${channel.slug}`}
               className="flex flex-col items-center text-center shrink-0 group transition-transform active:scale-95"
             >
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-tr from-rose-600/60 via-purple-500/40 to-zinc-700 group-hover:from-rose-500 group-hover:to-cyan-400 transition-all duration-300 shadow-lg">
+              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full p-0.5 bg-gradient-to-tr from-proz-purple via-orange-500/60 to-proz-cyan/70 group-hover:from-proz-purple group-hover:to-proz-cyan transition-all duration-300 shadow-lg">
                 <ChannelCircleAvatar channel={channel} initials={initials} />
               </div>
 
               <div className="mt-2 w-18 sm:w-22 max-w-[84px] px-0.5">
-                <p className="text-[11px] sm:text-xs font-semibold text-zinc-200 group-hover:text-rose-400 transition-colors truncate">
+                <p className="text-[11px] sm:text-xs font-semibold text-proz-white group-hover:text-proz-purple transition-colors truncate">
                   {channel.name}
                 </p>
-                <span className="text-[10px] text-zinc-500 block truncate">
+                <span className="text-[10px] text-proz-grey block truncate">
                   {channel.category}
                 </span>
               </div>

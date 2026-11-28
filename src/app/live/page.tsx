@@ -2,245 +2,217 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { 
-  Radio, 
-  Search, 
-  Heart, 
-  Tv, 
-  Play, 
-  Clock, 
-  ExternalLink, 
-  Sparkles, 
-  Check, 
-  ShieldCheck, 
-  AlertCircle,
-  Volume2,
-  Maximize2
+import {
+  Radio,
+  Search,
+  Heart,
+  Play,
+  ExternalLink,
+  RefreshCw,
 } from 'lucide-react';
 import { getAllChannels } from '@/lib/data/channelsData';
 import { resolveChannelProfile } from '@/lib/providers/channelRegistry';
-
-interface EpgProgram {
-  currentTitle: string;
-  currentTime: string;
-  nextTitle: string;
-  nextTime: string;
-}
+import VideoPlayer from '@/components/player/VideoPlayer';
 
 export default function LiveTvPage() {
   const allChannels = useMemo(() => {
-    return getAllChannels().map(c => resolveChannelProfile(c));
+    return getAllChannels().map((c) => resolveChannelProfile(c));
   }, []);
 
+  const [iptvStreams, setIptvStreams] = useState<any[]>([]);
+  const [loadingStreams, setLoadingStreams] = useState(true);
+  const [selectedLiveStream, setSelectedLiveStream] = useState<any | null>(null);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [activeChannelId, setActiveChannelId] = useState<string>(allChannels[0]?.id || 'alt-balaji');
   const [favorites, setFavorites] = useState<string[]>([]);
 
-  // Load favorites
   useEffect(() => {
     try {
       const saved = localStorage.getItem('proz_live_favorites');
       if (saved) setFavorites(JSON.parse(saved));
-    } catch {
-      // Ignore
-    }
+    } catch {}
+
+    setLoadingStreams(true);
+    fetch('/api/v07/catalog?category=live_tv')
+      .then((r) => r.json())
+      .then((d) => {
+        const list = Array.isArray(d?.items) ? d.items : [];
+        setIptvStreams(list);
+        if (list.length > 0) setSelectedLiveStream(list[0]);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingStreams(false));
   }, []);
 
   const toggleFavorite = (id: string) => {
-    let updated: string[];
-    if (favorites.includes(id)) {
-      updated = favorites.filter(f => f !== id);
-    } else {
-      updated = [...favorites, id];
-    }
+    const updated = favorites.includes(id)
+      ? favorites.filter((f) => f !== id)
+      : [...favorites, id];
     setFavorites(updated);
     try {
       localStorage.setItem('proz_live_favorites', JSON.stringify(updated));
-    } catch {
-      // Ignore
-    }
+    } catch {}
   };
 
-  const activeChannel = useMemo(() => {
-    return allChannels.find(c => c.id === activeChannelId) || allChannels[0];
-  }, [allChannels, activeChannelId]);
-
-  // EPG Program Generator
-  const epgData: EpgProgram = useMemo(() => {
-    return {
-      currentTitle: `${activeChannel?.name || 'Channel'} • Prime Time Broadcast`,
-      currentTime: '21:00 – 22:30 IST',
-      nextTitle: `${activeChannel?.category || 'Special'} • Late Night Masterwork`,
-      nextTime: '22:30 – 00:00 IST'
-    };
-  }, [activeChannel]);
-
-  const filteredChannels = useMemo(() => {
-    return allChannels.filter(c => {
-      const matchQ = c.name.toLowerCase().includes(search.toLowerCase()) || c.category.toLowerCase().includes(search.toLowerCase());
-      const matchCat = selectedCategory === 'All' || 
-        (selectedCategory === 'Favorites' ? favorites.includes(c.id) : c.category.toLowerCase() === selectedCategory.toLowerCase());
+  const filteredBroadcasters = useMemo(() => {
+    return allChannels.filter((c) => {
+      const matchQ =
+        c.name.toLowerCase().includes(search.toLowerCase()) ||
+        c.category.toLowerCase().includes(search.toLowerCase());
+      const matchCat =
+        selectedCategory === 'All' ||
+        (selectedCategory === 'Favorites'
+          ? favorites.includes(c.id)
+          : c.category.toLowerCase() === selectedCategory.toLowerCase());
       return matchQ && matchCat;
     });
   }, [allChannels, search, selectedCategory, favorites]);
 
-  return (
-    <div className="min-h-screen bg-[#07090E] text-zinc-100 pb-16">
-      
-      {/* Top Ambient Glow */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-rose-950/40 via-red-950/10 to-transparent pointer-events-none -z-10" />
+  const playerContent = useMemo(() => {
+    if (!selectedLiveStream) return null;
+    return {
+      id: selectedLiveStream.id || `iptv-${selectedLiveStream.title}`,
+      title: selectedLiveStream.title,
+      slug: selectedLiveStream.id || 'live-tv',
+      content_type: 'movie' as const,
+      category: 'Live TV (.m3u8)',
+      releaseYear: 2026,
+      streamUrl: selectedLiveStream.streamUrl,
+      fallbackMp4: selectedLiveStream.streamUrl,
+      poster_url: selectedLiveStream.poster || '',
+      backdrop_url: selectedLiveStream.backdrop || '',
+      videoSources: [
+        {
+          id: `src-live-${selectedLiveStream.id}`,
+          contentId: selectedLiveStream.id,
+          providerId: 'iptv_org',
+          providerName: 'IPTV-Org Live HLS',
+          sourceType: 'direct_hls' as const,
+          format: 'hls' as const,
+          playbackUrl: selectedLiveStream.streamUrl,
+          officialWatchUrl: selectedLiveStream.streamUrl,
+          pricingType: 'free' as const,
+          quality: '1080p',
+          country: 'GLOBAL',
+          rightsStatus: 'authorized' as const,
+          verificationStatus: 'verified' as const,
+          lastChecked: new Date().toISOString(),
+        },
+      ],
+    } as any;
+  }, [selectedLiveStream]);
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 space-y-6">
-        
-        {/* Header */}
+  return (
+    <div className="min-h-screen bg-proz-midnight text-proz-white pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 space-y-8">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold mb-1">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-proz-purple/15 border border-proz-purple/30 text-proz-purple text-xs font-bold mb-1.5">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-              <span>OFFICIAL BROADCAST & LIVE CHANNELS</span>
+              <span>LIVE BROADCASTS &amp; FREE-TO-AIR HLS</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
-              Live TV & Broadcasters
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-proz-white">
+              Live TV &amp; Broadcasters
             </h1>
           </div>
-
-          <div className="flex items-center gap-2 text-xs">
-            <span className="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 font-mono">
-              Region: India (IST)
-            </span>
-          </div>
+          <span className="px-3 py-1.5 rounded-xl glass-card text-xs text-proz-grey font-mono">
+            {iptvStreams.length} Live HLS Streams Active
+          </span>
         </div>
 
-        {/* Live Broadcast Player Container */}
+        {/* Live HLS Player Stage */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Main Video Broadcast Frame */}
-          <div className="lg:col-span-2 space-y-3">
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black border border-zinc-800 shadow-2xl flex flex-col items-center justify-center p-6 text-center">
-              
-              <div className="absolute top-4 left-4 flex items-center gap-2 z-10">
-                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-600 text-white font-bold text-[10px] tracking-wider uppercase shadow-md">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  LIVE
-                </span>
-                <span className="text-xs font-bold text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-md border border-white/10">
-                  {activeChannel.name}
-                </span>
-              </div>
-
-              {/* Broadcast Hub Screen */}
-              <div className="space-y-4 max-w-md">
-                <div 
-                  className="w-16 h-16 rounded-full mx-auto flex items-center justify-center font-extrabold text-white text-xl border-2 border-zinc-700 shadow-xl"
-                  style={{ background: `radial-gradient(circle, ${activeChannel.color || '#E11D48'}, #0A0D15)` }}
-                >
-                  {activeChannel.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()}
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-white">{epgData.currentTitle}</h3>
-                  <p className="text-xs text-rose-400 font-semibold mt-0.5">{epgData.currentTime}</p>
-                </div>
-
-                <p className="text-xs text-zinc-400">
-                  This broadcast feed is provided by the official {activeChannel.name} broadcaster network.
+          <div className="lg:col-span-2">
+            {playerContent ? (
+              <VideoPlayer content={playerContent} />
+            ) : (
+              <div className="aspect-video rounded-2xl cinema-card flex flex-col items-center justify-center p-6 text-center space-y-3">
+                <RefreshCw className={`w-8 h-8 text-proz-purple ${loadingStreams ? 'animate-spin' : ''}`} />
+                <p className="text-xs text-proz-grey">
+                  {loadingStreams
+                    ? 'Connecting to live HLS broadcast feeds...'
+                    : 'Select a live channel on the right to start HLS playback.'}
                 </p>
+              </div>
+            )}
+          </div>
 
-                <div className="flex items-center justify-center gap-3 pt-2">
-                  {activeChannel.officialWebsite && (
-                    <a
-                      href={activeChannel.officialWebsite}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold shadow-md transition-all"
-                    >
-                      <span>Watch Live Feed</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  )}
-
+          <div className="cinema-card rounded-2xl p-4 space-y-3 max-h-[480px] flex flex-col">
+            <h3 className="text-sm font-bold text-proz-white flex items-center gap-2 border-b border-proz-border/40 pb-2.5">
+              <Radio className="w-4 h-4 text-proz-purple" />
+              <span>
+                {loadingStreams
+                  ? 'Loading Live HLS Channels...'
+                  : `Playable Live HLS Channels (${iptvStreams.length})`}
+              </span>
+            </h3>
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {loadingStreams && iptvStreams.length === 0 && (
+                <div className="space-y-2 py-2">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div
+                      key={idx}
+                      className="h-12 rounded-xl bg-proz-elevated/60 animate-pulse border border-proz-border/40"
+                    />
+                  ))}
+                </div>
+              )}
+              {iptvStreams.map((ch) => {
+                const active = selectedLiveStream?.id === ch.id;
+                return (
                   <button
-                    onClick={() => toggleFavorite(activeChannel.id)}
-                    className="p-2 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white"
-                    title="Bookmark Channel"
+                    key={ch.id}
+                    onClick={() => setSelectedLiveStream(ch)}
+                    className={`w-full p-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition ${
+                      active
+                        ? 'bg-gradient-to-r from-proz-purple/25 to-orange-500/15 border border-proz-purple/60'
+                        : 'bg-proz-elevated/50 hover:bg-proz-elevated border border-proz-border/40'
+                    }`}
                   >
-                    <Heart className={`w-4 h-4 ${favorites.includes(activeChannel.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-proz-white truncate">{ch.title}</p>
+                      <span className="text-[10px] text-proz-grey block truncate">
+                        {ch.genres?.join(', ') || 'Free-to-Air HLS'}
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 text-[9px] font-bold shrink-0 flex items-center gap-1">
+                      <Play className="w-2.5 h-2.5 fill-current" /> LIVE
+                    </span>
                   </button>
-                </div>
-              </div>
-
-              {/* Bottom EPG Bar */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black via-black/80 to-transparent flex items-center justify-between text-xs text-left">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-zinc-500" />
-                  <span className="text-zinc-400 text-[11px]">Up Next:</span>
-                  <span className="font-semibold text-white text-[11px] truncate max-w-xs">{epgData.nextTitle}</span>
-                </div>
-                <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">{epgData.nextTime}</span>
-              </div>
-
+                );
+              })}
+              {!loadingStreams && iptvStreams.length === 0 && (
+                <p className="text-xs text-proz-grey py-6 text-center">
+                  No live HTTPS HLS streams available right now. Browse verified OTT channels below.
+                </p>
+              )}
             </div>
           </div>
-
-          {/* Program Guide & Broadcaster Info */}
-          <div className="space-y-4">
-            <div className="p-5 rounded-2xl bg-[#0F1420] border border-zinc-800 space-y-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Radio className="w-4 h-4 text-rose-500" />
-                <span>EPG Program Guide</span>
-              </h3>
-
-              <div className="space-y-2.5 text-xs">
-                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wide">NOW PLAYING</span>
-                    <span className="text-[10px] text-zinc-400 font-mono">{epgData.currentTime}</span>
-                  </div>
-                  <p className="font-bold text-white">{epgData.currentTitle}</p>
-                </div>
-
-                <div className="p-3 rounded-xl bg-zinc-900/60 border border-zinc-800/80 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">NEXT PROGRAM</span>
-                    <span className="text-[10px] text-zinc-500 font-mono">{epgData.nextTime}</span>
-                  </div>
-                  <p className="font-semibold text-zinc-300">{epgData.nextTitle}</p>
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-zinc-800/80 text-[11px] text-zinc-400">
-                <p>Status: <span className="text-emerald-400 font-semibold">{activeChannel.integrationStatus || 'Broadcaster Verified'}</span></p>
-                <p className="mt-1">Category: <span className="text-zinc-300 font-semibold">{activeChannel.category}</span></p>
-              </div>
-            </div>
-          </div>
-
         </div>
 
-        {/* Channels Search & Category Filter */}
-        <div className="space-y-4">
+        {/* Verified On-Demand Channels Directory */}
+        <div className="space-y-4 pt-4 border-t border-proz-border/40">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-proz-grey" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search live broadcaster or category..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#0F1420] border border-zinc-800 text-xs text-white focus:outline-none focus:border-rose-500"
+                placeholder="Search verified OTT channel or category..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl glass-input text-xs"
               />
             </div>
 
             <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none no-scrollbar">
-              {['All', 'Favorites', 'Indian OTT', 'Regional', 'Drama', 'Comedy'].map((cat) => (
+              {['All', 'Favorites', 'Indian OTT', 'Web Series', 'Regional', 'Drama', 'Comedy'].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-2 rounded-xl font-medium whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-2 rounded-xl font-semibold whitespace-nowrap border transition-all ${
                     selectedCategory === cat
-                      ? 'bg-rose-600 text-white font-bold'
-                      : 'bg-[#0F1420] text-zinc-400 hover:text-white border border-zinc-800'
+                      ? 'glass-button-primary border-transparent'
+                      : 'glass-button-secondary'
                   }`}
                 >
                   {cat}
@@ -249,50 +221,54 @@ export default function LiveTvPage() {
             </div>
           </div>
 
-          {/* Channels Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-            {filteredChannels.slice(0, 36).map((c) => {
-              const isActive = c.id === activeChannelId;
-              const initials = c.name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase();
+            {filteredBroadcasters.slice(0, 48).map((c) => {
+              const initials = c.name
+                .split(' ')
+                .slice(0, 2)
+                .map((w) => w[0])
+                .join('')
+                .toUpperCase();
+              const isFav = favorites.includes(c.id);
 
               return (
-                <button
+                <div
                   key={c.id}
-                  onClick={() => setActiveChannelId(c.id)}
-                  className={`p-3 rounded-xl border text-left transition-all group flex flex-col justify-between space-y-2 ${
-                    isActive
-                      ? 'bg-rose-600/15 border-rose-500 shadow-md ring-1 ring-rose-500'
-                      : 'bg-[#0F1420] border-zinc-800 hover:border-zinc-700'
-                  }`}
+                  className="p-3 rounded-2xl cinema-card hover:border-proz-purple/50 transition-all flex flex-col justify-between space-y-2.5"
                 >
                   <div className="flex items-center justify-between">
-                    <div 
-                      className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white border border-zinc-700"
-                      style={{ background: `radial-gradient(circle, ${c.color || '#991B1B'}, #0A0D15)` }}
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] text-white keep-white border border-white/15"
+                      style={{
+                        background: `radial-gradient(circle, ${c.color || '#FF2E54'}, #07070A)`,
+                      }}
                     >
                       {initials}
                     </div>
-
-                    <span className="flex items-center gap-1 text-[9px] font-bold text-rose-400">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                      LIVE
-                    </span>
+                    <button onClick={() => toggleFavorite(c.id)} title="Bookmark">
+                      <Heart
+                        className={`w-3.5 h-3.5 ${isFav ? 'fill-proz-purple text-proz-purple' : 'text-proz-grey'}`}
+                      />
+                    </button>
                   </div>
 
                   <div>
-                    <h4 className="text-xs font-bold text-white group-hover:text-rose-400 truncate">
-                      {c.name}
-                    </h4>
-                    <span className="text-[10px] text-zinc-500 block truncate">
-                      {c.category}
-                    </span>
+                    <h4 className="text-xs font-bold text-proz-white truncate">{c.name}</h4>
+                    <span className="text-[10px] text-proz-grey block truncate">{c.category}</span>
                   </div>
-                </button>
+
+                  <Link
+                    href={`/channels/${c.slug}`}
+                    className="w-full py-1.5 rounded-lg glass-button-secondary text-[10px] font-bold flex items-center justify-center gap-1"
+                  >
+                    <span>Open Channel</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                </div>
               );
             })}
           </div>
         </div>
-
       </div>
     </div>
   );

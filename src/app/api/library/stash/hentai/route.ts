@@ -9,8 +9,9 @@ export async function GET(req: NextRequest) {
     const subcat = sp.get('subcat')?.trim() || 'All';
     const page = Math.max(1, parseInt(sp.get('page') || '1', 10) || 1);
     const q = sp.get('q')?.trim() || '';
+    const sort = (sp.get('sort')?.trim() || 'newest') as 'newest' | 'popular' | 'rating' | 'title';
 
-    const result = await stashService.getHentaiCatalog({ subcat, page, q });
+    const result = await stashService.getHentaiCatalog({ subcat, page, q, sort });
     return NextResponse.json({
       success: true,
       subcat,

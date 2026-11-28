@@ -67,17 +67,17 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#080B12] text-slate-100 pt-28 pb-20 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-proz-midnight text-proz-white pt-10 sm:pt-14 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Title Banner */}
-        <div className="border-b border-white/10 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="border-b border-proz-border/60 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-              <User className="w-7 h-7 text-cyan-400" />
+            <h1 className="text-2xl sm:text-3xl font-black text-proz-white tracking-tight flex items-center gap-3">
+              <User className="w-7 h-7 text-proz-cyan" />
               <span>User Profile</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-proz-grey mt-1">
               Customize your profile name, contact info, and streaming preferences.
             </p>
           </div>
@@ -93,36 +93,36 @@ export default function ProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {/* Left Column Profile Card */}
-          <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 text-center space-y-4 h-fit backdrop-blur-xl">
+          <div className="p-6 rounded-3xl cinema-card text-center space-y-4 h-fit">
             <div className="relative w-24 h-24 mx-auto">
               <img
                 src={avatarUrl || user.avatarUrl}
                 alt={name || user.name}
-                className="w-full h-full rounded-full object-cover ring-4 ring-purple-500/50"
+                className="w-full h-full rounded-full object-cover ring-4 ring-proz-purple/50"
               />
-              <span className="absolute bottom-0 right-0 p-1.5 rounded-full bg-emerald-500 text-white ring-2 ring-[#080B12]">
+              <span className="absolute bottom-0 right-0 p-1.5 rounded-full bg-emerald-500 text-white keep-white ring-2 ring-proz-midnight">
                 <Check className="w-3 h-3" />
               </span>
             </div>
 
             <div>
-              <h3 className="text-base font-bold text-white">{name || user.name}</h3>
-              <p className="text-xs text-slate-400">{email || user.email}</p>
+              <h3 className="text-base font-bold text-proz-white">{name || user.name}</h3>
+              <p className="text-xs text-proz-grey">{email || user.email}</p>
             </div>
 
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-400">Membership Tier</span>
-              <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-amber-400">
-                <Crown className="w-4 h-4 fill-amber-400" />
+            <div className="p-3 rounded-2xl bg-proz-elevated/60 border border-proz-border space-y-1">
+              <span className="text-[10px] uppercase font-bold text-proz-grey">Membership Tier</span>
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold text-proz-cyan">
+                <Crown className="w-4 h-4 fill-current" />
                 <span>{user.subscription?.planId ? user.subscription.planId.replace('plan_', '').toUpperCase() + ' VIP' : 'FREE'}</span>
               </div>
-              <p className="text-[11px] text-cyan-400">{user.subscription?.videoQuality || '1080p FHD'}</p>
+              <p className="text-[11px] text-proz-cyan">{user.subscription?.videoQuality || '1080p FHD'}</p>
             </div>
 
             <div className="pt-2">
               <Link
                 href="/subscription"
-                className="block w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-lg shadow-purple-600/30 transition text-center"
+                className="block w-full py-2.5 rounded-xl glass-button-primary text-xs font-bold shadow-purple-glow transition text-center"
               >
                 Manage Subscription
               </Link>
@@ -133,40 +133,40 @@ export default function ProfilePage() {
           <div className="md:col-span-2 space-y-6">
             
             {/* Profile Edit Form */}
-            <div className="p-6 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl space-y-5">
-              <h3 className="text-base font-bold text-white">Edit Profile Details</h3>
+            <div className="p-6 rounded-3xl cinema-card space-y-5">
+              <h3 className="text-base font-bold text-proz-white">Edit Profile Details</h3>
               
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Display Name</label>
+                  <label className="text-xs font-semibold text-proz-grey">Display Name</label>
                   <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your name"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-400 transition"
+                    className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Email Address</label>
+                  <label className="text-xs font-semibold text-proz-grey">Email Address</label>
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-400 transition"
+                    className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Avatar Image URL (Optional)</label>
+                  <label className="text-xs font-semibold text-proz-grey">Avatar Image URL (Optional)</label>
                   <input
                     type="url"
                     value={avatarUrl}
                     onChange={(e) => setAvatarUrl(e.target.value)}
                     placeholder="https://images.example.com/avatar.jpg"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-400 transition"
+                    className="w-full px-4 py-2.5 rounded-xl glass-input text-sm"
                   />
                 </div>
 
@@ -177,7 +177,7 @@ export default function ProfilePage() {
                 <div className="flex items-center justify-between pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold shadow-lg shadow-cyan-600/30 transition"
+                    className="px-6 py-2.5 rounded-xl glass-button-primary text-xs font-bold shadow-purple-glow transition"
                   >
                     Save Changes
                   </button>
@@ -196,24 +196,24 @@ export default function ProfilePage() {
               {/* Devices Link */}
               <Link
                 href="/account/devices"
-                className="p-5 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-cyan-500/40 transition-all flex items-center justify-between group backdrop-blur-xl"
+                className="p-5 rounded-3xl cinema-card hover:border-proz-cyan/50 transition-all flex items-center justify-between group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 group-hover:scale-110 transition-transform">
+                  <div className="p-3 rounded-2xl bg-proz-cyan/15 border border-proz-cyan/30 text-proz-cyan group-hover:scale-110 transition-transform">
                     <Smartphone className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Device Manager</h4>
-                    <p className="text-xs text-slate-400">Manage connected sessions</p>
+                    <h4 className="text-sm font-bold text-proz-white">Device Manager</h4>
+                    <p className="text-xs text-proz-grey">Manage connected sessions</p>
                   </div>
                 </div>
-                <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+                <ExternalLink className="w-4 h-4 text-proz-grey group-hover:text-proz-cyan transition-colors" />
               </Link>
 
               {/* 18+ Adult Ecosystem Link */}
               <Link
                 href="/restricted"
-                className="p-5 rounded-3xl bg-white/[0.03] border border-white/10 hover:border-red-500/40 transition-all flex items-center justify-between group backdrop-blur-xl"
+                className="p-5 rounded-3xl cinema-card hover:border-proz-purple/50 transition-all flex items-center justify-between group"
               >
                 <div className="flex items-center gap-3">
                   <div className={`p-3 rounded-2xl border group-hover:scale-110 transition-transform ${

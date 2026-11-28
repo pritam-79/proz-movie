@@ -140,7 +140,7 @@ export default function HomePage() {
   const recommendedForYou = [...popularMovies].reverse().slice(0, 10);
 
   return (
-    <div className="pb-24 space-y-6 sm:space-y-9 bg-[#06080F]">
+    <div className="pb-24 space-y-6 sm:space-y-9 bg-proz-midnight">
       {/* 0. Sub-Header Horizontal Navigation */}
       <SubHeaderNav />
 
@@ -294,7 +294,7 @@ export default function HomePage() {
           viewAllHref="/movies?genre=scifi"
           aspectRatio="backdrop"
           badge="MIND BENDING"
-          icon={<Rocket className="w-5 h-5 text-cyan-400" />}
+          icon={<Rocket className="w-5 h-5 text-proz-cyan" />}
         />
       )}
 
@@ -331,7 +331,7 @@ export default function HomePage() {
           viewAllHref="/movies?sort=latest"
           aspectRatio="backdrop"
           badge="COMING SOON"
-          icon={<Calendar className="w-5 h-5 text-purple-400" />}
+          icon={<Calendar className="w-5 h-5 text-proz-purple" />}
         />
       )}
 

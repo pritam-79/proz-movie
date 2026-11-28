@@ -272,7 +272,7 @@ function SearchContent() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-[#080B12]"
+                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-proz-navy"
                 >
                   {CATEGORIES.map((c) => (
                     <option key={c.id} value={c.id}>{c.label}</option>
@@ -288,7 +288,7 @@ function SearchContent() {
                 <select
                   value={selectedGenre}
                   onChange={(e) => setSelectedGenre(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-[#080B12]"
+                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-proz-navy"
                 >
                   {GENRES.map((g) => (
                     <option key={g} value={g}>{g}</option>
@@ -304,7 +304,7 @@ function SearchContent() {
                 <select
                   value={selectedLanguage}
                   onChange={(e) => setSelectedLanguage(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-[#080B12]"
+                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-proz-navy"
                 >
                   {LANGUAGES.map((l) => (
                     <option key={l} value={l}>{l}</option>
@@ -320,7 +320,7 @@ function SearchContent() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-[#080B12]"
+                  className="w-full px-3 py-2 rounded-xl glass-input text-xs text-proz-white bg-proz-navy"
                 >
                   {SORT_OPTIONS.map((s) => (
                     <option key={s.id} value={s.id}>{s.label}</option>

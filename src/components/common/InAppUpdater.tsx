@@ -186,17 +186,17 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
     <>
       {/* ─── 1. TOP IN-APP UPDATE BANNER (Shown strictly when genuinely newer update exists & not dismissed) ─── */}
       {showBanner && hasUpdate && (
-        <div className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-purple-950/95 via-[#080B12]/95 to-cyan-950/95 border-b border-purple-500/40 backdrop-blur-xl shadow-2xl">
+        <div className="fixed top-16 left-0 right-0 z-40 bg-proz-navy/95 border-b border-proz-purple/40 backdrop-blur-xl shadow-2xl">
           <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 text-xs sm:text-sm">
             <div className="flex items-center gap-2.5 overflow-hidden">
-              <span className="p-1 rounded-lg bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
+              <span className="p-1 rounded-lg bg-proz-purple/20 text-proz-purple border border-proz-purple/30 shrink-0">
                 <Sparkles className="w-4 h-4" />
               </span>
               <div className="truncate">
-                <span className="font-bold text-white">
+                <span className="font-bold text-proz-white">
                   Update v{updateInfo.latestVersion} Available
                 </span>{' '}
-                <span className="text-slate-300 hidden sm:inline">
+                <span className="text-proz-grey hidden sm:inline">
                   (Installed: v{installedVersion}) • {updateInfo.title}
                 </span>
               </div>
@@ -205,14 +205,14 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
             <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => setIsOpen(true)}
-                className="px-3 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-md transition flex items-center gap-1.5"
+                className="px-3 py-1 rounded-lg glass-button-primary font-bold text-xs shadow-purple-glow transition flex items-center gap-1.5"
               >
                 <span>View Update</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={handleDismissBanner}
-                className="p-1 text-slate-400 hover:text-white transition"
+                className="p-1 text-proz-grey hover:text-proz-white transition"
                 title="Dismiss permanently for this release"
                 aria-label="Dismiss update notification"
               >
@@ -226,7 +226,7 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
       {/* ─── 2. UPDATE & VERSION DETAILS DIALOG ─── */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-          <div className="relative w-full max-w-lg rounded-3xl bg-[#0B0F1A] border border-white/15 shadow-2xl p-6 sm:p-8">
+          <div className="relative w-full max-w-lg rounded-3xl cinema-card bg-proz-navy border border-proz-border shadow-2xl p-6 sm:p-8">
             <button
               onClick={handleCloseModal}
               className="absolute top-5 right-5 p-2 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition"
@@ -276,15 +276,15 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
             </div>
 
             {/* Release Highlights */}
-            <div className="bg-[#080B12] rounded-2xl p-4 border border-white/10 mb-5 max-h-52 overflow-y-auto">
-              <h4 className="text-xs font-bold text-purple-300 mb-2.5 flex items-center gap-1.5 uppercase tracking-wider">
+            <div className="bg-proz-midnight rounded-2xl p-4 border border-proz-border mb-5 max-h-52 overflow-y-auto">
+              <h4 className="text-xs font-bold text-proz-purple mb-2.5 flex items-center gap-1.5 uppercase tracking-wider">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" /> Release Highlights v
                 {updateInfo.latestVersion}
               </h4>
               <ul className="space-y-2">
                 {updateInfo.changelog.map((item, idx) => (
-                  <li key={idx} className="text-xs text-slate-300 flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+                  <li key={idx} className="text-xs text-proz-grey flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-proz-cyan mt-1.5 shrink-0" />
                     <span className="leading-relaxed">{item}</span>
                   </li>
                 ))}
@@ -293,16 +293,16 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
 
             {isUpdating && (
               <div className="mb-4 space-y-2">
-                <div className="flex items-center justify-between text-xs text-slate-300">
+                <div className="flex items-center justify-between text-xs text-proz-grey">
                   <span className="flex items-center gap-2">
-                    <RefreshCw className="w-3.5 h-3.5 text-purple-400 animate-spin" />
+                    <RefreshCw className="w-3.5 h-3.5 text-proz-purple animate-spin" />
                     <span>Applying update safely (preserving user data)...</span>
                   </span>
-                  <span className="font-bold text-cyan-400">{updateProgress}%</span>
+                  <span className="font-bold text-proz-cyan">{updateProgress}%</span>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                <div className="w-full bg-proz-elevated h-2 rounded-full overflow-hidden">
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-cyan-400 h-full transition-all duration-300"
+                    className="bg-gradient-to-r from-proz-purple to-proz-cyan h-full transition-all duration-300"
                     style={{ width: `${updateProgress}%` }}
                   />
                 </div>
@@ -314,7 +314,7 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
                 <button
                   onClick={handleApplyUpdate}
                   disabled={isUpdating}
-                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 to-cyan-500 shadow-lg hover:opacity-95 transition disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold text-sm glass-button-primary shadow-purple-glow transition disabled:opacity-50"
                 >
                   <Download className="w-4 h-4" />
                   <span>
@@ -326,7 +326,7 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
               ) : (
                 <button
                   onClick={handleCloseModal}
-                  className="w-full py-3 px-4 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 transition"
+                  className="w-full py-3 px-4 rounded-xl font-bold text-sm text-white keep-white bg-emerald-600 hover:bg-emerald-500 transition"
                 >
                   PROZ v{installedVersion} Is Up To Date
                 </button>
@@ -336,14 +336,14 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
                 <Link
                   href="/updates"
                   onClick={handleCloseModal}
-                  className="text-purple-400 hover:text-purple-300 font-semibold"
+                  className="text-proz-purple hover:underline font-semibold"
                 >
                   Full Release Notes →
                 </Link>
                 <div className="flex items-center gap-3">
                   <button
                     onClick={handleCloseModal}
-                    className="text-slate-300 hover:text-white font-semibold"
+                    className="text-proz-grey hover:text-proz-white font-semibold"
                   >
                     Dismiss
                   </button>
@@ -351,7 +351,7 @@ export default function InAppUpdater({ suppressOverlay = false }: { suppressOver
                     <a
                       href={updateInfo.apkUrl}
                       download={`PROZ-MOVIE-v${updateInfo.latestVersion}.apk`}
-                      className="text-cyan-400 hover:text-cyan-300 font-semibold"
+                      className="text-proz-cyan hover:underline font-semibold"
                     >
                       APK File
                     </a>

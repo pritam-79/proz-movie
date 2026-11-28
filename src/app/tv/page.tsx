@@ -46,7 +46,7 @@ export default function TVModePage() {
   const activeScene = scenes[selectedIndex];
 
   return (
-    <div className="fixed inset-0 bg-[#06080F] text-white z-50 flex flex-col justify-between overflow-hidden select-none">
+    <div className="fixed inset-0 bg-[#07070A] text-white keep-white z-50 flex flex-col justify-between overflow-hidden select-none">
       {/* Background Cinematic Backdrop */}
       {activeScene && (
         <div 
@@ -54,7 +54,7 @@ export default function TVModePage() {
           style={{ backgroundImage: `url(${activeScene.paths.screenshot || activeScene.paths.webp})` }}
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#06080F] via-[#06080F]/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07070A] via-[#07070A]/80 to-transparent" />
 
       {/* TV Header Bar */}
       <div className="relative z-10 px-8 py-6 flex items-center justify-between border-b border-white/10">
@@ -66,31 +66,31 @@ export default function TVModePage() {
             <ArrowLeft className="w-5 h-5" />
             <span>Exit TV Mode</span>
           </Link>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-purple-500/20 border border-purple-500/30 text-purple-300 font-bold text-sm">
-            <Tv className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-proz-purple/20 border border-proz-purple/40 text-proz-purple font-bold text-sm">
+            <Tv className="w-4 h-4 text-proz-cyan" />
             <span>PROZ 10-FOOT INTERFACE</span>
           </div>
         </div>
 
         <div className="text-right text-xs text-slate-400">
-          Use Remote <span className="text-white font-mono font-bold">← →</span> or <span className="text-white font-mono font-bold">ENTER</span>
+          Use Remote <span className="text-white keep-white font-mono font-bold">← →</span> or <span className="text-white keep-white font-mono font-bold">ENTER</span>
         </div>
       </div>
 
       {/* Featured Hero Card for TV */}
       {activeScene && (
         <div className="relative z-10 px-12 max-w-4xl py-6">
-          <div className="flex items-center gap-3 text-sm text-cyan-400 font-bold mb-2">
+          <div className="flex items-center gap-3 text-sm text-proz-cyan font-bold mb-2">
             <span>{activeScene.studio?.name || 'Studio Vault'}</span>
             <span>•</span>
             <span>{activeScene.date}</span>
             {activeScene.rating && (
-              <span className="flex items-center gap-1 text-amber-400 ml-2">
-                <Star className="w-4 h-4 fill-amber-400" /> {activeScene.rating}
+              <span className="flex items-center gap-1 text-proz-cyan ml-2">
+                <Star className="w-4 h-4 fill-current" /> {activeScene.rating}
               </span>
             )}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg mb-4">
+          <h1 className="text-4xl md:text-5xl font-black text-white keep-white tracking-tight drop-shadow-lg mb-4">
             {activeScene.title}
           </h1>
           <p className="text-base text-slate-300 line-clamp-3 mb-6 max-w-2xl leading-relaxed">
@@ -100,7 +100,7 @@ export default function TVModePage() {
           <div className="flex items-center gap-4">
             <Link
               href={toStashWatchPath(activeScene.id)}
-              className="px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-lg flex items-center gap-3 shadow-2xl shadow-purple-600/50 transform hover:scale-105 transition"
+              className="px-8 py-4 rounded-2xl glass-button-primary font-bold text-lg flex items-center gap-3 shadow-purple-glow transform hover:scale-105 transition"
             >
               <Play className="w-6 h-6 fill-white" />
               <span>Watch Now</span>
@@ -123,7 +123,7 @@ export default function TVModePage() {
                 onClick={() => setSelectedIndex(idx)}
                 className={`relative flex-shrink-0 w-64 aspect-video rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
                   isSelected 
-                    ? 'ring-4 ring-purple-500 scale-105 shadow-2xl shadow-purple-600/60' 
+                    ? 'ring-4 ring-proz-purple scale-105 shadow-purple-glow' 
                     : 'opacity-60 hover:opacity-90'
                 }`}
               >
