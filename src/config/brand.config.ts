@@ -70,8 +70,8 @@ export interface BrandConfig {
 
 export const brandConfig: BrandConfig = {
   name: "PROZ Entertainment",
-  version: "v0.09.02",
-  versionCode: 11,
+  version: "v0.09.03",
+  versionCode: 12,
   tagline: "YOUR WORLD. YOUR ENTERTAINMENT.",
   websiteTitle: "PROZ Entertainment – Stream Your World",
   description:
@@ -131,6 +131,7 @@ export const brandConfig: BrandConfig = {
       { label: "Stash", href: "/library", badge: "DB" },
       { label: "Ranking", href: "/ranking" },
       { label: "Explore", href: "/explore" },
+      { label: "AI Videos", href: "/ai-videos", badge: "AI" },
       { label: "18+ Zone", href: "/restricted", badge: "18+" },
     ],
     userNav: [

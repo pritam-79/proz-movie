@@ -4,6 +4,24 @@ All notable changes to the PROZ Entertainment OTT & Stash platform are documente
 
 ---
 
+## [0.09.03] — 2026-11-29
+
+### Strict Visual Content Classification, AI Adult Videos Section, Genuine Photo Galleries, Player Duration & Scroll-Lock Fixes, Auth & Profile Crop
+- **Strict 4-Category Visual Classification (`src/lib/services/contentClassifier.ts`, `stashService.ts`, `/restricted`):**
+  - Separated **Hentai Anime (2D)**, **3D CGI Animation**, **3D VR Experiences**, and **Illustrated Comics** (moving 2D Indian adult comics like Savita Bhabhi out of Hentai 2D / 3D CGI into their own `Illustrated Comics` tab while preserving playable links).
+- **New Dedicated AI Adult Videos Section (`/ai-videos`, `/api/library/ai-videos`, `aiAdultVideos.ts`):**
+  - Strictly fictional 18+ AI-generated 3D, cinematic, and VR video catalog with safety rules blocking real-person likenesses/deepfakes and an operator-configurable AI generation studio.
+- **Genuine Adult Photo Galleries & Performers Infinite Scroll:**
+  - Removed video-screenshot pseudo-galleries from `getPhotoGalleries`, retaining genuine RedGIFs image sets, StashDB & Personal Stash galleries with URL deduplication and IntersectionObserver auto-loading for Performers & Galleries.
+- **Video Player & Fullscreen Fixes (`VideoPlayer.tsx`):**
+  - Fixed `01:05 / Infinity` duration display using `Number.isFinite`, added `seekable` bounds verification, touch-enabled seekbar scrubbing, Skip Credits, and `document.body.style.overflow = 'hidden'` fullscreen scroll-lock.
+- **Profile Photo Upload/Crop & Supabase Auth (`AuthContext.tsx`, `/profile`, `/auth/*`):**
+  - Added 256×256 square `<canvas>` profile photo cropping with zoom & persistent storage, plus Supabase Auth support for Google Sign-In, Email+Password, Password Reset, and Phone OTP.
+- **Live TV, Trailer Clarity, Global Search, Bug Recovery & Scroll Restoration:**
+  - Added Country/Language filters and Recently Watched channels in `/live`, explicit `"Trailer Only — Full Episode Unavailable"` notices on trailer-only titles, expanded `/api/search`, exponential-backoff `diagnosticFetch`, session splash screen & route scroll restoration, and synchronized `v0.09.03` (`versionCode = 12`).
+
+---
+
 ## [0.09.02] — 2026-11-27
 
 ### Complete Obsidian Ember Redesign, Light/Dark Themes, Naughty America & Channel Repairs, Stash/RedGIFs/StashDB Expansion & Bug Detector

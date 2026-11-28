@@ -15,16 +15,25 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreeTerms) return;
     setIsLoading(true);
+    setStatusMsg(null);
     try {
-      await signup(email, name);
-      router.push('/subscription');
-    } catch (err) {
-      console.error(err);
+      const res = await signup(email, name, password);
+      if (!res.ok) {
+        setStatusMsg(res.message || 'Sign-up failed.');
+      } else if (res.message) {
+        setStatusMsg(res.message);
+        setTimeout(() => router.push('/subscription'), 900);
+      } else {
+        router.push('/subscription');
+      }
+    } catch (err: any) {
+      setStatusMsg(err?.message || 'Sign-up failed.');
     } finally {
       setIsLoading(false);
     }
@@ -111,6 +120,12 @@ export default function RegisterPage() {
               </Link>.
             </label>
           </div>
+
+          {statusMsg && (
+            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
+              {statusMsg}
+            </div>
+          )}
 
           <button
             type="submit"

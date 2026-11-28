@@ -899,17 +899,51 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
     }
   }, [hasPlaybackError]);
 
+  const getSeekBounds = useCallback((vid: HTMLVideoElement) => {
+    if (vid.seekable && vid.seekable.length > 0) {
+      const start = vid.seekable.start(0);
+      const end = vid.seekable.end(vid.seekable.length - 1);
+      if (Number.isFinite(start) && Number.isFinite(end) && end > start) {
+        return { min: start, max: end, seekable: true };
+      }
+    }
+    const dur = Number.isFinite(vid.duration) && vid.duration > 0 ? vid.duration : duration;
+    return { min: 0, max: Number.isFinite(dur) && dur > 0 ? dur : 0, seekable: Number.isFinite(dur) && dur > 0 };
+  }, [duration]);
+
   const seekDelta = useCallback(
     (seconds: number) => {
       const vid = videoRef.current;
       if (!vid) return;
-      const maxDur = duration || vid.duration || vid.currentTime + Math.abs(seconds);
-      const target = Math.max(0, Math.min(maxDur || 99999, vid.currentTime + seconds));
-      vid.currentTime = target;
-      setCurrentTime(target);
+      const bounds = getSeekBounds(vid);
+      const fallbackMax = vid.currentTime + Math.max(0, seconds);
+      const upper = bounds.max > 0 ? bounds.max : fallbackMax;
+      const target = Math.max(bounds.min, Math.min(upper, vid.currentTime + seconds));
+      if (!Number.isFinite(target)) return;
+      try {
+        vid.currentTime = target;
+        setCurrentTime(target);
+      } catch {}
       scheduleControlsHide();
     },
-    [duration, scheduleControlsHide]
+    [getSeekBounds, scheduleControlsHide]
+  );
+
+  const jumpToTimestamp = useCallback(
+    (timestampSeconds: number) => {
+      const vid = videoRef.current;
+      if (!vid) return;
+      const bounds = getSeekBounds(vid);
+      const upper = bounds.max > 0 ? bounds.max : timestampSeconds;
+      const target = Math.max(bounds.min, Math.min(upper, timestampSeconds));
+      if (!Number.isFinite(target)) return;
+      try {
+        vid.currentTime = target;
+        setCurrentTime(target);
+      } catch {}
+      scheduleControlsHide();
+    },
+    [getSeekBounds, scheduleControlsHide]
   );
 
   // Double-tap left/right seek handler + single tap control reveal/toggle
@@ -938,11 +972,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
     }
   };
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const target = parseFloat(e.target.value);
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement> | React.FormEvent<HTMLInputElement>) => {
+    const target = parseFloat((e.target as HTMLInputElement).value);
+    if (!Number.isFinite(target)) return;
     if (videoRef.current) {
-      videoRef.current.currentTime = target;
-      setCurrentTime(target);
+      const bounds = getSeekBounds(videoRef.current);
+      const clamped = bounds.max > 0 ? Math.max(bounds.min, Math.min(bounds.max, target)) : Math.max(0, target);
+      try {
+        videoRef.current.currentTime = clamped;
+        setCurrentTime(clamped);
+      } catch {}
       scheduleControlsHide();
     }
   };
@@ -973,6 +1012,23 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
       }
     } catch {}
   };
+
+  useEffect(() => {
+    const onFsChange = () => {
+      const active = Boolean(document.fullscreenElement);
+      setIsFullscreen(active);
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = active ? 'hidden' : '';
+      }
+    };
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange);
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+    };
+  }, []);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
@@ -1230,7 +1286,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
               onLoadedMetadata={() => {
                 const vid = videoRef.current;
                 if (!vid) return;
-                if (!isNaN(vid.duration) && vid.duration > 0) setDuration(vid.duration);
+                if (Number.isFinite(vid.duration) && vid.duration > 0) setDuration(vid.duration);
                 const res = formatResolutionBadge(vid.videoWidth, vid.videoHeight);
                 if (res) setDetectedResolution(res);
                 syncTrackListsFromPlayers();
@@ -1244,26 +1300,30 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
               onCanPlay={() => {
                 setIsBuffering(false);
                 autoRetryCountRef.current = 0;
-                if (videoRef.current && (!duration || isNaN(duration)) && !isNaN(videoRef.current.duration)) {
-                  if (videoRef.current.duration > 0) setDuration(videoRef.current.duration);
+                if (videoRef.current && (!duration || !Number.isFinite(duration)) && Number.isFinite(videoRef.current.duration) && videoRef.current.duration > 0) {
+                  setDuration(videoRef.current.duration);
                 }
+              }}
+              onSeeked={() => {
+                setIsBuffering(false);
               }}
               onTimeUpdate={() => {
                 const vid = videoRef.current;
                 if (!vid) return;
                 const cur = vid.currentTime;
                 setCurrentTime(cur);
-                if ((!duration || isNaN(duration)) && vid.duration > 0) {
+                if ((!duration || !Number.isFinite(duration)) && Number.isFinite(vid.duration) && vid.duration > 0) {
                   setDuration(vid.duration);
                 }
                 const now = Date.now();
                 if (now - lastSavedProgressRef.current > 4000) {
                   lastSavedProgressRef.current = now;
-                  saveProgress(content.id, cur, vid.duration || duration || 0, currentEpisode?.id);
+                  const safeDur = Number.isFinite(vid.duration) && vid.duration > 0 ? vid.duration : Number.isFinite(duration) ? duration : 0;
+                  saveProgress(content.id, cur, safeDur, currentEpisode?.id);
                 }
               }}
               onDurationChange={() => {
-                if (videoRef.current && !isNaN(videoRef.current.duration) && videoRef.current.duration > 0) {
+                if (videoRef.current && Number.isFinite(videoRef.current.duration) && videoRef.current.duration > 0) {
                   setDuration(videoRef.current.duration);
                 }
               }}
@@ -1438,16 +1498,34 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
             )}
 
             {/* Skip Intro */}
-            {isPlaying && currentTime > 5 && currentTime < 90 && (
+            {isPlaying && currentTime >= 5 && currentTime < 85 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  seekDelta(85 - currentTime);
+                  jumpToTimestamp(85);
                 }}
                 className="absolute bottom-20 left-4 z-20 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 text-white keep-white text-xs font-bold hover:bg-proz-purple transition-all flex items-center gap-1.5 shadow-xl"
               >
                 <FastForward className="w-3.5 h-3.5" />
                 <span>Skip Intro</span>
+              </button>
+            )}
+
+            {/* Skip Credits */}
+            {isPlaying && Number.isFinite(duration) && duration > 180 && currentTime >= duration - 75 && currentTime < duration - 4 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (nextEpisode) {
+                    router.push(`/watch/${content.id}?episode=${nextEpisode.id}`);
+                  } else {
+                    jumpToTimestamp(Math.max(0, duration - 2));
+                  }
+                }}
+                className="absolute bottom-20 right-4 z-20 px-3 py-1.5 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 text-white keep-white text-xs font-bold hover:bg-proz-cyan hover:text-slate-950 transition-all flex items-center gap-1.5 shadow-xl"
+              >
+                <SkipForward className="w-3.5 h-3.5" />
+                <span>{nextEpisode ? 'Next Episode' : 'Skip Credits'}</span>
               </button>
             )}
 
@@ -1463,16 +1541,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
                 <div
                   className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-white/30 rounded-full pointer-events-none"
                   style={{
-                    width: duration > 0 ? `${Math.min(100, (bufferedTime / duration) * 100)}%` : '0%',
+                    width: Number.isFinite(duration) && duration > 0 ? `${Math.min(100, (bufferedTime / duration) * 100)}%` : '0%',
                   }}
                 />
                 <input
                   type="range"
                   min={0}
-                  max={duration || 100}
-                  value={currentTime}
+                  max={Number.isFinite(duration) && duration > 0 ? duration : Math.max(100, currentTime + 30)}
+                  step={0.5}
+                  value={Math.min(currentTime, Number.isFinite(duration) && duration > 0 ? duration : currentTime + 30)}
                   onChange={handleSeek}
-                  className="relative w-full h-1.5 bg-zinc-700/60 rounded-full appearance-none cursor-pointer accent-rose-500"
+                  onInput={handleSeek}
+                  className="relative w-full h-1.5 bg-zinc-700/60 rounded-full appearance-none cursor-pointer accent-rose-500 touch-none"
                 />
               </div>
 
@@ -1545,7 +1625,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({ content, episodeId }) 
                   </div>
 
                   <span className="text-[11px] text-zinc-300 font-mono truncate">
-                    {formatTime(currentTime)} / {duration > 0 ? formatTime(duration) : '--:--'}
+                    {formatTime(currentTime)} / {Number.isFinite(duration) && duration > 0 ? formatTime(duration) : 'LIVE'}
                   </span>
                 </div>
 

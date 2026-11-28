@@ -1,8 +1,8 @@
 {
   "name": "PROZ Entertainment",
-  "short_name": "PROZ v0.09.02",
-  "version": "0.09.02",
-  "description": "PROZ Entertainment v0.09.02 — Complete Obsidian Ember Redesign, All Channels & .ts Range Playback, RedGIFs/Stash/StashDB Ecosystem & Bug Detector",
+  "short_name": "PROZ v0.09.03",
+  "version": "0.09.03",
+  "description": "PROZ Entertainment v0.09.03 — Strict Hentai/3D CGI/VR/Comics Classification, AI Adult Videos Section, Genuine Photo Galleries, Player Duration & Scroll-Lock Fixes, Auth & Profile Crop",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#07070A",

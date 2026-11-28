@@ -4,6 +4,7 @@ import { stashAdapter } from '@/lib/providers/stash';
 import { testStashDbConnection } from '@/lib/providers/stashdb';
 import { stashService } from '@/lib/services/stashService';
 import { cine18Adapter } from '@/lib/providers/cine18';
+import { getProviderMetadataRegistry } from '@/lib/providers/providerMetadata';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,8 +34,9 @@ export async function GET() {
       success: true,
       checkedAt: new Date().toISOString(),
       latencyMs: Date.now() - start,
-      version: '0.09.02',
+      version: '0.09.03',
       systemHealth: cineTest.success ? 'healthy' : 'degraded',
+      providers: getProviderMetadataRegistry(),
       services: {
         apiGateway: { ok: true, status: 'operational', latencyMs: Date.now() - start },
         cine18: {

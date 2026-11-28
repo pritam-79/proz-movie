@@ -215,13 +215,30 @@ export default function TitleDetailPage() {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-3 pt-2">
-              <Link
-                href={`/watch/${content.id}`}
-                className="flex items-center gap-2 px-7 py-3.5 rounded-full glass-button-primary text-sm font-bold shadow-cyan-glow"
-              >
-                <Play className="w-4 h-4 fill-white" />
-                <span>Start Watching</span>
-              </Link>
+              {(() => {
+                const isTrailerOnly =
+                  content.playableType === 'trailer' ||
+                  (!content.streamUrl &&
+                    !content.fallbackMp4 &&
+                    (!content.videoSources?.length ||
+                      content.videoSources.every((s: any) => s.sourceType === 'youtube_trailer')));
+                return (
+                  <>
+                    <Link
+                      href={`/watch/${content.id}`}
+                      className="flex items-center gap-2 px-7 py-3.5 rounded-full glass-button-primary text-sm font-bold shadow-cyan-glow"
+                    >
+                      <Play className="w-4 h-4 fill-white" />
+                      <span>{isTrailerOnly ? 'Watch Official Trailer' : 'Start Watching'}</span>
+                    </Link>
+                    {isTrailerOnly && (
+                      <span className="px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-[11px] font-semibold text-amber-300">
+                        Trailer Only — Full Episode Unavailable
+                      </span>
+                    )}
+                  </>
+                );
+              })()}
 
               <button
                 onClick={toggleWatchlist}

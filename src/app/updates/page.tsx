@@ -26,6 +26,24 @@ import { brandConfig } from '@/config/brand.config';
 export default function UpdatesPage() {
   const features = [
     {
+      title: "v0.09.03 Strict Visual Classification & Illustrated Comics Separation",
+      desc: "Independent Hentai Anime (2D), 3D CGI Animation, 3D VR Experiences & Illustrated Comics tabs — Savita Bhabhi comics separated cleanly from Hentai & 3D CGI.",
+      icon: Sparkles,
+      color: "text-proz-purple"
+    },
+    {
+      title: "v0.09.03 AI Adult Videos Section (/ai-videos) & Genuine Photo Galleries",
+      desc: "New dedicated fictional 18+ AI-generated video hub with safety guardrails, plus genuine deduplicated Photo Galleries & infinite-scroll Performers.",
+      icon: Film,
+      color: "text-proz-cyan"
+    },
+    {
+      title: "v0.09.03 Player Duration Fix, Fullscreen Scroll-Lock, Profile Crop & Auth",
+      desc: "Fixed 01:05 / Infinity duration bug, added seekable bounds check, Skip Credits, fullscreen scroll-lock, 256x256 avatar cropping, Supabase Auth & route scroll restoration.",
+      icon: Zap,
+      color: "text-emerald-400"
+    },
+    {
       title: "v0.09.02 Complete Obsidian Ember Redesign & Light/Dark Themes",
       desc: "Unified Obsidian Onyx & Ember Crimson color system with persistent Dark, Daylight Light & System modes across all pages, cards, player HUD & modals.",
       icon: Sparkles,

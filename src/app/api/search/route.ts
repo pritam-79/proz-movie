@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getNormalizedMockContent } from '@/lib/data/mockContent';
+import { getAllChannels } from '@/lib/data/channelsData';
+import { stashService } from '@/lib/services/stashService';
+import { getAiAdultVideosCatalog } from '@/lib/providers/aiAdultVideos';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -76,9 +79,37 @@ export async function GET(req: NextRequest) {
   const paginated = list.slice(offset, offset + limit);
   const suggestions = paginated.slice(0, 5).map((r) => r.title);
 
+  // Extended cross-catalog search (Channels + optional 18+ Performers / Studios / Galleries / VR / AI Videos)
+  const matchingChannels = getAllChannels()
+    .filter((ch) => ch.name.toLowerCase().includes(lowerQ) || ch.category.toLowerCase().includes(lowerQ))
+    .slice(0, 6)
+    .map((ch) => ({ id: ch.id, name: ch.name, category: ch.category, href: `/live` }));
+
+  const includeRestricted = searchParams.get('include18') === '1';
+  let extended: Record<string, any[]> = { channels: matchingChannels };
+  if (includeRestricted) {
+    const [performers, vrRes, aiRes, galRes] = await Promise.all([
+      stashService.getPerformersDirectory({ q, page: 1 }).catch(() => []),
+      stashService.getVrCatalog({ q, page: 1 }).catch(() => ({ scenes: [] })),
+      getAiAdultVideosCatalog({ q, page: 1 }).catch(() => ({ items: [] })),
+      stashService.getPhotoGalleries('All', 1).catch(() => ({ galleries: [] })),
+    ]);
+    extended = {
+      channels: matchingChannels,
+      performers: performers.slice(0, 6).map((p) => ({ id: p.id, name: p.name, image: p.image, href: '/restricted' })),
+      vr: vrRes.scenes.slice(0, 6).map((v) => ({ id: v.id, title: v.title, href: v.watchHref || '/restricted' })),
+      aiVideos: aiRes.items.slice(0, 6).map((a) => ({ id: a.id, title: a.title, href: a.watchHref })),
+      galleries: galRes.galleries
+        .filter((g) => g.title.toLowerCase().includes(lowerQ))
+        .slice(0, 6)
+        .map((g) => ({ id: g.id, title: g.title, href: '/restricted' })),
+    };
+  }
+
   return NextResponse.json({
     results: paginated,
     total,
     suggestions,
+    extended,
   });
 }

@@ -1,4 +1,4 @@
-# PROZ ENTERTAINMENT v0.09.02 — YOUR WORLD. YOUR ENTERTAINMENT.
+# PROZ ENTERTAINMENT v0.09.03 — YOUR WORLD. YOUR ENTERTAINMENT.
 
 A production-grade, authorized OTT streaming platform combined with a private, federated multi-user media library and restricted 18+ ecosystem inspired by the open-source **Peek Stash Browser** architecture.
 

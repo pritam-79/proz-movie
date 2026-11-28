@@ -433,6 +433,42 @@ function RestrictedContent() {
     }
   };
 
+  // Infinite scroll auto-load for Performers & Galleries tabs
+  const perfSentinelRef = React.useRef<HTMLDivElement | null>(null);
+  const gallerySentinelRef = React.useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (activeTab !== 'performers' || perfPlayableOnly || loadingMorePerfs) return;
+    const node = perfSentinelRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          handleLoadMorePerformers();
+        }
+      },
+      { rootMargin: '250px' }
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [activeTab, perfPlayableOnly, loadingMorePerfs, perfPage]);
+
+  useEffect(() => {
+    if (activeTab !== 'galleries' || !galleryHasMore || loadingMoreGalleries) return;
+    const node = gallerySentinelRef.current;
+    if (!node) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          handleLoadMoreGalleries();
+        }
+      },
+      { rootMargin: '250px' }
+    );
+    obs.observe(node);
+    return () => obs.disconnect();
+  }, [activeTab, galleryHasMore, loadingMoreGalleries, galleryPage]);
+
   const handleManualRefreshSync = async () => {
     setSyncing(true);
     try {
@@ -1416,7 +1452,7 @@ function RestrictedContent() {
             </div>
 
             {activeTab === 'performers' && !perfPlayableOnly && (
-              <div className="flex justify-center pt-2">
+              <div ref={perfSentinelRef} className="flex justify-center pt-2">
                 <button
                   onClick={handleLoadMorePerformers}
                   disabled={loadingMorePerfs}
@@ -1564,11 +1600,11 @@ function RestrictedContent() {
                   <span>Hentai &amp; 3D CGI Animation ({(hentaiTotalCount || filteredHentai.length).toLocaleString()})</span>
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Playable 18+ adult animation plus StashDB Hentai OVAs &amp; 3D CGI (strictly consenting adults).
+                  Strictly separated 2D Japanese Hentai, 3D CGI / SFM, 3D VR, and 2D Illustrated Comics (18+ Consenting Adults).
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
-                {['All', 'Playable Adult Animation', 'Hentai OVAs', '3D CGI', 'VR Hentai'].map((sub) => (
+                {['All', 'Hentai Anime (2D)', '3D CGI Animation', '3D VR Experiences', 'Illustrated Comics'].map((sub) => (
                   <button
                     key={sub}
                     onClick={() => setHentaiSubcat(sub)}
@@ -1738,7 +1774,7 @@ function RestrictedContent() {
                   ))}
                 </div>
                 {galleryHasMore && activeTab === 'galleries' && (
-                  <div className="flex justify-center pt-2">
+                  <div ref={gallerySentinelRef} className="flex justify-center pt-2">
                     <button
                       type="button"
                       onClick={handleLoadMoreGalleries}

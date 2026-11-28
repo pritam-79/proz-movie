@@ -153,7 +153,7 @@ export interface HentaiCatalogEntry {
   id: string;
   title: string;
   studio: string;
-  subType: 'Playable Adult Animation' | 'Hentai OVAs' | '3D CGI' | 'VR Hentai';
+  subType: 'Hentai Anime (2D)' | '3D CGI Animation' | '3D VR Experiences' | 'Illustrated Comics';
   cover: string;
   rating: number;
   views?: number;
@@ -162,6 +162,7 @@ export interface HentaiCatalogEntry {
   isPlayable: boolean;
   watchHref?: string;
   details?: string;
+  classification?: import('./contentClassifier').ClassificationMetadata;
 }
 
 export interface RecommendationGroup {
@@ -1396,26 +1397,34 @@ class StashBackendService {
     totalCount: number;
     items: HentaiCatalogEntry[];
   }> {
-    const subcat = options.subcat || 'All';
+    const { classifyAdultVisualContent, mapCategoryToUiLabel } = await import('./contentClassifier');
+    const rawSubcat = options.subcat || 'All';
+    const subcatAliasMap: Record<string, string> = {
+      'Playable Adult Animation': 'Illustrated Comics',
+      'Hentai OVAs': 'Hentai Anime (2D)',
+      '3D CGI': '3D CGI Animation',
+      'VR Hentai': '3D VR Experiences',
+    };
+    const subcat = subcatAliasMap[rawSubcat] || rawSubcat;
     const page = options.page || 1;
     const qLower = (options.q || '').trim().toLowerCase();
 
     const rgSearch =
-      subcat === '3D CGI'
+      subcat === '3D CGI Animation'
         ? '3d animation sfm blender'
-        : subcat === 'VR Hentai'
-        ? 'vr hentai'
+        : subcat === '3D VR Experiences'
+        ? 'vr hentai 180'
         : 'hentai';
 
     const [cache, dbHentaiRes, db3DRes, rgHentaiRes, rg3dRes] = await Promise.all([
       this.syncLibrary(),
-      subcat === 'Playable Adult Animation'
+      subcat === 'Illustrated Comics'
         ? Promise.resolve({ count: 0, scenes: [] as StashDbSceneItem[] })
         : fetchStashDbScenes({
             page,
             perPage: 16,
             query: options.q,
-            tagIds: subcat === '3D CGI' ? [STASHDB_TAG_IDS.THREE_D] : [STASHDB_TAG_IDS.HENTAI],
+            tagIds: subcat === '3D CGI Animation' ? [STASHDB_TAG_IDS.THREE_D] : [STASHDB_TAG_IDS.HENTAI],
             sort: 'DATE',
           }).catch(() => ({ count: 0, scenes: [] as StashDbSceneItem[] })),
       subcat === 'All'
@@ -1427,7 +1436,7 @@ class StashBackendService {
             sort: 'DATE',
           }).catch(() => ({ count: 0, scenes: [] as StashDbSceneItem[] }))
         : Promise.resolve({ count: 0, scenes: [] as StashDbSceneItem[] }),
-      subcat !== 'Playable Adult Animation'
+      subcat !== 'Illustrated Comics'
         ? fetchRedGifsVideos({
             query: options.q?.trim() ? `${options.q.trim()} ${rgSearch}` : rgSearch,
             page,
@@ -1435,7 +1444,7 @@ class StashBackendService {
             order: 'top28',
           }).catch(() => ({ items: [], creators: [], total: 0 }))
         : Promise.resolve({ items: [], creators: [], total: 0 }),
-      subcat === 'All' || subcat === '3D CGI'
+      subcat === 'All' || subcat === '3D CGI Animation'
         ? fetchRedGifsVideos({
             query: options.q?.trim() ? `${options.q.trim()} sfm 3d` : 'sfm 3d',
             page,
@@ -1447,109 +1456,122 @@ class StashBackendService {
 
     const items: HentaiCatalogEntry[] = [];
     const seen = new Set<string>();
+    const seenTitles = new Set<string>();
 
-    // 1. Playable Cine18 Adult Animation (Savita Bhabhi etc.)
-    if ((subcat === 'All' || subcat === 'Playable Adult Animation') && page === 1) {
+    const pushClassified = (entry: Omit<HentaiCatalogEntry, 'subType' | 'classification'>, sourceProvider: string, playbackUrl?: string) => {
+      const titleKey = normalizeTitleKey(entry.title);
+      if (seen.has(entry.id) || (titleKey && seenTitles.has(titleKey))) return;
+
+      const meta = classifyAdultVisualContent({
+        id: entry.id,
+        title: entry.title,
+        studio: entry.studio,
+        tags: entry.tags,
+        details: entry.synopsis || entry.details,
+        sourceProvider,
+        playbackUrl: playbackUrl || entry.watchHref,
+        isPlayable: entry.isPlayable,
+      });
+
+      const uiLabel = mapCategoryToUiLabel(meta.content_category);
+      if (uiLabel === 'AI Adult Videos') return; // AI videos belong to their dedicated /ai-videos section
+      if (subcat !== 'All' && uiLabel !== subcat) return;
+
+      seen.add(entry.id);
+      if (titleKey) seenTitles.add(titleKey);
+      items.push({
+        ...entry,
+        subType: uiLabel,
+        classification: meta,
+      });
+    };
+
+    // 1. Playable 2D Illustrated Comics (Savita Bhabhi / Desi Comic Series — isolated into Illustrated Comics!)
+    if ((subcat === 'All' || subcat === 'Illustrated Comics') && page === 1) {
       for (const v of cache.cineAnimationVideos) {
         if (qLower && !v.title.toLowerCase().includes(qLower)) continue;
         const id = `cine18-${v.uid}`;
-        seen.add(id);
-        items.push({
-          id,
-          title: v.title,
-          studio: v.channelName,
-          subType: 'Playable Adult Animation',
-          cover: v.banner_img || v.portrait_img || '',
-          rating: v.rating || 4.7,
-          views: v.total_views || 15000,
-          synopsis: v.description || v.preview_text || 'Playable 18+ adult comic & animation episode.',
-          tags: ['Playable 18+ Animation', v.channelName],
-          isPlayable: true,
-          watchHref: `/watch/${id}`,
-        });
+        pushClassified(
+          {
+            id,
+            title: v.title,
+            studio: v.channelName,
+            cover: v.banner_img || v.portrait_img || '',
+            rating: v.rating || 4.7,
+            views: v.total_views || 15000,
+            synopsis: v.description || v.preview_text || 'Playable 18+ illustrated adult comic episode.',
+            tags: ['Illustrated Comic', '2D Comic', v.channelName],
+            isPlayable: true,
+            watchHref: `/watch/${id}`,
+          },
+          'cine18_comics',
+          `/watch/${id}`
+        );
       }
     }
 
-    // 2. Playable RedGIFs Hentai & 3D CGI / SFM Clips
+    // 2. Playable RedGIFs Hentai 2D, 3D CGI / SFM & 3D VR Clips (strictly classified, never forced)
     for (const rg of [...rgHentaiRes.items, ...rg3dRes.items]) {
-      if (seen.has(rg.id)) continue;
-      seen.add(rg.id);
-      const lowerCombo = `${rg.title} ${rg.tags.join(' ')}`.toLowerCase();
-      const is3D = /(3d|sfm|blender|cgi|render)/.test(lowerCombo);
-      const isVrH = /(vr|180|360)/.test(lowerCombo);
-      const computedType: HentaiCatalogEntry['subType'] =
-        subcat === '3D CGI'
-          ? '3D CGI'
-          : isVrH
-          ? 'VR Hentai'
-          : is3D
-          ? '3D CGI'
-          : 'Hentai OVAs';
-
-      if (subcat !== 'All' && subcat !== computedType) continue;
-      items.push({
-        id: rg.id,
-        title: rg.title,
-        studio: rg.displayName,
-        subType: computedType,
-        cover: rg.poster || rg.thumbnail,
-        rating: 4.8,
-        views: rg.views,
-        synopsis: rg.description,
-        tags: rg.tags.slice(0, 5),
-        isPlayable: true,
-        watchHref: `/watch/${rg.id}`,
-        details: rg.description,
-      });
+      pushClassified(
+        {
+          id: rg.id,
+          title: rg.title,
+          studio: rg.displayName,
+          cover: rg.poster || rg.thumbnail,
+          rating: 4.8,
+          views: rg.views,
+          synopsis: rg.description,
+          tags: rg.tags.slice(0, 5),
+          isPlayable: true,
+          watchHref: `/watch/${rg.id}`,
+          details: rg.description,
+        },
+        'redgifs',
+        rg.hdUrl || `/watch/${rg.id}`
+      );
     }
 
-    // 3. StashDB Hentai & 3D Scenes
+    // 3. StashDB Hentai 2D & 3D CGI Scenes
     const matchedHentai = await this.matchStashDbScenes(dbHentaiRes.scenes);
     for (const sc of matchedHentai) {
-      if (seen.has(sc.id)) continue;
-      seen.add(sc.id);
-      const isVrHentai = sc.studioName.toLowerCase().includes('vr') || sc.tags.some((t) => /vr/i.test(t));
-      const computedType: HentaiCatalogEntry['subType'] =
-        subcat === '3D CGI'
-          ? '3D CGI'
-          : isVrHentai
-          ? 'VR Hentai'
-          : 'Hentai OVAs';
-      if (subcat !== 'All' && subcat !== computedType && !(subcat === 'Hentai OVAs' && computedType === 'VR Hentai')) {
-        continue;
-      }
-      items.push({
-        id: sc.id,
-        title: sc.title,
-        studio: sc.studioName,
-        subType: computedType,
-        cover: sc.image,
-        rating: 4.8,
-        synopsis: sc.details,
-        tags: sc.tags.length > 0 ? sc.tags : ['Hentai', '18+ Consenting Adults'],
-        isPlayable: Boolean(sc.isPlayable && sc.matchedSceneId),
-        watchHref: sc.matchedSceneId ? toStashWatchPath(sc.matchedSceneId) : undefined,
-        details: sc.details,
-      });
-    }
-
-    if (subcat === 'All') {
-      const matched3d = await this.matchStashDbScenes(db3DRes.scenes);
-      for (const sc of matched3d) {
-        if (seen.has(sc.id)) continue;
-        seen.add(sc.id);
-        items.push({
+      const watchHref = sc.matchedSceneId ? toStashWatchPath(sc.matchedSceneId) : undefined;
+      pushClassified(
+        {
           id: sc.id,
           title: sc.title,
           studio: sc.studioName,
-          subType: '3D CGI',
           cover: sc.image,
           rating: 4.8,
           synopsis: sc.details,
-          tags: sc.tags.length > 0 ? sc.tags : ['3D', 'VR/CGI'],
+          tags: sc.tags.length > 0 ? sc.tags : ['Hentai', '18+ Consenting Adults'],
           isPlayable: Boolean(sc.isPlayable && sc.matchedSceneId),
-          watchHref: sc.matchedSceneId ? toStashWatchPath(sc.matchedSceneId) : undefined,
-        });
+          watchHref,
+          details: sc.details,
+        },
+        'stashdb',
+        watchHref
+      );
+    }
+
+    if (subcat === 'All' || subcat === '3D CGI Animation') {
+      const matched3d = await this.matchStashDbScenes(db3DRes.scenes);
+      for (const sc of matched3d) {
+        const watchHref = sc.matchedSceneId ? toStashWatchPath(sc.matchedSceneId) : undefined;
+        pushClassified(
+          {
+            id: sc.id,
+            title: sc.title,
+            studio: sc.studioName,
+            cover: sc.image,
+            rating: 4.8,
+            synopsis: sc.details,
+            tags: sc.tags.length > 0 ? sc.tags : ['3D', 'CGI'],
+            isPlayable: Boolean(sc.isPlayable && sc.matchedSceneId),
+            watchHref,
+          },
+          'stashdb',
+          watchHref
+        );
       }
     }
 
@@ -1614,6 +1636,19 @@ class StashBackendService {
 
     const galleries: StashGallery[] = [...personalGals];
     const seenIds = new Set(galleries.map((g) => g.id));
+    const seenImageKeys = new Set<string>();
+
+    const dedupeImages = (raw: string[]): string[] => {
+      const unique: string[] = [];
+      for (const url of raw) {
+        if (!url) continue;
+        const normKey = url.split('?')[0].toLowerCase();
+        if (seenImageKeys.has(normKey)) continue;
+        seenImageKeys.add(normKey);
+        unique.push(url);
+      }
+      return unique;
+    };
 
     // 1. StashDB Performer Portrait Sets
     for (const p of topFemales.performers.filter((x) => (x.images?.length || 0) >= 2).slice(0, 8)) {
@@ -1653,23 +1688,21 @@ class StashBackendService {
       });
     }
 
-    // 3. RedGIFs Real Photography Sets (grouped cleanly so Photography works even without STASHDB_API_KEY!)
-    const rgPhotos = rgImagesGeneral.items.map((x) => x.hdUrl || x.poster || x.thumbnail).filter(Boolean);
-    if (rgPhotos.length >= 2) {
-      // Group into thematic sets of 6 real images + individual featured creator galleries
-      for (let idx = 0; idx < Math.min(rgImagesGeneral.items.length, 18); idx += 6) {
+    // 3. RedGIFs Real Photography Sets (type=i genuine image galleries, deduplicated)
+    if (rgImagesGeneral.items.length >= 2) {
+      for (let idx = 0; idx < Math.min(rgImagesGeneral.items.length, 24); idx += 6) {
         const chunk = rgImagesGeneral.items.slice(idx, idx + 6);
-        const imgs = Array.from(new Set(chunk.map((x) => x.hdUrl || x.poster || x.thumbnail).filter(Boolean)));
+        const imgs = dedupeImages(chunk.map((x) => x.hdUrl || x.poster || x.thumbnail).filter(Boolean));
         if (imgs.length === 0) continue;
         const lead = chunk[0];
-        const setNum = Math.floor(idx / 6) + 1 + (page - 1) * 3;
+        const setNum = Math.floor(idx / 6) + 1 + (page - 1) * 4;
         const id = `gal-rg-photo-p${page}-${setNum}`;
         if (seenIds.has(id)) continue;
         seenIds.add(id);
         galleries.push({
           id,
-          title: `${lead.displayName} & Creators — Adult Photo Set #${setNum}`,
-          details: `Performer Portrait Sets • Curated Photography Collection • ${imgs.length} High-Res Photos`,
+          title: `${lead.displayName} & Creators — Photo Gallery #${setNum}`,
+          details: `Source: RedGIFs Image Gallery • ${imgs.length} High-Res Photos`,
           date: lead.createdAt || '2026-11-26',
           imageCount: imgs.length,
           rating: 4.9,
@@ -1681,16 +1714,16 @@ class StashBackendService {
       }
     }
 
-    const rgArtPhotos = rgImagesCosplay.items.map((x) => x.hdUrl || x.poster || x.thumbnail).filter(Boolean);
+    const rgArtPhotos = dedupeImages(rgImagesCosplay.items.map((x) => x.hdUrl || x.poster || x.thumbnail).filter(Boolean));
     if (rgArtPhotos.length > 0) {
-      const imgs = Array.from(new Set(rgArtPhotos)).slice(0, 12);
+      const imgs = rgArtPhotos.slice(0, 12);
       const id = `gal-rg-art-p${page}`;
       if (!seenIds.has(id)) {
         seenIds.add(id);
         galleries.push({
           id,
           title: `Hentai, Cosplay & 3D Art Photography (Set ${page})`,
-          details: `Hentai & Anime CG • ${imgs.length} curated illustrations & cosplay photos`,
+          details: `Source: RedGIFs Artwork • ${imgs.length} curated illustrations & cosplay photos`,
           date: '2026-11-26',
           imageCount: imgs.length,
           rating: 4.8,
@@ -1702,8 +1735,8 @@ class StashBackendService {
       }
     }
 
-    // 4. StashDB Hentai & VR Stills
-    const hentaiImgs = hentaiScenes.scenes.flatMap((s) => s.images).filter(Boolean);
+    // 4. StashDB Hentai & VR Stills (only genuine StashDB image sets)
+    const hentaiImgs = dedupeImages(hentaiScenes.scenes.flatMap((s) => s.images).filter(Boolean));
     if (hentaiImgs.length > 0) {
       const id = `gal-hentai-cg-p${page}`;
       if (!seenIds.has(id)) {
@@ -1711,19 +1744,19 @@ class StashBackendService {
         galleries.push({
           id,
           title: 'Hentai & Adult Anime CG Artwork Collection',
-          details: `Hentai & Anime CG • ${hentaiImgs.length} indexed illustrations & scene stills`,
+          details: `Source: StashDB Hentai Archives • ${hentaiImgs.length} indexed illustrations`,
           date: '2026-11-24',
           imageCount: hentaiImgs.length,
           rating: 4.8,
           coverPath: hentaiImgs[0],
-          images: Array.from(new Set(hentaiImgs)).slice(0, 12),
+          images: hentaiImgs.slice(0, 12),
           studio: { id: 'std-hentai-cg', name: 'StashDB Hentai Archives' },
           tags: [{ id: 'cat-hentai', name: 'Hentai & Anime CG' }],
         });
       }
     }
 
-    const vrImgs = vrScenes.scenes.flatMap((s) => s.images).filter(Boolean);
+    const vrImgs = dedupeImages(vrScenes.scenes.flatMap((s) => s.images).filter(Boolean));
     if (vrImgs.length > 0) {
       const id = `gal-vr-stills-p${page}`;
       if (!seenIds.has(id)) {
@@ -1731,48 +1764,14 @@ class StashBackendService {
         galleries.push({
           id,
           title: 'VR 180°/360° & Stereoscopic Stills',
-          details: `VR & 3D Stills • ${vrImgs.length} VR production captures`,
+          details: `Source: StashDB VR Studios • ${vrImgs.length} VR production captures`,
           date: '2026-11-24',
           imageCount: vrImgs.length,
           rating: 4.9,
           coverPath: vrImgs[0],
-          images: Array.from(new Set(vrImgs)).slice(0, 12),
+          images: vrImgs.slice(0, 12),
           studio: { id: 'std-vr-stills', name: 'StashDB VR Studios' },
           tags: [{ id: 'cat-vr', name: 'VR & 3D Stills' }],
-        });
-      }
-    }
-
-    // 5. Real Cine18 Studio & Star Photo Portfolios (Page 1+ ensures non-empty galleries everywhere!)
-    if (page === 1) {
-      const byStudio = new Map<string, string[]>();
-      for (const v of [...cache.cineAdultVideos, ...cache.cineSeriesVideos]) {
-        const imgs = [v.portrait_img, v.banner_img].filter((u) => Boolean(u && u.startsWith('http')));
-        if (imgs.length === 0) continue;
-        const list = byStudio.get(v.channelName) || [];
-        list.push(...imgs);
-        byStudio.set(v.channelName, list);
-      }
-      let studioIdx = 0;
-      for (const [studioName, rawImgs] of Array.from(byStudio.entries())) {
-        if (studioIdx >= 10) break;
-        const imgs = Array.from(new Set(rawImgs)).slice(0, 12);
-        if (imgs.length < 3) continue;
-        studioIdx++;
-        const id = `gal-cine18-${normalizeTitleKey(studioName).replace(/\s+/g, '-')}`;
-        if (seenIds.has(id)) continue;
-        seenIds.add(id);
-        galleries.push({
-          id,
-          title: `${studioName} — Featured Lookbook & Stills`,
-          details: `Adult Scene Stills • Official ${studioName} portfolio (${imgs.length} High-Res Stills)`,
-          date: '2026-11-26',
-          imageCount: imgs.length,
-          rating: 4.7,
-          coverPath: imgs[0],
-          images: imgs,
-          studio: { id: `cine-gal-${studioIdx}`, name: studioName },
-          tags: [{ id: 'cat-stills', name: 'Adult Scene Stills' }],
         });
       }
     }

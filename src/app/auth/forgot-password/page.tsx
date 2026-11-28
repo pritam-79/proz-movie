@@ -3,14 +3,19 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Logo from '@/components/brand/Logo';
+import { useAuth } from '@/context/AuthContext';
 import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
+  const { requestPasswordReset } = useAuth();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const res = await requestPasswordReset(email);
+    setStatusMsg(res.message || null);
     setSubmitted(true);
   };
 

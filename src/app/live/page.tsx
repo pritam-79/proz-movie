@@ -24,12 +24,17 @@ export default function LiveTvPage() {
   const [selectedLiveStream, setSelectedLiveStream] = useState<any | null>(null);
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [countryFilter, setCountryFilter] = useState('All');
+  const [languageFilter, setLanguageFilter] = useState('All');
+  const [recentStreams, setRecentStreams] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem('proz_live_favorites');
       if (saved) setFavorites(JSON.parse(saved));
+      const savedRecent = localStorage.getItem('proz_live_recent');
+      if (savedRecent) setRecentStreams(JSON.parse(savedRecent));
     } catch {}
 
     setLoadingStreams(true);
@@ -43,6 +48,42 @@ export default function LiveTvPage() {
       .catch(() => {})
       .finally(() => setLoadingStreams(false));
   }, []);
+
+  const selectLiveChannel = (ch: any) => {
+    setSelectedLiveStream(ch);
+    setRecentStreams((prev) => {
+      const next = [ch, ...prev.filter((x) => x.id !== ch.id)].slice(0, 8);
+      try {
+        localStorage.setItem('proz_live_recent', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
+  const availableCountries = useMemo(() => {
+    const set = new Set<string>(['All']);
+    for (const s of iptvStreams) {
+      if (s.country) set.add(String(s.country).toUpperCase());
+    }
+    return Array.from(set).slice(0, 20);
+  }, [iptvStreams]);
+
+  const availableLanguages = useMemo(() => {
+    const set = new Set<string>(['All']);
+    for (const s of iptvStreams) {
+      if (s.language) set.add(String(s.language));
+    }
+    return Array.from(set).slice(0, 15);
+  }, [iptvStreams]);
+
+  const filteredIptvStreams = useMemo(() => {
+    return iptvStreams.filter((s) => {
+      const matchCountry = countryFilter === 'All' || String(s.country || '').toUpperCase() === countryFilter;
+      const matchLang = languageFilter === 'All' || String(s.language || '') === languageFilter;
+      const matchQ = !search.trim() || String(s.title || '').toLowerCase().includes(search.toLowerCase());
+      return matchCountry && matchLang && matchQ;
+    });
+  }, [iptvStreams, countryFilter, languageFilter, search]);
 
   const toggleFavorite = (id: string) => {
     const updated = favorites.includes(id)
@@ -143,9 +184,47 @@ export default function LiveTvPage() {
               <span>
                 {loadingStreams
                   ? 'Loading Live HLS Channels...'
-                  : `Playable Live HLS Channels (${iptvStreams.length})`}
+                  : `Playable Live HLS Channels (${filteredIptvStreams.length})`}
               </span>
             </h3>
+            <div className="grid grid-cols-2 gap-1.5">
+              <select
+                value={countryFilter}
+                onChange={(e) => setCountryFilter(e.target.value)}
+                className="px-2 py-1 rounded-lg glass-input text-[11px]"
+              >
+                {availableCountries.map((c) => (
+                  <option key={c} value={c}>
+                    {c === 'All' ? 'All Countries' : c}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={languageFilter}
+                onChange={(e) => setLanguageFilter(e.target.value)}
+                className="px-2 py-1 rounded-lg glass-input text-[11px]"
+              >
+                {availableLanguages.map((l) => (
+                  <option key={l} value={l}>
+                    {l === 'All' ? 'All Languages' : l}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {recentStreams.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                <span className="text-[10px] text-proz-grey shrink-0">Recent:</span>
+                {recentStreams.slice(0, 4).map((rc) => (
+                  <button
+                    key={rc.id}
+                    onClick={() => selectLiveChannel(rc)}
+                    className="px-2 py-0.5 rounded-full bg-proz-purple/15 border border-proz-purple/30 text-[10px] text-proz-white shrink-0 truncate max-w-[110px]"
+                  >
+                    {rc.title}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1">
               {loadingStreams && iptvStreams.length === 0 && (
                 <div className="space-y-2 py-2">
@@ -157,12 +236,12 @@ export default function LiveTvPage() {
                   ))}
                 </div>
               )}
-              {iptvStreams.map((ch) => {
+              {filteredIptvStreams.map((ch) => {
                 const active = selectedLiveStream?.id === ch.id;
                 return (
                   <button
                     key={ch.id}
-                    onClick={() => setSelectedLiveStream(ch)}
+                    onClick={() => selectLiveChannel(ch)}
                     className={`w-full p-2.5 rounded-xl flex items-center justify-between gap-2 text-left transition ${
                       active
                         ? 'bg-gradient-to-r from-proz-purple/25 to-orange-500/15 border border-proz-purple/60'

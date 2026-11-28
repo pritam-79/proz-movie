@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionName;
             } catch (Exception e) {
-                return "0.09.02";
+                return "0.09.03";
             }
         }
 
@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 return pInfo.versionCode;
             } catch (Exception e) {
-                return 11;
+                return 12;
             }
         }
     }
@@ -147,7 +147,7 @@ public class MainActivity extends Activity {
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Set modern mobile User-Agent to avoid web engine compatibility blocks
-        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.09.02";
+        String customUa = "Mozilla/5.0 (Linux; Android " + Build.VERSION.RELEASE + "; " + Build.MODEL + ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36 ProzMovieApp/0.09.03";
         settings.setUserAgentString(customUa);
 
         // Hardware acceleration
@@ -397,7 +397,7 @@ public class MainActivity extends Activity {
             try {
                 URL url = new URL(apkUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.09.02");
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) ProzMovieApp/0.09.03");
                 conn.setConnectTimeout(15000);
                 conn.setReadTimeout(30000);
                 conn.connect();
@@ -415,7 +415,7 @@ public class MainActivity extends Activity {
                 if (downloadDir == null) {
                     downloadDir = getCacheDir();
                 }
-                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.09.02.apk");
+                apkFile = new File(downloadDir, "PROZ-MOVIE-v0.09.03.apk");
                 if (apkFile.exists()) {
                     apkFile.delete();
                 }

@@ -199,8 +199,20 @@ export async function diagnosticFetch(
   url: string,
   init?: RequestInit & { retries?: number; category?: DiagnosticCategory }
 ): Promise<Response> {
-  const maxRetries = init?.retries ?? (bugDetector.isAutoRecoveryEnabled() ? 2 : 0);
+  if (!url || (!/^https?:\/\//i.test(url) && !url.startsWith('/'))) {
+    const err = new Error(`Invalid request URL: ${String(url)}`);
+    bugDetector.report({
+      severity: 'error',
+      category: init?.category ?? 'api',
+      source: String(url || 'empty-url'),
+      message: err.message,
+    });
+    throw err;
+  }
+
+  const maxRetries = Math.min(init?.retries ?? (bugDetector.isAutoRecoveryEnabled() ? 2 : 0), 3);
   const category = init?.category ?? 'api';
+  const PERMANENT_STATUSES = new Set([400, 401, 403, 404, 405, 410, 422]);
   let lastError: any = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -219,7 +231,8 @@ export async function diagnosticFetch(
         });
       }
 
-      if (res.ok || res.status < 500 || attempt === maxRetries) {
+      const shouldRetryStatus = !res.ok && !PERMANENT_STATUSES.has(res.status) && (res.status >= 500 || res.status === 429);
+      if (res.ok || !shouldRetryStatus || attempt === maxRetries) {
         if (!res.ok) {
           bugDetector.report({
             severity: res.status >= 500 ? 'error' : 'warn',
@@ -234,7 +247,8 @@ export async function diagnosticFetch(
         return res;
       }
 
-      await new Promise((r) => setTimeout(r, 350 * (attempt + 1)));
+      const backoffMs = Math.min(400 * Math.pow(2, attempt), 4000);
+      await new Promise((r) => setTimeout(r, backoffMs));
     } catch (err: any) {
       lastError = err;
       if (attempt === maxRetries) {
@@ -246,7 +260,8 @@ export async function diagnosticFetch(
         });
         throw err;
       }
-      await new Promise((r) => setTimeout(r, 400 * (attempt + 1)));
+      const backoffMs = Math.min(400 * Math.pow(2, attempt), 4000);
+      await new Promise((r) => setTimeout(r, backoffMs));
     }
   }
 

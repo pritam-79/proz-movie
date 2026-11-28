@@ -10,8 +10,8 @@ android {
         applicationId = "com.prozmovie.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 11
-        versionName = "0.09.02"
+        versionCode = 12
+        versionName = "0.09.03"
     }
 
     signingConfigs {
